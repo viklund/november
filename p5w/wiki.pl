@@ -143,5 +143,4 @@ sub edit_page {
 }
 
 # start the server on port 8080
-my $pid = Wiki->new(8080)->background();
-print "Use 'kill $pid' to stop server.\n";
+Wiki->new(8080)->run();
