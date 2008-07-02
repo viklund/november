@@ -23,9 +23,12 @@
 
 * Images (and other files)
 
-* Formatting
+* Text formatting
 
 * Unicode support
+
+* A decent default CSS layout
+** Pluggable layouts
 
 == Desirable features
 (without which the wiki is still manageable, but maybe less enjoyable)
