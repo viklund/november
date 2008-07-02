@@ -51,14 +51,27 @@ sub escape {
     return $escapeevil->filtered_html;
 }
 
+sub exists_wiki_page {
+    my ($page) = @_;
+
+    return $page && -e $CONTENT_PATH . $page;
+}
+
 sub build_wiki_links {
     my ($text) = @_;
 
-    $text =~ s{ \[\[   # starting marker
-                (\w*)  # alphanumerics and underscores
-                \]\]   # ending marker
-              }
-              {<a href="/view?page=$1">$1</a>}xg;
+    while ( $text =~ m{ \[\[   # starting marker
+                        (\w*)  # alphanumerics and underscores
+                        \]\]   # ending marker
+                      }x ) {
+        my $page = $1;
+
+        my $link = exists_wiki_page( $page )
+                   ? "<a href='/view?page=$1'>$1</a>"
+                   : "<a href='/edit?page=$1' style='color: red'>$1</a>";
+
+        $text =~ s{ \[\[ (\w*) \]\] }{$link}x;
+    }
 
     return $text;
 }
@@ -69,8 +82,15 @@ sub view_page {
 
     my $page = $cgi->param('page') || 'Main_Page';
 
-    if ( $page eq '' || !-e $CONTENT_PATH . $page ) {
-        print not_found($cgi);
+    if ( !exists_wiki_page($page) ) {
+        print "HTTP/1.0 200 OK\r\n";
+        print $cgi->header,
+              $cgi->start_html($page . ' not found'),
+              $cgi->h1($page),
+              $cgi->a({href=>"/edit?page=$page"},"Create"),
+              $cgi->p,
+              "The page $page does not exist.",
+              $cgi->end_html;
         return;
     }
 
@@ -88,11 +108,16 @@ sub edit_page {
     my ($cgi) = @_;
     return if !ref $cgi;
 
-    my $page = $cgi->param('page') || 'Main_Page';
+    my $page = $cgi->param('page') or return;
 
-    if ( $page eq '' || !-e $CONTENT_PATH . $page ) {
-        print not_found($cgi);
-        return;
+    my $action = "Editing";
+    my $old_content = '';
+
+    if ( !exists_wiki_page($page) ) {
+        $action = "Creating";
+    }
+    else {
+        $old_content = read_file($CONTENT_PATH . $page);
     }
 
     if ( my $article_text = $cgi->param('articletext') ) {
@@ -104,10 +129,11 @@ sub edit_page {
     print "HTTP/1.0 200 OK\r\n";
     print $cgi->header,
           $cgi->start_html($page),
-          $cgi->h1("Editing $page"),
+          $cgi->h1("$action $page"),
           $cgi->start_form,
+          $cgi->hidden('page', $page),
           $cgi->textarea( -name => 'articletext',
-                          -default => scalar read_file($CONTENT_PATH . $page),
+                          -default => $old_content,
                           -rows => 10,
                           -columns => 50 ),
           $cgi->p,
