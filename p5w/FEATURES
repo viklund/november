@@ -14,7 +14,8 @@
 
 * The concept of a user "owning" an edit
 
-* Collision prevention (at least a warning)
+* Collision prevention -- the second person simultaneously editing a page
+  should get at least a warning
 
 * Article history
 ** Diffs between arbritary versions (a la Mediawiki)

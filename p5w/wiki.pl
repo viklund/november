@@ -6,6 +6,9 @@ package Wiki;
 use HTTP::Server::Simple::CGI;
 use HTML::EscapeEvil;
 use File::Slurp;
+use DateTime;
+use Data::Dumper;
+
 use base qw(HTTP::Server::Simple::CGI);
 
 my %dispatch = (
@@ -14,6 +17,7 @@ my %dispatch = (
 );
 
 my $CONTENT_PATH = 'wiki-content/';
+my $RECENT_CHANGES_PATH = 'wiki-recent-changes';
 
 sub not_found {
     my ($cgi) = @_;
@@ -76,6 +80,28 @@ sub build_wiki_links {
     return $text;
 }
 
+sub read_recent_changes {
+    return [] unless -e $RECENT_CHANGES_PATH;
+    return eval( read_file( $RECENT_CHANGES_PATH ) );
+}
+
+sub write_recent_changes {
+    my ($recent_changes_ref) = @_;
+
+    $Data::Dumper::Terse = 1;
+    $Data::Dumper::Indent = 1;
+    write_file( $RECENT_CHANGES_PATH, Dumper( $recent_changes_ref ) );
+}
+
+sub add_recent_change {
+    my ($page, $contents) = @_;
+
+    my @recent_changes = read_recent_changes();
+    unshift @recent_changes, # put most recent first
+            [ $page, DateTime->now()->epoch(), $contents ];
+    write_recent_changes( \@recent_changes );
+}
+
 sub view_page {
     my ($cgi) = @_;
     return if !ref $cgi;
@@ -122,6 +148,7 @@ sub edit_page {
 
     if ( my $article_text = $cgi->param('articletext') ) {
         write_file( $CONTENT_PATH . $page, $article_text );
+        add_recent_change( $page, $article_text );
 
         return view_page($cgi);
     }
