@@ -1,0 +1,37 @@
+== Essential features
+(without which not even we would consider it a wiki)
+
+* Linking (2008-06-28)
+* Editing (2008-07-02)
+
+== Important features
+(without which other people might not consider it a wiki)
+
+* Creating new pages (without resorting to URL rewriting)
+
+* User authentication
+* Logging in, logging out
+
+* The concept of a user "owning" an edit
+
+* Collision prevention (at least a warning)
+
+* Article history
+** Diffs between arbritary versions (a la Mediawiki)
+
+* Recent changes
+
+* Images (and other files)
+
+* Formatting
+
+* Unicode support
+
+== Desirable features
+(without which the wiki is still manageable, but maybe less enjoyable)
+
+* Contents (summarizing the headings in the article)
+
+* Good merging when conflicts occur
+
+* A plug-in system
