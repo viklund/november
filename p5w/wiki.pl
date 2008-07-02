@@ -14,6 +14,7 @@ use base qw(HTTP::Server::Simple::CGI);
 my %dispatch = (
     '/view' => \&view_page,
     '/edit' => \&edit_page,
+    '/recentchanges' => \&list_recent_changes,
 );
 
 my $CONTENT_PATH = 'wiki-content/';
@@ -61,6 +62,14 @@ sub exists_wiki_page {
     return $page && -e $CONTENT_PATH . $page;
 }
 
+sub make_link {
+    my ($page) = @_;
+
+    return exists_wiki_page( $page )
+           ? "<a href='/view?page=$page'>$page</a>"
+           : "<a href='/edit?page=$page' style='color: red'>$page</a>";
+}
+
 sub build_wiki_links {
     my ($text) = @_;
 
@@ -69,10 +78,7 @@ sub build_wiki_links {
                         \]\]   # ending marker
                       }x ) {
         my $page = $1;
-
-        my $link = exists_wiki_page( $page )
-                   ? "<a href='/view?page=$1'>$1</a>"
-                   : "<a href='/edit?page=$1' style='color: red'>$1</a>";
+        my $link = make_link($page);
 
         $text =~ s{ \[\[ (\w*) \]\] }{$link}x;
     }
@@ -96,7 +102,7 @@ sub write_recent_changes {
 sub add_recent_change {
     my ($page, $contents) = @_;
 
-    my @recent_changes = read_recent_changes();
+    my @recent_changes = @{read_recent_changes()};
     unshift @recent_changes, # put most recent first
             [ $page, DateTime->now()->epoch(), $contents ];
     write_recent_changes( \@recent_changes );
@@ -110,6 +116,8 @@ sub view_page {
 
     if ( !exists_wiki_page($page) ) {
         print "HTTP/1.0 200 OK\r\n";
+
+        my $title = $page . ' not found';
         print $cgi->header,
               $cgi->start_html($page . ' not found'),
               $cgi->h1($page),
@@ -153,10 +161,12 @@ sub edit_page {
         return view_page($cgi);
     }
 
+    my $title = $action . ' ' . $page;
+
     print "HTTP/1.0 200 OK\r\n";
     print $cgi->header,
-          $cgi->start_html($page),
-          $cgi->h1("$action $page"),
+          $cgi->start_html($title),
+          $cgi->h1($title),
           $cgi->start_form,
           $cgi->hidden('page', $page),
           $cgi->textarea( -name => 'articletext',
@@ -166,6 +176,26 @@ sub edit_page {
           $cgi->p,
           $cgi->submit,
           $cgi->end_form,
+          $cgi->end_html;
+}
+
+sub list_recent_changes {
+    my ($cgi) = @_;
+    return if !ref $cgi;
+
+    my @recent_changes = @{read_recent_changes()};
+
+    my $title = 'Recent changes';
+
+    my $list = [ map { make_link( $_->[0] )
+                       . ' was changed on ' . $_->[1]
+                       . ' by an anonymous gerbil' } @recent_changes ];
+
+    print "HTTP/1.0 200 OK\r\n";
+    print $cgi->header,
+          $cgi->start_html($title),
+          $cgi->h1($title),
+          $cgi->ul( $cgi->li($list) ),
           $cgi->end_html;
 }
 
