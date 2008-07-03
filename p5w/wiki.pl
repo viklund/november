@@ -70,7 +70,7 @@ sub make_link {
            : "<a href='/edit?page=$page' style='color: red'>$page</a>";
 }
 
-sub format {
+sub format_html {
     my ($text) = @_;
 
     while ( $text =~ m{ \[\[   # starting marker
@@ -137,7 +137,7 @@ sub view_page {
           $cgi->h1($page),
           $cgi->a({href=>"/edit?page=$page"},"Edit"),
           $cgi->p,
-          format(escape(scalar read_file($CONTENT_PATH . $page))),
+          format_html(escape(scalar read_file($CONTENT_PATH . $page))),
           $cgi->end_html;
 }
 
