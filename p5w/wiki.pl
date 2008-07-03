@@ -70,7 +70,7 @@ sub make_link {
            : "<a href='/edit?page=$page' style='color: red'>$page</a>";
 }
 
-sub build_wiki_links {
+sub format {
     my ($text) = @_;
 
     while ( $text =~ m{ \[\[   # starting marker
@@ -82,6 +82,9 @@ sub build_wiki_links {
 
         $text =~ s{ \[\[ (\w*) \]\] }{$link}x;
     }
+
+    # Add paragraphs
+    $text =~ s{\n\s*\n}{\n<p>}xg;
 
     return $text;
 }
@@ -134,7 +137,7 @@ sub view_page {
           $cgi->h1($page),
           $cgi->a({href=>"/edit?page=$page"},"Edit"),
           $cgi->p,
-          build_wiki_links(escape(scalar read_file($CONTENT_PATH . $page))),
+          format(escape(scalar read_file($CONTENT_PATH . $page))),
           $cgi->end_html;
 }
 
