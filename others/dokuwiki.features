@@ -1,0 +1,20 @@
+== Dokuwiki
+
+Wiki with a file-based storage enginge.
+
+* Page history
+    * Old versions of pages are stored in the 'attic' in gzipped form.
+    * Meta information stored in <id>.meta files
+    * Changelog stored in <id>.changelog
+    * And some info is stored in a global recent changes file...
+* Recent changes
+    * ... which gets read and parsed here
+* Text formatting
+    * Somekind of Parser/Lexer thingy, executed upon viewing
+* Conflict handling
+    * Locking pages upon editing
+    * Second user cant edit until lock i released (15 min is default)
+* Merging
+    * Shows diff, user gets to choose
+* Introspection (ability to configure the wiki by editing pages)
+* Permissions
