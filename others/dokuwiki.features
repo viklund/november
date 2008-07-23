@@ -13,7 +13,7 @@ Wiki with a file-based storage enginge.
     * Some kind of Parser/Lexer thingy, executed upon viewing
 * Conflict handling
     * Locking pages upon editing
-    * Second user can't edit until lock I released (15 min is default)
+    * Second user can't edit until lock is released (15 min is default)
 * Merging
     * Shows diff, user gets to choose
 * Introspection (ability to configure the wiki by editing pages)
