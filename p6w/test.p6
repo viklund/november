@@ -1,7 +1,7 @@
 #!perl6
 
 my @in;
-push @in, $_ while =$*IN;
+push @in, $_ for =$*IN;
 
 print "Content-type: text/html\r\n\r\n";
 
