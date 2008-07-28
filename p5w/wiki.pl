@@ -12,9 +12,9 @@ use Data::Dumper;
 use base qw(HTTP::Server::Simple::CGI);
 
 my %dispatch = (
-    '/view' => \&view_page,
-    '/edit' => \&edit_page,
-    '/recentchanges' => \&list_recent_changes,
+    'view' => \&view_page,
+    'edit' => \&edit_page,
+    'recentchanges' => \&list_recent_changes,
 );
 
 my $CONTENT_PATH = 'wiki-content/';
@@ -33,8 +33,8 @@ sub not_found {
 sub handle_request {
     my ($self, $cgi) = @_;
 
-    my $path = $cgi->path_info();
-    my $handler = $dispatch{$path};
+    my $action = $cgi->param('action') || 'view';
+    my $handler = $dispatch{$action};
 
     if (ref($handler) eq "CODE") {
         $handler->($cgi);
