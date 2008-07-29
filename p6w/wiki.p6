@@ -58,26 +58,26 @@ class Wiki {
         my $CONTENT_PATH = 'wiki-content/';
         my $page = $cgi.param('page') // 'Main_Page';
 
-#        if ( !exists_wiki_page($page) ) {
-#            print "HTTP/1.0 200 OK\r\n";
-#
-#            my $title = $page ~ ' not found';
-#            print $cgi.header,
-#                  $cgi.start_html($page ~ ' not found'),
-#                  $cgi.h1($page),
-#                  $cgi.a({href=>"/edit?page=$page"},"Create"),
-#                  $cgi.p,
-#                 "The page $page does not exist.",
-#                 $cgi.end_html;
-#            return;
-#        }
+        if !exists_wiki_page($page) {
+            print "HTTP/1.0 200 OK\r\n";
+
+            my $title = $page ~ ' not found';
+            print $cgi.header,
+                  $cgi.start_html($page ~ ' not found'),
+                  $cgi.h1($page),
+                  $cgi.a({href=>"/edit?page=$page"},"Create"),
+                  $cgi.p,
+                 "The page $page does not exist.",
+                 $cgi.end_html;
+            return;
+        }
 
         print $cgi.header,
               $cgi.start_html($page),
               $cgi.h1($page),
               $cgi.a((hash 'href', "/edit?page=$page"),"Edit"),
               $cgi.p,
-              format_html(escape(read_file($CONTENT_PATH ~ $page))),
+              format_html(escape(slurp($CONTENT_PATH ~ $page))),
               $cgi.end_html;
     }
 
@@ -86,23 +86,80 @@ class Wiki {
         return True;
     }
 
-    sub escape($text) {
-        # TODO: Implement
+    sub escape($text is rw) {
+        # HTML::EscapeEvil of course does this much better, deriving
+        # HTML::Parser. Here we settle (for now) for the more crude
+        # escape-everything solution.
+#        $text ~~ s :g / \& /&amp;/;
+#        $text ~~ s :g / \< /&lt;/;
+#        $text ~~ s :g / \> /&gt;/;
+#        $text ~~ s :g / \" /&quot;/;
+#        $text ~~ s :g / \' /&#039;/;
+
+        # Oh, and you can't substitute using regexes yet, so we'll go
+        # it with by stitching strings in a sub.
+        $text = replace_all( '&', '&amp;',
+                replace_all( '<', '&lt;',
+                replace_all( '>', '&gt;',
+                replace_all( '"', '&quot;',
+                replace_all( "'", '&#039;', $text )))));
+
         return $text;
     }
 
-    sub read_file($file) {
-        # TODO: Implement
-        return "This is the example content";
+    sub replace_all($char, $replacement, $text is rw) {
+        while index($text, $char) !~~ Failure {
+            my $pos = index($text, $char);
+            $text = substr($text, 0, $pos)
+                    ~ $replacement
+                    ~ substr($text, $pos+1);
+        }
+        return $text;
     }
 
-    sub format_html($text) {
-        # TODO: Implement
+    sub format_html($text is rw) {
+        # we'd like to do $text ~~ m{ \[\[ (\w*) \]\] }
+        # but that syntax is not implemented yet
+
+        while (my $opening = index($text, '[[')) !~~ Failure
+              && (my $closing = index($text, ']]')) !~~ Failute
+              && $opening < $closing {
+
+            my $alnum = ('a'..'z', 'A'..'Z', '0'..'9').join('');
+            my $substitute = True;
+            for $opening+2..$closing-1 -> $pos {
+                if index($alnum, substr($text, $pos, 1)) ~~ Failure {
+                    $substitute = False;
+                }
+            }
+
+            if $substitute {
+                my $page = substr($text, $opening+2, $closing-1-($opening+2));
+                my $link = make_link($page);
+
+                $text = substr($text, 0, $opening)
+                        ~ $link
+                        ~ substr($text, $closing+2);
+            }
+        }
+
+        # Add paragraphs
+#        $text ~~ s:g{\n\s*\n}{\n<p>};
+
         return $text;
+    }
+
+    sub make_link($page) {
+        # TODO: Implement
+        return "look, a link!";
     }
 
     sub not_found($cgi) {
-        return "the unbearable lightness of being";
+        return "HTTP/1.0 404 Not found\r\n",
+            $cgi.header,
+            $cgi.start_html('Not found'),
+            $cgi.h1('Not found'),
+            $cgi.end_html;
     }
 }
 
