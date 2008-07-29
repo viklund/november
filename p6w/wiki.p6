@@ -93,7 +93,17 @@ class Wiki {
 
     sub read_file($file) {
         # TODO: Implement
-        return "This is the example content";
+        my $text = '';
+        try {
+            my $fh = open($file);
+            while !$fh.eof {
+                $text ~= $fh.readline();
+            }
+        };
+        if ($text ~~ '') {
+            $text = "This is the example content";
+        }
+        return $text;
     }
 
     sub format_html($text) {
