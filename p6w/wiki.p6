@@ -67,24 +67,31 @@ class Wiki {
 
         # RAKUDO: Oh, and you can't substitute using regexes yet, so we'll go
         # it with by stitching strings in a sub.
-        return $text;
-        $text = replace_all( '&', '&amp;',
-                replace_all( '<', '&lt;',
+        $text = replace_all( '<', '&lt;',
                 replace_all( '>', '&gt;',
                 replace_all( '"', '&quot;',
-                replace_all( "'", '&#039;', $text )))));
+                replace_all( "'", '&#039;',
+                replace_all( '&', '&amp;', $text )))));
 
         return $text;
     }
 
-    sub replace_all($char, $replacement, $text is rw) {
+    sub replace_all($char, $replacement, $text) {
+        say "Replacing $char";
+        my $new_text = '';
         while index($text, $char) !~~ Failure {
             my $pos = index($text, $char);
-            $text = substr($text, 0, $pos)
-                    ~ $replacement
-                    ~ substr($text, $pos+1);
+
+            # RAKUDO: BUG 57434
+            my $end = $pos;
+            if ($end == 0) {
+                $end = -$text.chars;
+            }
+            $new_text ~= substr($text, 0, $end)
+                      ~ $replacement;
+            $text = substr($text, $pos+1);
         }
-        return $text;
+        return $new_text ~ $text;
     }
 
     sub format_html($text is rw) {
