@@ -1,71 +1,35 @@
 #!perl6
 
-# should probably be in its own file, yes
-class CGI {
-    method param($param)      { return 'Main_Page' }
-    method header             { return
-"Content-Type: text/html; charset=ISO-8859-1\r\n\r\n" }
-    method start_html($title) { return "<!DOCTYPE html
-	PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
-	 \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
-<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en-US\" xml:lang=\"en-US\">
-<head>
-<title>$title</title>
-<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />
-</head>
-<body>\r\n" }
-    method h1($text)          { return "<h1>$text</h1>" }
-    method a($opts,$text)     { return '<a href="' ~ $opts<href> ~ "\">$text</a>" }
-    method p                  { return '<p />' }
-    method end_html           { return "\r\n</body>\r\n" }
-}
+use CGI;
 
 # writing 'package Wiki;' didn't work :)
 class Wiki {
 
-    my %.dispatch is rw;
+    my $.content_path is rw;
 
-    method handle_request($cgi) {
-#        my $path = $cgi.path_info();
-        my $path = "/view";   # faking it for now
-
+    method init {
         # a rakudo bug prevents us from setting the attribute
         # outside of a method
-        %.dispatch = (
-            '/view' => &view_page,
-        );
+        $.content_path = 'wiki-content/';
+    }
 
-        my $handler = %.dispatch{$path};
+    method handle_request($cgi) {
+        my $action = $cgi.param<action> // 'view';
 
-        if $handler ~~ Code {
-            $handler($cgi);
-        }
-        elsif $path eq '/' {
-            view_page($cgi);
-        }
-        else {
-            print not_found($cgi);
+        given $action {
+            when 'view' { self.view_page($cgi) }
         }
     }
 
-    sub view_page($cgi) {
-        # could not write it with statement-modifier if. submitted bug.
-        if $cgi !~~ CGI {
-            return;
-        };
+    method view_page(CGI $cgi) {
+        my $page = $cgi.param<page> // 'Main_Page';
 
-        # would like to make this a class variable, but that doesn't work
-        my $CONTENT_PATH = 'wiki-content/';
-        my $page = $cgi.param('page') // 'Main_Page';
-
-        if !exists_wiki_page($page) {
-            print "HTTP/1.0 200 OK\r\n";
-
+        if !self.exists_wiki_page($page) {
             my $title = $page ~ ' not found';
             print $cgi.header,
                   $cgi.start_html($page ~ ' not found'),
                   $cgi.h1($page),
-                  $cgi.a({href=>"/edit?page=$page"},"Create"),
+                  $cgi.a((hash 'href', "/edit?page=$page") ,"Create"),
                   $cgi.p,
                  "The page $page does not exist.",
                  $cgi.end_html;
@@ -75,15 +39,20 @@ class Wiki {
         print $cgi.header,
               $cgi.start_html($page),
               $cgi.h1($page),
-              $cgi.a((hash 'href', "/edit?page=$page"),"Edit"),
+              $cgi.a((hash 'href', "?action=edit?page=$page"),"Edit"),
               $cgi.p,
-              format_html(escape(slurp($CONTENT_PATH ~ $page))),
+              format_html(escape(slurp($.content_path ~ $page))),
               $cgi.end_html;
     }
 
-    sub exists_wiki_page($page) {
-        # TODO: Implement
-        return True;
+    method exists_wiki_page($page) {
+        # RAKUDO: use :e
+        my $exists = False;
+        try {
+            my $fh = open( $.content_path ~ $page );
+            $exists = True;
+        }
+        return $exists;
     }
 
     sub escape($text is rw) {
@@ -96,8 +65,9 @@ class Wiki {
 #        $text ~~ s :g / \" /&quot;/;
 #        $text ~~ s :g / \' /&#039;/;
 
-        # Oh, and you can't substitute using regexes yet, so we'll go
+        # RAKUDO: Oh, and you can't substitute using regexes yet, so we'll go
         # it with by stitching strings in a sub.
+        return $text;
         $text = replace_all( '&', '&amp;',
                 replace_all( '<', '&lt;',
                 replace_all( '>', '&gt;',
@@ -118,14 +88,14 @@ class Wiki {
     }
 
     sub format_html($text is rw) {
-        # we'd like to do $text ~~ m{ \[\[ (\w*) \]\] }
+        # RAKUDO: we'd like to do $text ~~ m{ \[\[ (\w*) \]\] }
         # but that syntax is not implemented yet
 
         while (my $opening = index($text, '[[')) !~~ Failure
-              && (my $closing = index($text, ']]')) !~~ Failute
+              && (my $closing = index($text, ']]')) !~~ Failure
               && $opening < $closing {
 
-            my $alnum = ('a'..'z', 'A'..'Z', '0'..'9').join('');
+            my $alnum = ('a'..'z', 'A'..'Z', '0'..'9', '_').join('');
             my $substitute = True;
             for $opening+2..$closing-1 -> $pos {
                 if index($alnum, substr($text, $pos, 1)) ~~ Failure {
@@ -136,6 +106,11 @@ class Wiki {
             if $substitute {
                 my $page = substr($text, $opening+2, $closing-1-($opening+2));
                 my $link = make_link($page);
+
+                # RAKUDO: BUG substr($text,0,0) == $text
+                if ($opening == 0) {
+                    $opening = -$text.chars
+                }
 
                 $text = substr($text, 0, $opening)
                         ~ $link
@@ -164,4 +139,7 @@ class Wiki {
 }
 
 my Wiki $wiki = Wiki.new;
-$wiki.handle_request(CGI.new);
+$wiki.init();
+my      $cgi  = CGI.new does HTML; # mr. Ugly
+$cgi.init();
+$wiki.handle_request($cgi);
