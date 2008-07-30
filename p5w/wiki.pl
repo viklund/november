@@ -8,6 +8,7 @@ use HTML::EscapeEvil;
 use File::Slurp;
 use DateTime;
 use Data::Dumper;
+use HTML::Template;
 
 use base qw(HTTP::Server::Simple::CGI);
 
@@ -17,21 +18,31 @@ my %dispatch = (
     'recentchanges' => \&list_recent_changes,
 );
 
+my $TEMPLATE_PATH = 'template/';
 my $CONTENT_PATH = 'wiki-content/';
 my $RECENT_CHANGES_PATH = 'wiki-recent-changes';
 
-sub not_found {
+sub unknown_action {
     my ($cgi) = @_;
 
-    return "HTTP/1.0 404 Not found\r\n",
-           $cgi->header,
-           $cgi->start_html('Not found'),
-           $cgi->h1('Not found'),
-           $cgi->end_html;
+    my $template = HTML::Template->new(
+        filename => $TEMPLATE_PATH.'unknown_action.tmpl');
+
+    $template->param(ACTION => $cgi->param('action'));
+
+    return # "HTTP/1.0 404 Not found\r\n",
+           $template->output();
 }
 
 sub handle_request {
     my ($self, $cgi) = @_;
+
+    my $path = $cgi->path_info();
+    if ( $path eq '/wiki.css' ) {
+        print "HTTP/1.0 200 OK\r\n",
+              read_file('wiki.css');
+        return;
+    }
 
     my $action = $cgi->param('action') || 'view';
     my $handler = $dispatch{$action};
@@ -40,11 +51,8 @@ sub handle_request {
         $handler->($cgi);
 
     }
-    elsif ($path eq '/') {
-        view_page($cgi);
-    }
     else {
-        print not_found($cgi);
+        print unknown_action($cgi);
     }
 }
 
@@ -66,8 +74,8 @@ sub make_link {
     my ($page) = @_;
 
     return exists_wiki_page( $page )
-           ? "<a href='/view?page=$page'>$page</a>"
-           : "<a href='/edit?page=$page' style='color: red'>$page</a>";
+           ? "<a href='/?page=$page'>$page</a>"
+           : "<a href='/?page=$page&action=edit' style='color: red'>$page</a>";
 }
 
 sub format_html {
@@ -118,27 +126,28 @@ sub view_page {
     my $page = $cgi->param('page') || 'Main_Page';
 
     if ( !exists_wiki_page($page) ) {
-        print "HTTP/1.0 200 OK\r\n";
+        my $template = HTML::Template->new(
+            filename => $TEMPLATE_PATH.'not_found.tmpl');
 
-        my $title = $page . ' not found';
-        print $cgi->header,
-              $cgi->start_html($page . ' not found'),
-              $cgi->h1($page),
-              $cgi->a({href=>"/edit?page=$page"},"Create"),
-              $cgi->p,
-              "The page $page does not exist.",
-              $cgi->end_html;
+        $template->param(PAGE => $page);
+
+        print # "HTTP/1.0 200 OK\r\n",
+              $template->output();
+
         return;
     }
 
-    print "HTTP/1.0 200 OK\r\n";
-    print $cgi->header,
-          $cgi->start_html($page),
-          $cgi->h1($page),
-          $cgi->a({href=>"/edit?page=$page"},"Edit"),
-          $cgi->p,
-          format_html(escape(scalar read_file($CONTENT_PATH . $page))),
-          $cgi->end_html;
+    my $template = HTML::Template->new(
+        filename => $TEMPLATE_PATH.'view.tmpl');
+
+    $template->param(TITLE => $page);
+    my $content = format_html(escape(scalar read_file($CONTENT_PATH . $page)));
+    $template->param(CONTENT => $content);
+
+    print #"HTTP/1.0 200 OK\r\n",
+        $template->output();
+
+    return;
 }
 
 sub edit_page {
@@ -164,22 +173,15 @@ sub edit_page {
         return view_page($cgi);
     }
 
-    my $title = $action . ' ' . $page;
+    my $template = HTML::Template->new(
+            filename => $TEMPLATE_PATH.'edit.tmpl');
 
-    print "HTTP/1.0 200 OK\r\n";
-    print $cgi->header,
-          $cgi->start_html($title),
-          $cgi->h1($title),
-          $cgi->start_form,
-          $cgi->hidden('page', $page),
-          $cgi->textarea( -name => 'articletext',
-                          -default => $old_content,
-                          -rows => 10,
-                          -columns => 50 ),
-          $cgi->p,
-          $cgi->submit,
-          $cgi->end_form,
-          $cgi->end_html;
+    $template->param(PAGE => $page);
+    my $title = $action . ' ' . $page;
+    $template->param(TITLE => $title);
+
+    print # "HTTP/1.0 200 OK\r\n",
+          $template->output();
 }
 
 sub list_recent_changes {
@@ -194,12 +196,13 @@ sub list_recent_changes {
                        . ' was changed on ' . $_->[1]
                        . ' by an anonymous gerbil' } @recent_changes ];
 
-    print "HTTP/1.0 200 OK\r\n";
-    print $cgi->header,
-          $cgi->start_html($title),
-          $cgi->h1($title),
-          $cgi->ul( $cgi->li($list) ),
-          $cgi->end_html;
+    my $template = HTML::Template->new(
+            filename => $TEMPLATE_PATH.'recent_changes.tmpl');
+
+    $template->param(CHANGES => $list);
+
+    print # "HTTP/1.0 200 OK\r\n",
+          $template->output();
 }
 
 # start the server on port 8080
