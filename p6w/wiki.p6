@@ -76,8 +76,7 @@ class Wiki {
         return $text;
     }
 
-    sub replace_all($char, $replacement, $text) {
-        say "Replacing $char";
+    sub replace_all($char, $replacement, $text is rw) {
         my $new_text = '';
         while index($text, $char) !~~ Failure {
             my $pos = index($text, $char);
