@@ -27,6 +27,7 @@ sub not_found {
            $cgi->header,
            $cgi->start_html('Not found'),
            $cgi->h1('Not found'),
+           $cgi->p("The action wasn't found."),
            $cgi->end_html;
 }
 
@@ -39,9 +40,6 @@ sub handle_request {
     if (ref($handler) eq "CODE") {
         $handler->($cgi);
 
-    }
-    elsif ($path eq '/') {
-        view_page($cgi);
     }
     else {
         print not_found($cgi);
@@ -66,8 +64,8 @@ sub make_link {
     my ($page) = @_;
 
     return exists_wiki_page( $page )
-           ? "<a href='/view?page=$page'>$page</a>"
-           : "<a href='/edit?page=$page' style='color: red'>$page</a>";
+           ? "<a href='/?page=$page'>$page</a>"
+           : "<a href='/?page=$page&action=edit' style='color: red'>$page</a>";
 }
 
 sub format_html {
@@ -135,7 +133,7 @@ sub view_page {
     print $cgi->header,
           $cgi->start_html($page),
           $cgi->h1($page),
-          $cgi->a({href=>"/edit?page=$page"},"Edit"),
+          $cgi->a({href=>"/?page=$page&action=edit"},"Edit"),
           $cgi->p,
           format_html(escape(scalar read_file($CONTENT_PATH . $page))),
           $cgi->end_html;
