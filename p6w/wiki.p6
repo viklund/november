@@ -65,7 +65,7 @@ class Wiki {
 #        $text ~~ s :g / \" /&quot;/;
 #        $text ~~ s :g / \' /&#039;/;
 
-        # Oh, and you can't substitute using regexes yet, so we'll go
+        # RAKUDO: Oh, and you can't substitute using regexes yet, so we'll go
         # it with by stitching strings in a sub.
         return $text;
         $text = replace_all( '&', '&amp;',
@@ -88,15 +88,14 @@ class Wiki {
     }
 
     sub format_html($text is rw) {
-        # we'd like to do $text ~~ m{ \[\[ (\w*) \]\] }
+        # RAKUDO: we'd like to do $text ~~ m{ \[\[ (\w*) \]\] }
         # but that syntax is not implemented yet
-        return $text;
 
         while (my $opening = index($text, '[[')) !~~ Failure
-              && (my $closing = index($text, ']]')) !~~ Failute
+              && (my $closing = index($text, ']]')) !~~ Failure
               && $opening < $closing {
 
-            my $alnum = ('a'..'z', 'A'..'Z', '0'..'9').join('');
+            my $alnum = ('a'..'z', 'A'..'Z', '0'..'9', '_').join('');
             my $substitute = True;
             for $opening+2..$closing-1 -> $pos {
                 if index($alnum, substr($text, $pos, 1)) ~~ Failure {
@@ -107,6 +106,11 @@ class Wiki {
             if $substitute {
                 my $page = substr($text, $opening+2, $closing-1-($opening+2));
                 my $link = make_link($page);
+
+                # RAKUDO: BUG substr($text,0,0) == $text
+                if ($opening == 0) {
+                    $opening = -$text.chars
+                }
 
                 $text = substr($text, 0, $opening)
                         ~ $link
