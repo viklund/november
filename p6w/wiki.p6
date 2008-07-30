@@ -24,12 +24,12 @@ class Wiki {
     method view_page(CGI $cgi) {
         my $page = $cgi.param<page> // 'Main_Page';
 
-        if !exists_wiki_page($page) {
+        if !self.exists_wiki_page($page) {
             my $title = $page ~ ' not found';
             print $cgi.header,
                   $cgi.start_html($page ~ ' not found'),
                   $cgi.h1($page),
-                  $cgi.a({href=>"/edit?page=$page"},"Create"),
+                  $cgi.a((hash 'href', "/edit?page=$page") ,"Create"),
                   $cgi.p,
                  "The page $page does not exist.",
                  $cgi.end_html;
@@ -39,15 +39,20 @@ class Wiki {
         print $cgi.header,
               $cgi.start_html($page),
               $cgi.h1($page),
-              $cgi.a((hash 'href', "/edit?page=$page"),"Edit"),
+              $cgi.a((hash 'href', "?action=edit?page=$page"),"Edit"),
               $cgi.p,
               format_html(escape(slurp($.content_path ~ $page))),
               $cgi.end_html;
     }
 
-    sub exists_wiki_page($page) {
-        # TODO: Implement
-        return True;
+    method exists_wiki_page($page) {
+        # RAKUDO: use :e
+        my $exists = False;
+        try {
+            my $fh = open( $.content_path ~ $page );
+            $exists = True;
+        }
+        return $exists;
     }
 
     sub escape($text is rw) {
