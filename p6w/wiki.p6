@@ -131,6 +131,6 @@ class Wiki {
 
 my Wiki $wiki = Wiki.new;
 $wiki.init();
-my      $cgi  = CGI.new does HTML # mr. Ugly;
+my      $cgi  = CGI.new does HTML; # mr. Ugly
 $cgi.init();
 $wiki.handle_request($cgi);
