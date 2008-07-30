@@ -8,6 +8,10 @@ h1, h2, h3, h4, h5, h6 {
     font-family: sans-serif;
 }
 
+h1 {
+    border-bottom: solid 3px #888;
+}
+
 #toolbar {
     border-bottom: solid #88f 1px;
     background: #ccf;
