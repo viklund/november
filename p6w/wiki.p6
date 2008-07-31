@@ -5,7 +5,8 @@ use CGI;
 # writing 'package Wiki;' didn't work :)
 class Wiki {
 
-    my $.content_path is rw;
+    my  $.content_path is rw;
+    has $.cgi          is rw;
 
     method init {
         # a rakudo bug prevents us from setting the attribute
@@ -13,36 +14,43 @@ class Wiki {
         $.content_path = 'wiki-content/';
     }
 
-    method handle_request($cgi) {
+    method handle_request(CGI $cgi) {
+        $.cgi = $cgi;
         my $action = $cgi.param<action> // 'view';
 
+        # RAKUDO: when doesn't work properly yet
+        my $handled = False;
         given $action {
-            when 'view' { self.view_page($cgi) }
+            when 'view' { self.view_page(); $handled = True }
+        }
+
+        if !$handled {
+            self.not_found();
         }
     }
 
-    method view_page(CGI $cgi) {
-        my $page = $cgi.param<page> // 'Main_Page';
+    method view_page() {
+        my $page = $.cgi.param<page> // 'Main_Page';
 
         if !self.exists_wiki_page($page) {
             my $title = $page ~ ' not found';
-            print $cgi.header,
-                  $cgi.start_html($page ~ ' not found'),
-                  $cgi.h1($page),
-                  $cgi.a((hash 'href', "/edit?page=$page") ,"Create"),
-                  $cgi.p,
+            print $.cgi.header,
+                  $.cgi.start_html($page ~ ' not found'),
+                  $.cgi.h1($page),
+                  $.cgi.a((hash 'href', "?action=edit&page=$page") ,"Create"),
+                  $.cgi.p,
                  "The page $page does not exist.",
-                 $cgi.end_html;
+                 $.cgi.end_html;
             return;
         }
 
-        print $cgi.header,
-              $cgi.start_html($page),
-              $cgi.h1($page),
-              $cgi.a((hash 'href', "?action=edit?page=$page"),"Edit"),
-              $cgi.p,
-              format_html(escape(slurp($.content_path ~ $page))),
-              $cgi.end_html;
+        print $.cgi.header,
+              $.cgi.start_html($page),
+              $.cgi.h1($page),
+              $.cgi.a((hash 'href', "?action=edit&page=$page"),"Edit"),
+              $.cgi.p,
+              self.format_html(self.escape(slurp($.content_path ~ $page))),
+              $.cgi.end_html;
     }
 
     method exists_wiki_page($page) {
@@ -55,7 +63,7 @@ class Wiki {
         return $exists;
     }
 
-    sub escape($text is rw) {
+    method escape($text is rw) {
         # HTML::EscapeEvil of course does this much better, deriving
         # HTML::Parser. Here we settle (for now) for the more crude
         # escape-everything solution.
@@ -67,27 +75,33 @@ class Wiki {
 
         # RAKUDO: Oh, and you can't substitute using regexes yet, so we'll go
         # it with by stitching strings in a sub.
-        return $text;
-        $text = replace_all( '&', '&amp;',
-                replace_all( '<', '&lt;',
-                replace_all( '>', '&gt;',
-                replace_all( '"', '&quot;',
-                replace_all( "'", '&#039;', $text )))));
+        $text = self.replace_all( '<', '&lt;',
+                self.replace_all( '>', '&gt;',
+                self.replace_all( '"', '&quot;',
+                self.replace_all( "'", '&#039;',
+                self.replace_all( '&', '&amp;', $text )))));
 
         return $text;
     }
 
-    sub replace_all($char, $replacement, $text is rw) {
+    method replace_all($char, $replacement, $text is rw) {
+        my $new_text = '';
         while index($text, $char) !~~ Failure {
             my $pos = index($text, $char);
-            $text = substr($text, 0, $pos)
-                    ~ $replacement
-                    ~ substr($text, $pos+1);
+
+            # RAKUDO: BUG 57434
+            my $end = $pos;
+            if ($end == 0) {
+                $end = -$text.chars;
+            }
+            $new_text ~= substr($text, 0, $end)
+                      ~ $replacement;
+            $text = substr($text, $pos+1);
         }
-        return $text;
+        return $new_text ~ $text;
     }
 
-    sub format_html($text is rw) {
+    method format_html($text is rw) {
         # RAKUDO: we'd like to do $text ~~ m{ \[\[ (\w*) \]\] }
         # but that syntax is not implemented yet
 
@@ -104,8 +118,8 @@ class Wiki {
             }
 
             if $substitute {
-                my $page = substr($text, $opening+2, $closing-1-($opening+2));
-                my $link = make_link($page);
+                my $page = substr($text, $opening+2, $closing-($opening+2));
+                my $link = self.make_link($page);
 
                 # RAKUDO: BUG substr($text,0,0) == $text
                 if ($opening == 0) {
@@ -124,17 +138,18 @@ class Wiki {
         return $text;
     }
 
-    sub make_link($page) {
-        # TODO: Implement
-        return "look, a link!";
+    method make_link($page) {
+        if self.exists_wiki_page($page) {
+            return $.cgi.a((hash 'href', "?action=view&page=$page"),$page),
+        } 
+        return $.cgi.a((hash 'href', "?action=edit&page=$page", 'class', 'new'),$page),
     }
 
-    sub not_found($cgi) {
-        return "HTTP/1.0 404 Not found\r\n",
-            $cgi.header,
-            $cgi.start_html('Not found'),
-            $cgi.h1('Not found'),
-            $cgi.end_html;
+    method not_found() {
+        say $.cgi.header,
+            $.cgi.start_html('Action Not found'),
+            $.cgi.h1('Action Not found'),
+            $.cgi.end_html;
     }
 }
 
