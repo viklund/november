@@ -22,6 +22,9 @@ my $TEMPLATE_PATH = 'template/';
 my $CONTENT_PATH = 'wiki-content/';
 my $RECENT_CHANGES_PATH = 'wiki-recent-changes';
 
+sub status_ok        { return "HTTP/1.0 200 OK\r\n\r\n"; }
+sub status_not_found { return "HTTP/1.0 404 Not found\r\n\r\n"; }
+
 sub unknown_action {
     my ($cgi) = @_;
 
@@ -30,7 +33,7 @@ sub unknown_action {
 
     $template->param(ACTION => $cgi->param('action'));
 
-    return # "HTTP/1.0 404 Not found\r\n",
+    return status_not_found(),
            $template->output();
 }
 
@@ -39,7 +42,7 @@ sub handle_request {
 
     my $path = $cgi->path_info();
     if ( $path eq '/wiki.css' ) {
-        print #"HTTP/1.0 200 OK\r\n",
+        print status_ok(),
               read_file('wiki.css');
         return;
     }
@@ -131,7 +134,7 @@ sub view_page {
 
         $template->param(PAGE => $page);
 
-        print # "HTTP/1.0 200 OK\r\n",
+        print status_ok(),
               $template->output();
 
         return;
@@ -144,7 +147,7 @@ sub view_page {
     my $content = format_html(escape(scalar read_file($CONTENT_PATH . $page)));
     $template->param(CONTENT => $content);
 
-    print #"HTTP/1.0 200 OK\r\n",
+    print status_ok(),
         $template->output();
 
     return;
@@ -180,7 +183,7 @@ sub edit_page {
     my $title = $action . ' ' . $page;
     $template->param(TITLE => $title);
 
-    print # "HTTP/1.0 200 OK\r\n",
+    print status_ok(),
           $template->output();
 }
 
@@ -202,7 +205,7 @@ sub list_recent_changes {
 
     $template->param(CHANGES => $changes);
 
-    print # "HTTP/1.0 200 OK\r\n",
+    print status_ok(),
           $template->output();
 }
 
