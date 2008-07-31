@@ -22,6 +22,7 @@ class Wiki {
         my $handled = False;
         given $action {
             when 'view' { self.view_page(); $handled = True }
+            when 'edit' { self.edit_page(); $handled = True }
         }
 
         if !$handled {
@@ -49,7 +50,24 @@ class Wiki {
               $.cgi.h1($page),
               $.cgi.a((hash 'href', "?action=edit&page=$page"),"Edit"),
               $.cgi.p,
-              self.format_html(self.escape(slurp($.content_path ~ $page))),
+              self.format_html(self.escape(self.read_page($page))),
+              $.cgi.end_html;
+    }
+
+    method edit_page() {
+        # $page should be an instance variable?
+        my $page = $.cgi.param<page> // 'Main_Page';
+        my $text = '';
+        try {
+            $text = self.read_page($page);
+        }
+        print $.cgi.header,
+              $.cgi.start_html($page),
+              $.cgi.h1("Editing $page"),
+              $.cgi.start_form(hash <>),
+              $.cgi.textarea( (hash <cols 50 rows 10>), $text),
+              $.cgi.submit(<>),
+              $.cgi.end_form,
               $.cgi.end_html;
     }
 
@@ -61,6 +79,10 @@ class Wiki {
             $exists = True;
         }
         return $exists;
+    }
+
+    method read_page($page) {
+        slurp $.content_path ~ $page;
     }
 
     method escape($text is rw) {
