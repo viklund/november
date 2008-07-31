@@ -192,14 +192,15 @@ sub list_recent_changes {
 
     my $title = 'Recent changes';
 
-    my $list = [ map { make_link( $_->[0] )
-                       . ' was changed on ' . $_->[1]
-                       . ' by an anonymous gerbil' } @recent_changes ];
+    my $changes = [ map { { page => make_link( $_->[0] ),
+                            time => $_->[1],
+                            author => 'an anonymous gerbil' } }
+                    @recent_changes ];
 
     my $template = HTML::Template->new(
             filename => $TEMPLATE_PATH.'recent_changes.tmpl');
 
-    $template->param(CHANGES => $list);
+    $template->param(CHANGES => $changes);
 
     print # "HTTP/1.0 200 OK\r\n",
           $template->output();
