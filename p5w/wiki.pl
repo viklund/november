@@ -39,7 +39,7 @@ sub handle_request {
 
     my $path = $cgi->path_info();
     if ( $path eq '/wiki.css' ) {
-        print "HTTP/1.0 200 OK\r\n",
+        print #"HTTP/1.0 200 OK\r\n",
               read_file('wiki.css');
         return;
     }
