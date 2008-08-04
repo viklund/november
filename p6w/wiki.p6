@@ -2,7 +2,6 @@
 
 use CGI;
 
-# writing 'package Wiki;' didn't work :)
 class Wiki {
 
     my  $.content_path is rw;
