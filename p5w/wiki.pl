@@ -23,6 +23,7 @@ my %dispatch = (
 my $TEMPLATE_PATH = 'template/';
 my $CONTENT_PATH = 'wiki-content/';
 my $RECENT_CHANGES_PATH = 'wiki-recent-changes';
+my $USERFILE_PATH = 'wiki-users';
 
 sub status_ok        { return "HTTP/1.0 200 OK\r\n\r\n"; }
 sub status_not_found { return "HTTP/1.0 404 Not found\r\n\r\n"; }
@@ -113,6 +114,11 @@ sub write_recent_changes {
     $Data::Dumper::Terse = 1;
     $Data::Dumper::Indent = 1;
     write_file( $RECENT_CHANGES_PATH, Dumper( $recent_changes_ref ) );
+}
+
+sub read_users {
+    return [] unless -e $USERFILE_PATH;
+    return eval( read_file( $USERFILE_PATH ) );
 }
 
 sub add_recent_change {
@@ -206,7 +212,11 @@ sub log_in {
         my $template = HTML::Template->new(
             filename => $TEMPLATE_PATH.'login_failed.tmpl');
 
-        if ( md5_base64($password) eq md5_base64('barabas') ) {
+        my %users = %{read_users()};
+
+        if ( md5_base64(md5_base64($user_name).$password)
+             eq $users{$user_name}->{password} ) {
+
             $template = HTML::Template->new(
                 filename => $TEMPLATE_PATH.'login_succeeded.tmpl');
         }
