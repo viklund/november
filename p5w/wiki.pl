@@ -9,12 +9,14 @@ use File::Slurp;
 use DateTime;
 use Data::Dumper;
 use HTML::Template;
+use Digest::MD5 qw(md5_base64);
 
 use base qw(HTTP::Server::Simple::CGI);
 
 my %dispatch = (
     'view' => \&view_page,
     'edit' => \&edit_page,
+    'log_in' => \&log_in,
     'recentchanges' => \&list_recent_changes,
 );
 
@@ -192,6 +194,36 @@ sub edit_page {
 
     print status_ok(),
           $template->output();
+}
+
+sub log_in {
+    my ($cgi) = @_;
+    return if !ref $cgi;
+
+    if ( my $user_name = $cgi->param('user_name') ) {
+        my $password = $cgi->param('password');
+
+        my $template = HTML::Template->new(
+            filename => $TEMPLATE_PATH.'login_failed.tmpl');
+
+        if ( md5_base64($password) eq md5_base64('barabas') ) {
+            $template = HTML::Template->new(
+                filename => $TEMPLATE_PATH.'login_succeeded.tmpl');
+        }
+
+        print status_ok(),
+              $template->output();
+
+        return;
+    }
+
+    my $template = HTML::Template->new(
+        filename => $TEMPLATE_PATH.'log_in.tmpl');
+
+    print status_ok(),
+        $template->output();
+
+    return;
 }
 
 sub list_recent_changes {
