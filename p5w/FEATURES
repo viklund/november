@@ -9,8 +9,8 @@
 
 * Creating new pages (without resorting to URL rewriting) [2008-07-02]
 
-* User authentication
-* Logging in, logging out
+* User authentication [2008-08-07]
+* Logging in [2008-08-07], logging out
 
 * The concept of a user "owning" an edit
 

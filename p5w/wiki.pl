@@ -176,6 +176,10 @@ sub edit_page {
     my ($cgi) = @_;
     return if !ref $cgi;
 
+    if ( ! defined $cgi->cookie('session_id') ) {
+        return not_authorized($cgi);
+    }
+
     my $page = $cgi->param('page') or return;
 
     my $already_exists
@@ -202,6 +206,21 @@ sub edit_page {
           $template->output();
 }
 
+sub not_authorized {
+    my ($cgi) = @_;
+    return if !ref $cgi;
+
+    my $template = HTML::Template->new(
+        filename => $TEMPLATE_PATH.'action_not_authorized.tmpl');
+
+    $template->param(DISALLOWED_ACTION => 'edit pages');
+
+    print status_ok(),
+          $template->output();
+
+    return;
+}
+
 sub log_in {
     my ($cgi) = @_;
     return if !ref $cgi;
@@ -219,8 +238,9 @@ sub log_in {
 
             my $session_id = md5_base64(time);
             my $session_cookie = $cgi->cookie(
-                -name  => 'session_id',
-                -value => $session_id
+                -name    => 'session_id',
+                -value   => $session_id,
+                -expires => '+1h'
             );
 
             print "HTTP/1.0 200 OK\r\n",
