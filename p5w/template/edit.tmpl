@@ -12,7 +12,8 @@
             <h1><TMPL_VAR NAME=TITLE></h1>
             <form method="POST">
                 <input type="hidden" name="page" value="<TMPL_VAR NAME=PAGE>" />
-                <textarea rows="10" cols="50"><TMPL_VAR NAME=CONTENT></textarea>
+                <input type="hidden" name="action" value="edit" />
+                <textarea name="articletext" rows="10" cols="50"><TMPL_VAR NAME=CONTENT></textarea>
                 <p/>
                 <input type="submit" value="Save" />
             </form>

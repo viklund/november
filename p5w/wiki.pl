@@ -25,18 +25,6 @@ my $RECENT_CHANGES_PATH = 'wiki-recent-changes';
 sub status_ok        { return "HTTP/1.0 200 OK\r\n\r\n"; }
 sub status_not_found { return "HTTP/1.0 404 Not found\r\n\r\n"; }
 
-sub unknown_action {
-    my ($cgi) = @_;
-
-    my $template = HTML::Template->new(
-        filename => $TEMPLATE_PATH.'unknown_action.tmpl');
-
-    $template->param(ACTION => $cgi->param('action'));
-
-    return status_not_found(),
-           $template->output();
-}
-
 sub handle_request {
     my ($self, $cgi) = @_;
 
@@ -57,6 +45,18 @@ sub handle_request {
     else {
         print unknown_action($cgi);
     }
+}
+
+sub unknown_action {
+    my ($cgi) = @_;
+
+    my $template = HTML::Template->new(
+        filename => $TEMPLATE_PATH.'unknown_action.tmpl');
+
+    $template->param(ACTION => $cgi->param('action'));
+
+    return status_not_found(),
+           $template->output();
 }
 
 sub escape {
@@ -153,21 +153,27 @@ sub view_page {
     return;
 }
 
+sub redirect_to_view_page {
+    my ($cgi) = @_;
+    return if !ref $cgi;
+
+    my $page = $cgi->param('page') or return;
+
+    print $cgi->redirect("http://localhost:8080/?page=$page");
+
+    return;
+}
+
 sub edit_page {
     my ($cgi) = @_;
     return if !ref $cgi;
 
     my $page = $cgi->param('page') or return;
 
-    my $action = "Editing";
-    my $old_content = '';
-
-    if ( !exists_wiki_page($page) ) {
-        $action = "Creating";
-    }
-    else {
-        $old_content = read_file($CONTENT_PATH . $page);
-    }
+    my $already_exists
+                    = exists_wiki_page($page);
+    my $action      = $already_exists ? 'Editing' : 'Creating';
+    my $old_content = $already_exists ? read_file($CONTENT_PATH . $page) : '';
 
     if ( my $article_text = $cgi->param('articletext') ) {
         write_file( $CONTENT_PATH . $page, $article_text );
@@ -182,6 +188,7 @@ sub edit_page {
     $template->param(PAGE => $page);
     my $title = $action . ' ' . $page;
     $template->param(TITLE => $title);
+    $template->param(CONTENT => $old_content);
 
     print status_ok(),
           $template->output();
