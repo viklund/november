@@ -209,17 +209,29 @@ sub log_in {
     if ( my $user_name = $cgi->param('user_name') ) {
         my $password = $cgi->param('password');
 
-        my $template = HTML::Template->new(
-            filename => $TEMPLATE_PATH.'login_failed.tmpl');
-
         my %users = %{read_users()};
 
         if ( md5_base64(md5_base64($user_name).$password)
              eq $users{$user_name}->{password} ) {
 
-            $template = HTML::Template->new(
+            my $template = HTML::Template->new(
                 filename => $TEMPLATE_PATH.'login_succeeded.tmpl');
+
+            my $session_id = md5_base64(time);
+            my $session_cookie = $cgi->cookie(
+                -name  => 'session_id',
+                -value => $session_id
+            );
+
+            print "HTTP/1.0 200 OK\r\n",
+                  $cgi->header( -cookie => $session_cookie ),
+                  $template->output();
+
+            return;
         }
+
+        my $template = HTML::Template->new(
+            filename => $TEMPLATE_PATH.'login_failed.tmpl');
 
         print status_ok(),
               $template->output();
