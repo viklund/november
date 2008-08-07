@@ -18,13 +18,15 @@ my %dispatch = (
     'edit' => \&edit_page,
     'log_in' => \&log_in,
     'log_out' => \&log_out,
-    'recentchanges' => \&list_recent_changes,
+    'recent_changes' => \&list_recent_changes,
 );
 
 my $TEMPLATE_PATH = 'template/';
 my $CONTENT_PATH = 'wiki-content/';
 my $RECENT_CHANGES_PATH = 'wiki-recent-changes';
 my $USERFILE_PATH = 'wiki-users';
+
+my %sessions;
 
 sub status_ok        { return "HTTP/1.0 200 OK\r\n\r\n"; }
 sub status_not_found { return "HTTP/1.0 404 Not found\r\n\r\n"; }
@@ -123,11 +125,11 @@ sub read_users {
 }
 
 sub add_recent_change {
-    my ($page, $contents) = @_;
+    my ($page, $contents, $author) = @_;
 
     my @recent_changes = @{read_recent_changes()};
     unshift @recent_changes, # put most recent first
-            [ $page, DateTime->now()->epoch(), $contents ];
+            [ $page, DateTime->now()->epoch(), $contents, $author ];
     write_recent_changes( \@recent_changes );
 }
 
@@ -177,7 +179,9 @@ sub edit_page {
     my ($cgi) = @_;
     return if !ref $cgi;
 
-    if ( ! $cgi->cookie('session_id') ) {
+    my $session_id = $cgi->cookie('session_id');
+    if ( !$session_id || !exists $sessions{$session_id} ) {
+
         return not_authorized($cgi);
     }
 
@@ -190,7 +194,9 @@ sub edit_page {
 
     if ( my $article_text = $cgi->param('articletext') ) {
         write_file( $CONTENT_PATH . $page, $article_text );
-        add_recent_change( $page, $article_text );
+
+        my $author = $sessions{$session_id}{user_name};
+        add_recent_change( $page, $article_text, $author );
 
         return view_page($cgi);
     }
@@ -244,6 +250,10 @@ sub log_in {
                 -expires => '+1h'
             );
 
+            $sessions{$session_id} = {
+                'user_name' => $user_name,
+            };
+
             print "HTTP/1.0 200 OK\r\n",
                   $cgi->header( -cookie => $session_cookie ),
                   $template->output();
@@ -277,6 +287,9 @@ sub log_out {
         my $template = HTML::Template->new(
                 filename => $TEMPLATE_PATH.'logout_succeeded.tmpl');
 
+        my $session_id = $cgi->cookie('session_id');
+        delete $sessions{$session_id};
+
         my $session_cookie = $cgi->cookie(
             -name    => 'session_id',
             -value   => '',
@@ -308,7 +321,7 @@ sub list_recent_changes {
 
     my $changes = [ map { { page => make_link( $_->[0] ),
                             time => $_->[1],
-                            author => 'an anonymous gerbil' } }
+                            author => $_->[3] || 'nobody' } }
                     @recent_changes ];
 
     my $template = HTML::Template->new(

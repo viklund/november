@@ -12,7 +12,7 @@
 * User authentication [2008-08-07]
 * Logging in [2008-08-07], logging out [2008-08-07]
 
-* The concept of a user authoring an edit
+* The concept of a user authoring an edit [2008-08-07]
 
 * Collision prevention -- the second person simultaneously editing a page
   should get at least a warning
