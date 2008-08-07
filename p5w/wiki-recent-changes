@@ -1,5 +1,25 @@
 [
   [
+    'Main_Page',
+    1218088859,
+    'This is the <i>glorious</i> contents of Main. (Note how HTML tags are escaped.)
+
+I now \'magically\' link to [[Another_Page]]. Kazam!
+
+Let me just try to create a [[Not_Yet_Created_Page]] and... see what happens.',
+    'johan'
+  ],
+  [
+    'Not_Yet_Created_Page',
+    1218088792,
+    'Aaarhg! I created it! :)
+
+That\'s ok, there are other not yet created pages...
+
+Adding some more stuff, destroying the beautiful ideal of this page even more.',
+    'carl'
+  ],
+  [
     'Another_Page',
     1218057494,
     'Time to crank it up a bit here. The word "crank" can mean many things, even at the same time.
