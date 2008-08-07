@@ -17,6 +17,7 @@ my %dispatch = (
     'view' => \&view_page,
     'edit' => \&edit_page,
     'log_in' => \&log_in,
+    'log_out' => \&log_out,
     'recentchanges' => \&list_recent_changes,
 );
 
@@ -176,7 +177,7 @@ sub edit_page {
     my ($cgi) = @_;
     return if !ref $cgi;
 
-    if ( ! defined $cgi->cookie('session_id') ) {
+    if ( ! $cgi->cookie('session_id') ) {
         return not_authorized($cgi);
     }
 
@@ -261,6 +262,35 @@ sub log_in {
 
     my $template = HTML::Template->new(
         filename => $TEMPLATE_PATH.'log_in.tmpl');
+
+    print status_ok(),
+        $template->output();
+
+    return;
+}
+
+sub log_out {
+    my ($cgi) = @_;
+    return if !ref $cgi;
+
+    if ( defined $cgi->cookie('session_id') ) {
+        my $template = HTML::Template->new(
+                filename => $TEMPLATE_PATH.'logout_succeeded.tmpl');
+
+        my $session_cookie = $cgi->cookie(
+            -name    => 'session_id',
+            -value   => '',
+        );
+
+        print "HTTP/1.0 200 OK\r\n",
+              $cgi->header( -cookie => $session_cookie ),
+              $template->output();
+
+        return;
+    }
+
+    my $template = HTML::Template->new(
+        filename => $TEMPLATE_PATH.'logout_succeeded.tmpl');
 
     print status_ok(),
         $template->output();
