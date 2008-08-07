@@ -1,0 +1,13 @@
+A few things that need to be done, but that are not critical to the success
+of the project:
+
+* Hide "Log in" when logged in and "Log out" when logged out.
+
+* Find all messages on the page and replace them with sensible things.
+
+* Rethink the exact layout of the login screen.
+
+* Refine the time indications in recent changes. (Right now they are just
+  seconds since epoch.)
+
+* Add 'returnto' links for the login and logout actions.

@@ -39,3 +39,6 @@
 * Good merging when conflicts occur
 
 * A plug-in system
+
+(See also the JANITORS file, for desired smaller-than-feature changes and
+additions.)
