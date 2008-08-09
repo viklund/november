@@ -17,7 +17,7 @@ class Wiki {
         $.cgi = $cgi;
         my $action = $cgi.param<action> // 'view';
 
-        # RAKUDO: when doesn't work properly yet
+        # RAKUDO: 'when' doesn't work properly yet
         my $handled = False;
         given $action {
             when 'view' { self.view_page(); $handled = True }
@@ -37,7 +37,7 @@ class Wiki {
             print $.cgi.header,
                   $.cgi.start_html($page ~ ' not found'),
                   $.cgi.h1($page),
-                  $.cgi.a((hash 'href', "?action=edit&page=$page") ,"Create"),
+                  $.cgi.a({ 'href' => "?action=edit&page=$page" }, "Create"),
                   $.cgi.p,
                  "The page $page does not exist.",
                  $.cgi.end_html;
@@ -47,7 +47,7 @@ class Wiki {
         print $.cgi.header,
               $.cgi.start_html($page),
               $.cgi.h1($page),
-              $.cgi.a((hash 'href', "?action=edit&page=$page"),"Edit"),
+              $.cgi.a({'href' => "?action=edit&page=$page"}, "Edit"),
               $.cgi.p,
               self.format_html(self.escape(self.read_page($page))),
               $.cgi.end_html;
@@ -63,8 +63,8 @@ class Wiki {
         print $.cgi.header,
               $.cgi.start_html($page),
               $.cgi.h1("Editing $page"),
-              $.cgi.start_form(hash <>),
-              $.cgi.textarea( (hash <cols 50 rows 10>), $text),
+              $.cgi.start_form({}),
+              $.cgi.textarea({cols => 50, rows => 10}, $text),
               $.cgi.submit(<>),
               $.cgi.end_form,
               $.cgi.end_html;
@@ -107,45 +107,35 @@ class Wiki {
 
     method replace_all($char, $replacement, $text is rw) {
         my $new_text = '';
-        while index($text, $char) !~~ Failure {
+         while index($text, $char) !~~ Failure {
             my $pos = index($text, $char);
 
-            # RAKUDO: BUG 57434
-            my $end = $pos;
-            if ($end == 0) {
-                $end = -$text.chars;
-            }
-            $new_text ~= substr($text, 0, $end)
+            $new_text ~= substr($text, 0, $pos)
                       ~ $replacement;
             $text = substr($text, $pos+1);
-        }
+         }
         return $new_text ~ $text;
     }
 
     method format_html($text is rw) {
-        # RAKUDO: we'd like to do $text ~~ m{ \[\[ (\w*) \]\] }
-        # but that syntax is not implemented yet
+        while ( $text ~~ /\[\[ (.*?) \]\]/ ) {
+            my $opening = $/.from;
+            my $closing = $/.to-2;
 
-        while (my $opening = index($text, '[[')) !~~ Failure
-              && (my $closing = index($text, ']]')) !~~ Failure
-              && $opening < $closing {
-
-            my $alnum = ('a'..'z', 'A'..'Z', '0'..'9', '_').join('');
             my $substitute = True;
             for $opening+2..$closing-1 -> $pos {
-                if index($alnum, substr($text, $pos, 1)) ~~ Failure {
+                if !(substr($text, $pos, 1) ~~ /<alnum>|'_'/) {
                     $substitute = False;
                 }
             }
 
+            # much nicer:
+            # my $inside = $0;
+            # my $substitute = ?($inside ~~ /^[<alnum>|'_']*$/);
+
             if $substitute {
                 my $page = substr($text, $opening+2, $closing-($opening+2));
                 my $link = self.make_link($page);
-
-                # RAKUDO: BUG substr($text,0,0) == $text
-                if ($opening == 0) {
-                    $opening = -$text.chars
-                }
 
                 $text = substr($text, 0, $opening)
                         ~ $link
@@ -154,16 +144,19 @@ class Wiki {
         }
 
         # Add paragraphs
-#        $text ~~ s:g{\n\s*\n}{\n<p>};
+#        $text ~~ s:g{\n\s*\n}{\n<p />};
+        # This would have worked, were it not for another bug in rakudo
+#        $text = $text.subst(/\n\s*\n/, "\n<p />") while $text ~~ /\n\s*\n/;
 
         return $text;
     }
 
     method make_link($page) {
         if self.exists_wiki_page($page) {
-            return $.cgi.a((hash 'href', "?action=view&page=$page"),$page),
+            return $.cgi.a({'href' => "?action=view&page=$page"}, $page);
         } 
-        return $.cgi.a((hash 'href', "?action=edit&page=$page", 'class', 'new'),$page),
+        return $.cgi.a({'href'  => "?action=edit&page=$page",
+                        'class' => 'new'}, $page);
     }
 
     method not_found() {
@@ -176,6 +169,6 @@ class Wiki {
 
 my Wiki $wiki = Wiki.new;
 $wiki.init();
-my      $cgi  = CGI.new does HTML; # mr. Ugly
+my $cgi = CGI.new does HTML; # mr. Ugly
 $cgi.init();
 $wiki.handle_request($cgi);
