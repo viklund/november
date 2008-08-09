@@ -14,10 +14,10 @@ use Digest::MD5 qw(md5_base64);
 use base qw(HTTP::Server::Simple::CGI);
 
 my %dispatch = (
-    'view' => \&view_page,
-    'edit' => \&edit_page,
-    'log_in' => \&log_in,
-    'log_out' => \&log_out,
+    'view'           => \&view_page,
+    'edit'           => \&edit_page,
+    'log_in'         => \&log_in,
+    'log_out'        => \&log_out,
     'recent_changes' => \&list_recent_changes,
 );
 
@@ -117,11 +117,6 @@ sub write_recent_changes {
     $Data::Dumper::Terse = 1;
     $Data::Dumper::Indent = 1;
     write_file( $RECENT_CHANGES_PATH, Dumper( $recent_changes_ref ) );
-}
-
-sub read_users {
-    return [] unless -e $USERFILE_PATH;
-    return eval( read_file( $USERFILE_PATH ) );
 }
 
 sub add_recent_change {
@@ -228,6 +223,11 @@ sub not_authorized {
     return;
 }
 
+sub read_users {
+    return [] unless -e $USERFILE_PATH;
+    return eval( read_file( $USERFILE_PATH ) );
+}
+
 sub log_in {
     my ($cgi) = @_;
     return if !ref $cgi;
@@ -316,8 +316,6 @@ sub list_recent_changes {
     return if !ref $cgi;
 
     my @recent_changes = @{read_recent_changes()};
-
-    my $title = 'Recent changes';
 
     my $changes = [ map { { page => make_link( $_->[0] ),
                             time => $_->[1],
