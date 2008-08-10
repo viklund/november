@@ -24,6 +24,7 @@ my %dispatch = (
 my $TEMPLATE_PATH = 'skin/';
 my $CONTENT_PATH = 'data/articles/';
 my $RECENT_CHANGES_PATH = 'data/recent-changes';
+my $MODIFICATIONS_PATH = 'data/modifications/';
 my $USERFILE_PATH = 'data/users';
 
 my %sessions;
@@ -119,13 +120,33 @@ sub write_recent_changes {
     write_file( $RECENT_CHANGES_PATH, Dumper( $recent_changes_ref ) );
 }
 
+sub read_modification {
+    my ($modification_id) = @_;
+    my $file = $MODIFICATIONS_PATH . $modification_id;
+    return [] unless -e $file;
+    return eval( read_file($file) );
+}
+
+sub write_modification {
+    my ($modification_id, $modification_ref) = @_;
+
+    $Data::Dumper::Terse = 1;
+    $Data::Dumper::Indent = 1;
+    write_file( $MODIFICATIONS_PATH . $modification_id,
+                Dumper( $modification_ref ) );
+}
+
 sub add_recent_change {
     my ($page, $contents, $author) = @_;
 
+    my $modification_id = DateTime->now()->epoch();
+
     my @recent_changes = @{read_recent_changes()};
     unshift @recent_changes, # put most recent first
-            [ $page, DateTime->now()->epoch(), $contents, $author ];
+            $modification_id;
     write_recent_changes( \@recent_changes );
+
+    write_modification( $modification_id, [$page, $contents, $author] );
 }
 
 sub view_page {
@@ -317,15 +338,18 @@ sub list_recent_changes {
 
     my @recent_changes = @{read_recent_changes()};
 
-    my $changes = [ map { { page => make_link( $_->[0] ),
-                            time => $_->[1],
-                            author => $_->[3] || 'nobody' } }
-                    @recent_changes ];
+    my @changes;
+    for my $modification_id (@recent_changes) {
+        my $modification = read_modification($modification_id);
+        push @changes, { page => make_link( $modification->[0] ),
+                         time => $modification_id,
+                         author => $modification->[2] || 'somebody' };
+    }
 
     my $template = HTML::Template->new(
             filename => $TEMPLATE_PATH.'recent_changes.tmpl');
 
-    $template->param(CHANGES => $changes);
+    $template->param(CHANGES => \@changes);
 
     print status_ok(),
           $template->output();
