@@ -17,6 +17,7 @@ my %dispatch = (
     'view'           => \&view_page,
     'edit'           => \&edit_page,
     'view_history'   => \&view_history,
+    'view_diff'      => \&view_diff,
     'log_in'         => \&log_in,
     'log_out'        => \&log_out,
     'recent_changes' => \&list_recent_changes,
@@ -95,6 +96,13 @@ sub make_old_href {
     return "/?page=$page&revision=$revision";
 }
 
+sub make_diff_href {
+    my ($page, $old_revision, $new_revision) = @_;
+
+    return sprintf('/?page=%s&action=view_diff&old_revision=%s&new_revision=%s',
+                   $page, $old_revision, $new_revision);
+}
+
 sub format_html {
     my ($text) = @_;
 
@@ -145,6 +153,7 @@ sub read_old_page {
 
     my $page_history = read_page_history($page);
     return unless @$page_history;
+    return "" if $revision < 1;
     # we count from the end, so that the oldest revision is number 1
     my $latest_change = read_modification($page_history->[-$revision]);
     return $latest_change->[1];
@@ -315,9 +324,11 @@ sub view_history {
     my $revision = @page_history;
     for my $modification_id (@page_history) {
         my $modification = read_modification($modification_id);
-        push @changes, { view_link => make_old_href($page, $revision--),
+        push @changes, { view_link => make_old_href($page, $revision),
+                         diff_link => make_diff_href($page, $revision-1, $revision),
                          time => $modification_id,
                          author => $modification->[2] || 'somebody' };
+        --$revision;
     }
 
     my $template = HTML::Template->new(
@@ -328,6 +339,37 @@ sub view_history {
 
     print status_ok(),
           $template->output();
+}
+
+sub view_diff {
+    my ($cgi) = @_;
+    return if !ref $cgi;
+
+    my $page         = $cgi->param('page') or return not_found('');
+    my $old_revision = $cgi->param('old_revision');
+    my $new_revision = $cgi->param('new_revision');
+
+    return not_found($page) if !exists_wiki_page($page);
+
+    my @old_contents = split("\n", read_old_page($page, $old_revision));
+    my @new_contents = split("\n", read_old_page($page, $new_revision));
+
+    use Algorithm::Diff qw(diff);
+    my @changes = map { {'indels' => [
+                             map { {type => $_->[0], line => $_->[1], change => $_->[2]} } @$_
+                         ]}
+                  } diff(\@old_contents, \@new_contents);
+
+    my $template = HTML::Template->new(
+        filename => $TEMPLATE_PATH.'view_diff.tmpl');
+
+    $template->param(PAGE => $page);
+    $template->param(HUNKS => \@changes);
+
+    print status_ok(),
+        $template->output();
+
+    return;
 }
 
 sub read_users {
