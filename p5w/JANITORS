@@ -10,4 +10,11 @@ of the project:
 * Refine the time indications in recent changes. (Right now they are just
   seconds since epoch.)
 
-* Add 'returnto' links for the login and logout actions.
+* Add 'returnto' links for the login and logout actions. And maybe redirects,
+  or at least manual links.
+
+* Cosmetically remove the underscores in link titles.
+
+* Implement 'created new page' flag in recent-changes.
+
+* Implement 'minor edits'.
