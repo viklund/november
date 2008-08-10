@@ -17,8 +17,10 @@
 * Collision prevention -- the second person simultaneously editing a page
   should get at least a warning
 
-* Article history
-** Diffs between arbritary versions (a la Mediawiki)
+* Article history [2008-08-10]
+** Ability to view old revisions of pages
+** Diffs between consequtive revisions
+** Diffs between arbritary revisions (a la Mediawiki)
 
 * Recent changes [2008-07-02]
 

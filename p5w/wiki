@@ -16,6 +16,7 @@ use base qw(HTTP::Server::Simple::CGI);
 my %dispatch = (
     'view'           => \&view_page,
     'edit'           => \&edit_page,
+    'view_history'   => \&view_history,
     'log_in'         => \&log_in,
     'log_out'        => \&log_out,
     'recent_changes' => \&list_recent_changes,
@@ -107,6 +108,45 @@ sub format_html {
     return $text;
 }
 
+sub read_page_history {
+    my ($page) = @_;
+
+    my $file = $CONTENT_PATH . $page;
+    return unless -e $file;
+    my $page_history = eval( read_file($file) );
+    return $page_history;
+}
+
+sub write_page_history {
+    my ($page, $page_history_ref) = @_;
+
+    $Data::Dumper::Terse = 1;
+    $Data::Dumper::Indent = 1;
+    write_file( $CONTENT_PATH . $page, Dumper( $page_history_ref ) );
+}
+
+sub read_page {
+    my ($page) = @_;
+
+    my $page_history = read_page_history($page);
+    return unless @$page_history;
+    my $latest_change = read_modification(shift @$page_history);
+    return $latest_change->[1];
+}
+
+sub modify_page {
+    my ($page, $article_text, $author) = @_;
+
+    my $modification_id = DateTime->now()->epoch();
+
+    my @page_history = @{read_page_history($page)};
+    unshift @page_history, $modification_id;
+    write_page_history( $page, \@page_history );
+
+    write_modification( $modification_id, [$page, $article_text, $author] );
+    add_recent_change( $modification_id, $page, $article_text, $author );
+}
+
 sub read_recent_changes {
     return [] unless -e $RECENT_CHANGES_PATH;
     return eval( read_file( $RECENT_CHANGES_PATH ) );
@@ -137,16 +177,26 @@ sub write_modification {
 }
 
 sub add_recent_change {
-    my ($page, $contents, $author) = @_;
-
-    my $modification_id = DateTime->now()->epoch();
+    my ($modification_id, $page, $contents, $author) = @_;
 
     my @recent_changes = @{read_recent_changes()};
     unshift @recent_changes, # put most recent first
             $modification_id;
     write_recent_changes( \@recent_changes );
+}
 
-    write_modification( $modification_id, [$page, $contents, $author] );
+sub not_found {
+    my ($page) = @_;
+
+    my $template = HTML::Template->new(
+        filename => $TEMPLATE_PATH.'not_found.tmpl');
+
+    $template->param(PAGE => $page);
+
+    print status_not_found(),
+          $template->output();
+
+    return;
 }
 
 sub view_page {
@@ -155,24 +205,15 @@ sub view_page {
 
     my $page = $cgi->param('page') || 'Main_Page';
 
-    if ( !exists_wiki_page($page) ) {
-        my $template = HTML::Template->new(
-            filename => $TEMPLATE_PATH.'not_found.tmpl');
-
-        $template->param(PAGE => $page);
-
-        print status_ok(),
-              $template->output();
-
-        return;
-    }
+    return not_found($page) if !exists_wiki_page($page);
 
     my $template = HTML::Template->new(
         filename => $TEMPLATE_PATH.'view.tmpl');
 
     $template->param(TITLE => $page);
-    my $content = format_html(escape(scalar read_file($CONTENT_PATH . $page)));
-    $template->param(CONTENT => $content);
+    my $raw_contents = read_page($page);
+    my $contents = format_html(escape($raw_contents));
+    $template->param(CONTENT => $contents);
 
     print status_ok(),
         $template->output();
@@ -201,18 +242,16 @@ sub edit_page {
         return not_authorized($cgi);
     }
 
-    my $page = $cgi->param('page') or return;
+    my $page = $cgi->param('page') or return not_found('');
 
     my $already_exists
                     = exists_wiki_page($page);
     my $action      = $already_exists ? 'Editing' : 'Creating';
-    my $old_content = $already_exists ? read_file($CONTENT_PATH . $page) : '';
+    my $old_content = $already_exists ? read_page($page) : '';
 
     if ( my $article_text = $cgi->param('articletext') ) {
-        write_file( $CONTENT_PATH . $page, $article_text );
-
         my $author = $sessions{$session_id}{user_name};
-        add_recent_change( $page, $article_text, $author );
+        modify_page( $page, $article_text, $author );
 
         return view_page($cgi);
     }
@@ -242,6 +281,32 @@ sub not_authorized {
           $template->output();
 
     return;
+}
+
+sub view_history {
+    my ($cgi) = @_;
+    return if !ref $cgi;
+
+    my $page = $cgi->param('page') or return not_found('');
+    return not_found($page) if !exists_wiki_page($page);
+
+    my @page_history = @{read_page_history($page)};
+
+    my @changes;
+    for my $modification_id (@page_history) {
+        my $modification = read_modification($modification_id);
+        push @changes, { time => $modification_id,
+                         author => $modification->[2] || 'somebody' };
+    }
+
+    my $template = HTML::Template->new(
+            filename => $TEMPLATE_PATH.'page_history.tmpl');
+
+    $template->param(PAGE    => $page);
+    $template->param(CHANGES => \@changes);
+
+    print status_ok(),
+          $template->output();
 }
 
 sub read_users {
