@@ -22,9 +22,9 @@ my %dispatch = (
 );
 
 my $TEMPLATE_PATH = 'template/';
-my $CONTENT_PATH = 'wiki-content/';
-my $RECENT_CHANGES_PATH = 'wiki-recent-changes';
-my $USERFILE_PATH = 'wiki-users';
+my $CONTENT_PATH = 'data/articles/';
+my $RECENT_CHANGES_PATH = 'data/recent-changes';
+my $USERFILE_PATH = 'data/users';
 
 my %sessions;
 
