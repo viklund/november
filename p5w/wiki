@@ -89,6 +89,12 @@ sub make_link {
            : "<a href='/?page=$page&action=edit' style='color: red'>$page</a>";
 }
 
+sub make_old_href {
+    my ($page, $revision) = @_;
+
+    return "/?page=$page&revision=$revision";
+}
+
 sub format_html {
     my ($text) = @_;
 
@@ -131,6 +137,16 @@ sub read_page {
     my $page_history = read_page_history($page);
     return unless @$page_history;
     my $latest_change = read_modification(shift @$page_history);
+    return $latest_change->[1];
+}
+
+sub read_old_page {
+    my ($page, $revision) = @_;
+
+    my $page_history = read_page_history($page);
+    return unless @$page_history;
+    # we count from the end, so that the oldest revision is number 1
+    my $latest_change = read_modification($page_history->[-$revision]);
     return $latest_change->[1];
 }
 
@@ -203,7 +219,8 @@ sub view_page {
     my ($cgi) = @_;
     return if !ref $cgi;
 
-    my $page = $cgi->param('page') || 'Main_Page';
+    my $page     = $cgi->param('page') || 'Main_Page';
+    my $revision = $cgi->param('revision');
 
     return not_found($page) if !exists_wiki_page($page);
 
@@ -211,7 +228,9 @@ sub view_page {
         filename => $TEMPLATE_PATH.'view.tmpl');
 
     $template->param(TITLE => $page);
-    my $raw_contents = read_page($page);
+    my $raw_contents = defined $revision
+        ? read_old_page($page, $revision)
+        : read_page($page);
     my $contents = format_html(escape($raw_contents));
     $template->param(CONTENT => $contents);
 
@@ -293,9 +312,11 @@ sub view_history {
     my @page_history = @{read_page_history($page)};
 
     my @changes;
+    my $revision = @page_history;
     for my $modification_id (@page_history) {
         my $modification = read_modification($modification_id);
-        push @changes, { time => $modification_id,
+        push @changes, { view_link => make_old_href($page, $revision--),
+                         time => $modification_id,
                          author => $modification->[2] || 'somebody' };
     }
 

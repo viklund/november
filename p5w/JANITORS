@@ -18,3 +18,14 @@ of the project:
 * Implement 'created new page' flag in recent-changes.
 
 * Implement 'minor edits'.
+
+* Think about the pre- and postconditions of every subroutine. For example,
+  read_old_page currently assumes that $revision lies in the right interval
+  (1..$latest). Implement checks so that the wiki engine never crashes from
+  this kind of user input. Document pre- and postconditions.
+
+* Add a nice little message 'You are viewing an old revision of this page'
+  to the view-old-revision pages.
+
+* Add nice little '<- go to previous edition' and 'go to next revision ->'
+  to the view-old-revision pages.

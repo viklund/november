@@ -15,7 +15,8 @@
             <ul>
                 <TMPL_LOOP NAME=CHANGES>
                     <li>
-                        <a href="#">(view)</a> <a href="#">(diff)</a>
+                        <a href="<TMPL_VAR NAME=VIEW_LINK>">(view)</a>
+                        <a href="#">(diff)</a>
                         Changed on
                         <TMPL_VAR NAME=TIME> by
                         <TMPL_VAR NAME=AUTHOR>
