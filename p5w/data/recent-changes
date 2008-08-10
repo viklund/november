@@ -1,99 +1,14 @@
 [
-  [
-    'Main_Page',
-    1218088859,
-    'This is the <i>glorious</i> contents of Main. (Note how HTML tags are escaped.)
-
-I now \'magically\' link to [[Another_Page]]. Kazam!
-
-Let me just try to create a [[Not_Yet_Created_Page]] and... see what happens.',
-    'johan'
-  ],
-  [
-    'Not_Yet_Created_Page',
-    1218088792,
-    'Aaarhg! I created it! :)
-
-That\'s ok, there are other not yet created pages...
-
-Adding some more stuff, destroying the beautiful ideal of this page even more.',
-    'carl'
-  ],
-  [
-    'Another_Page',
-    1218057494,
-    'Time to crank it up a bit here. The word "crank" can mean many things, even at the same time.
-
-Hm, let\'s actually keep the link to [[Main_Page]]. It\'s a yellow toy duck. Bzaaah!'
-  ],
-  [
-    'Another_Page',
-    1218057386,
-    'Time to crank it up a bit here.
-
-Hm, let\'s actually keep the link to [[Main_Page]]. It\'s a yellow toy duck. Bzaaah!'
-  ],
-  [
-    'Main_Page',
-    1218057283,
-    'This is the <i>glorious</i> contents of Main. (Note how HTML tags are escaped.)
-
-I now \'magically\' link to [[Another_Page]]. Kazam!
-
-Let me just try to create a [[Not_Yet_Created_Page]] and see what happens.
-
-Hah!'
-  ],
-  [
-    'Main_Page',
-    1218057231,
-    'This is the <i>glorious</i> contents of Main. (Note how HTML tags are escaped.)
-
-I now \'magically\' link to [[Another_Page]]. Kazam!
-
-Let me just try to create a [[Not_Yet_Created_Page]] and see what happens.
-'
-  ],
-  [
-    'Not_Yet_Created_Page',
-    1218057191,
-    'Aaarhg! I created it! :)
-
-That\'s ok, there are other not yet created pages... Though maybe none as beutiful as this was... wasn\'t...
-
-Adding some more stuff, destroying the beautiful ideal of this page even more.'
-  ],
-  [
-    'Not_Yet_Created_Page',
-    1218056837,
-    'Aaarhg! I created it! :)
-
-That\'s ok, there are other not yet created pages... Though maybe none as beutiful as this was... wasn\'t...'
-  ],
-  [
-    'Not_Yet_Created_Page',
-    1218056698,
-    'Aaarhg! I created it! :)
-
-That\'s ok, there are other not yet created pages...'
-  ],
-  [
-    'Another_Page',
-    1218056287,
-    'Time to clean up a bit here.
-
-Hm, let\'s actually keep the link to [[Main_Page]]. It\'s a yellow toy duck. Bzaaah!'
-  ],
-  [
-    'Another_Page',
-    1215026471,
-    'Time to clean up a bit here.
-
-Hm, let\'s actually keep the link to [[Main_Page]]. It\'s handy.'
-  ],
-  [
-    'Not_Yet_Created_Page',
-    1215026435,
-    'Aaarhg! I created it! :)'
-  ]
+  1218088859,
+  1218088792,
+  1218057494,
+  1218057386,
+  1218057283,
+  1218057231,
+  1218057191,
+  1218056837,
+  1218056698,
+  1218056287,
+  1215026471,
+  1215026435,
 ]

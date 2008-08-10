@@ -1,0 +1,9 @@
+[
+  'Main_Page',
+  'This is the <i>glorious</i> contents of Main. (Note how HTML tags are escaped.)
+
+I now \'magically\' link to [[Another_Page]]. Kazam!
+
+Let me just try to create a [[Not_Yet_Created_Page]] and see what happens.
+'
+]
