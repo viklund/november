@@ -21,7 +21,7 @@ my %dispatch = (
     'recent_changes' => \&list_recent_changes,
 );
 
-my $TEMPLATE_PATH = 'template/';
+my $TEMPLATE_PATH = 'skin/';
 my $CONTENT_PATH = 'data/articles/';
 my $RECENT_CHANGES_PATH = 'data/recent-changes';
 my $USERFILE_PATH = 'data/users';
@@ -35,9 +35,9 @@ sub handle_request {
     my ($self, $cgi) = @_;
 
     my $path = $cgi->path_info();
-    if ( $path eq '/wiki.css' ) {
+    if ( $path eq '/spartan.css' ) {
         print status_ok(),
-              read_file('wiki.css');
+              read_file('skin/spartan.css');
         return;
     }
 
