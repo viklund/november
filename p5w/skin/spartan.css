@@ -40,3 +40,13 @@ h1 {
 #content {
     padding: 20px 40px 0;
 }
+
+.diff .insertion {
+    border: solid 1px #080;
+    background: #8f8;
+}
+
+.diff .deletion {
+    border: solid 1px #800;
+    background: #f88;
+}

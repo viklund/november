@@ -341,6 +341,9 @@ sub view_history {
           $template->output();
 }
 
+sub ins { my ($type, $change) = @_; $type eq '+' ? $change : '' };
+sub del { my ($type, $change) = @_; $type eq '-' ? $change : '' };
+
 sub view_diff {
     my ($cgi) = @_;
     return if !ref $cgi;
@@ -356,8 +359,10 @@ sub view_diff {
 
     use Algorithm::Diff qw(diff);
     my @changes = map { {'indels' => [
-                             map { {type => $_->[0], line => $_->[1], change => $_->[2]} } @$_
-                         ]}
+                             map { { insertion => ins( $_->[0], $_->[2] ),
+                                     deletion  => del( $_->[0x], $_->[2] ),
+                                   } } @$_
+                         ] }
                   } diff(\@old_contents, \@new_contents);
 
     my $template = HTML::Template->new(
