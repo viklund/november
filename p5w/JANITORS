@@ -29,3 +29,7 @@ of the project:
 
 * Add nice little '<- go to previous edition' and 'go to next revision ->'
   to the view-old-revision pages.
+
+* Make the CSS stylesheet adhere to a baseline grid
+  <http://webtypography.net/Rhythm_and_Proportion/Vertical_Motion/2.2.2/>
+  <http://www.alistapart.com/articles/settingtypeontheweb/>
