@@ -33,3 +33,11 @@ of the project:
 * Make the CSS stylesheet adhere to a baseline grid
   <http://webtypography.net/Rhythm_and_Proportion/Vertical_Motion/2.2.2/>
   <http://www.alistapart.com/articles/settingtypeontheweb/>
+
+* It would probably be a good idea to make the contents of the files in
+  data/modifications/ hash references instead of array references. Right now,
+  different fields are indexed by number, which is quite opaque.
+
+* Add ability to edit old revision pages. This should be accompanied by a
+  "Warning: this is an old revision you're editing." and a link to editing
+  the latest version of the page.
