@@ -277,6 +277,9 @@ sub edit_page {
     my $action      = $already_exists ? 'Editing' : 'Creating';
     my $old_content = $already_exists ? read_page($page) : '';
 
+    # Hmmm... what happens, really, if someone includes a '</textarea>' in the
+    # page source?
+
     if ( my $article_text = $cgi->param('articletext') ) {
         my $author = $sessions{$session_id}{user_name};
         modify_page( $page, $article_text, $author );
