@@ -54,7 +54,7 @@ class Wiki {
               $.cgi.h1($page),
               $.cgi.a({'href' => "?action=edit&page=$page"}, "Edit"),
               $.cgi.p,
-              self.format_html(self.escape(self.read_page($page))),
+              self.format_html(self.read_page($page)),
               $.cgi.end_html;
     }
 
@@ -95,7 +95,6 @@ class Wiki {
         }
         return [] unless $exists;
         my $page_history = eval( slurp($file) );
-        say $page_history.WHAT;
         return $page_history;
     }
 
@@ -109,7 +108,8 @@ class Wiki {
 
     method read_modification($modification_id) {
 
-        # RAKUDO: Had to inline this class variable because it wouldn't work otherwise.
+        # RAKUDO: Had to inline this class variable because it wouldn't work
+        # otherwise.
         my $file = 'data/modifications/' ~ $modification_id;
         # RAKUDO: use :e
         my $exists = False;
@@ -121,76 +121,44 @@ class Wiki {
         return eval( slurp($file) );
     }
 
-    method escape($text is rw) {
-        # HTML::EscapeEvil of course does this much better, deriving
-        # HTML::Parser. Here we settle (for now) for the more crude
-        # escape-everything solution.
-#        $text ~~ s :g / \& /&amp;/;
-#        $text ~~ s :g / \< /&lt;/;
-#        $text ~~ s :g / \> /&gt;/;
-#        $text ~~ s :g / \" /&quot;/;
-#        $text ~~ s :g / \' /&#039;/;
-
-        # RAKUDO: Oh, and you can't substitute using regexes yet, so we'll go
-        # it with by stitching strings in a sub.
-        $text = self.replace_all( '<', '&lt;',
-                self.replace_all( '>', '&gt;',
-                self.replace_all( '"', '&quot;',
-                self.replace_all( "'", '&#039;',
-                self.replace_all( '&', '&amp;', $text )))));
-
-        return $text;
-    }
-
-    method replace_all($char, $replacement, $text is rw) {
-        my $new_text = '';
-         while index($text, $char) !~~ Failure {
-            my $pos = index($text, $char);
-
-            $new_text ~= substr($text, 0, $pos)
-                      ~ $replacement;
-            $text = substr($text, $pos+1);
-         }
-        return $new_text ~ $text;
+    method quote($metachar) {
+        # RAKUDO: Tried chained trinary. Saw the result and cried.
+        return '&#039;' if $metachar eq '\'';
+        return '&lt;'   if $metachar eq '<';
+        return '&gt;'   if $metachar eq '>';
+        return '&amp;'  if $metachar eq '&';
+        return $metachar;
     }
 
     method format_html($text is rw) {
-        while ( $text ~~ /\[\[ (.*?) \]\]/ ) {
-            my $opening = $/.from;
-            my $closing = $/.to-2;
+        # RAKUDO: When 'gather' is implemented, we can to this with
+        # `join '', gather { ... }` instead.
+        my $result = '';
+        if $text ~~ Wiki::Syntax::TOP {
+            # RAKDUO: Must match again. [perl #57858]
+            $text ~~ Wiki::Syntax::TOP;
+            for $/<paragraph> -> $p {
 
-            my $substitute = True;
-            for $opening+2..$closing-1 -> $pos {
-                if !(substr($text, $pos, 1) ~~ /<alnum>|'_'/) {
-                    $substitute = False;
-                }
-            }
-
-            # much nicer:
-            # my $inside = $0;
-            # my $substitute = ?($inside ~~ /^[<alnum>|'_']*$/);
-
-            if $substitute {
-                my $page = substr($text, $opening+2, $closing-($opening+2));
-                my $link = self.make_link($page);
-
-                $text = substr($text, 0, $opening)
-                        ~ $link
-                        ~ substr($text, $closing+2);
+                $result ~= '<p>';
+                for $p<parchunk> {
+                    my $text = $_.values[0];
+                    given $_.keys[0] {
+                        when 'twext'     { $result ~= $text }
+                        when 'wikimark'  { my $page = substr($text, 2, -2);
+                                           $result ~= self.make_link($page) }
+                        when 'metachar'  { $result ~= self.quote($text) }
+                        when 'malformed' { $result ~= $text }
+                    }
+                 }
+                 $result ~= "</p>\n";
             }
         }
-
-        # Add paragraphs
-#        $text ~~ s:g{\n\s*\n}{\n<p />};
-        # This would have worked, were it not for another bug in rakudo
-#        $text = $text.subst(/\n\s*\n/, "\n<p />") while $text ~~ /\n\s*\n/;
-
-        return $text;
+        return $result;
     }
 
     method make_link($page) {
         if self.exists_wiki_page($page) {
-            return $.cgi.a({'href' => "?action=view&page=$page"}, $page);
+            return $.cgi.a({'href' => "?page=$page"}, $page);
         } 
         return $.cgi.a({'href'  => "?action=edit&page=$page",
                         'class' => 'new'}, $page);
@@ -202,6 +170,37 @@ class Wiki {
             $.cgi.h1('Action Not found'),
             $.cgi.end_html;
     }
+}
+
+grammar Wiki::Syntax {
+    token TOP { ^ [ <paragraph> | <newlines> ]* $ };
+
+    token paragraph { <parchunk>+ };
+    token newlines { \n ** {2..*} };
+
+    token parchunk { <twext> || <wikimark> || <metachar> || <malformed> };
+
+    # RAKUDO: a token may not be called 'text' [perl #57864]
+    token twext { [ <alnum> || <otherchar> || <sp> ]+ };
+
+    # RAKUDO: sequences of quoted characters don't work [perl #57870
+#    token otherchar { <[ '!'..'%' '('..'/' ':' ';' '?' '@'
+#                      '\' '^'..'`' '{'..'~' ]> };
+    token otherchar {
+      [ '!' | '#' | '$' | '%' | '(' | ')' | '*' | '+'
+      | ',' | '-' | '.' | '/' | ':' | ';' | '=' | '?'
+      | '@' | '^' | '_' | '`' | '{' | '|' | '}' | '~'
+      | '\\'
+      ]
+    };
+
+    token sp { ' ' };
+
+    token wikimark { '[[' <twext> ']]' };
+
+    token metachar { '<' || '>' || '&' || \' };
+
+    token malformed { '[' || ']' }
 }
 
 my Wiki $wiki = Wiki.new;
