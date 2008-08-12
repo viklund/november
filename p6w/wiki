@@ -1,6 +1,7 @@
 #!perl6
 
 use CGI;
+use HTML::Template;
 
 class Wiki {
 
@@ -10,12 +11,14 @@ class Wiki {
     # two class attrs runs fine.
 #    my  $.modifications_path is rw;
     has $.cgi                is rw;
+    my $.template_path       is rw;
 
     method init {
         # a rakudo bug prevents us from setting the attribute
         # outside of a method
         $.content_path = 'data/articles/';
 #        $.modifications_path = 'data/modifications/';
+        $.template_path = 'skin/';
     }
 
     method handle_request(CGI $cgi) {
@@ -38,41 +41,43 @@ class Wiki {
         my $page = $.cgi.param<page> // 'Main_Page';
 
         if !self.exists_wiki_page($page) {
-            my $title = $page ~ ' not found';
-            print $.cgi.header,
-                  $.cgi.start_html($page ~ ' not found'),
-                  $.cgi.h1($page),
-                  $.cgi.a({ 'href' => "?action=edit&page=$page" }, "Create"),
-                  $.cgi.p,
-                 "The page $page does not exist.",
-                 $.cgi.end_html;
+            my $template = HTML::Template.new(
+                filename => $.template_path ~ 'not_found.tmpl');
+
+            $template.param('PAGE' => $page);
+
+            print #status_not_found(),
+                  $template.output();
             return;
         }
 
-        print $.cgi.header,
-              $.cgi.start_html($page),
-              $.cgi.h1($page),
-              $.cgi.a({'href' => "?action=edit&page=$page"}, "Edit"),
-              $.cgi.p,
-              self.format_html(self.read_page($page)),
-              $.cgi.end_html;
+        my $template = HTML::Template.new(
+            filename => $.template_path ~ 'view.tmpl');
+
+        $template.param('TITLE' => $page);
+        $template.param('CONTENT' => self.format_html(self.read_page($page)));
+
+        print $template.output();
     }
 
     method edit_page() {
-        # $page should be an instance variable?
         my $page = $.cgi.param<page> // 'Main_Page';
-        my $text = '';
-        try {
-            $text = self.read_page($page);
-        }
-        print $.cgi.header,
-              $.cgi.start_html($page),
-              $.cgi.h1("Editing $page"),
-              $.cgi.start_form({}),
-              $.cgi.textarea({cols => 50, rows => 10}, $text),
-              $.cgi.submit(<>),
-              $.cgi.end_form,
-              $.cgi.end_html;
+
+        my $already_exists
+                        = self.exists_wiki_page($page);
+        my $action      = $already_exists ?? 'Editing' !! 'Creating';
+        my $old_content = $already_exists ?? self.read_page($page) !! '';
+        my $title = "$action $page";
+
+        my $template = HTML::Template.new(
+            filename => $.template_path ~ 'edit.tmpl');
+
+        $template.param('PAGE'    => $page);
+        $template.param('TITLE'   => $title);
+        $template.param('CONTENT' => $old_content);
+
+        print #status_ok(),
+              $template.output();
     }
 
     method exists_wiki_page($page) {

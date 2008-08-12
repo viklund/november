@@ -1,0 +1,23 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <title><TMPL_VAR NAME=TITLE></title>
+        <link rel="stylesheet" type="text/css" href="spartan.css" />
+    </head>
+    <body>
+        <ul id="toolbar">
+            <li><a href="?action=log_in">Log in</a></li>
+            <li><a href="?action=log_out">Log out</a></li>
+        </ul>
+        <div id="content">
+            <h1><TMPL_VAR NAME=TITLE></h1>
+            <form method="POST">
+                <input type="hidden" name="page" value="<TMPL_VAR NAME=PAGE>" />
+                <input type="hidden" name="action" value="edit" />
+                <textarea name="articletext" rows="10" cols="50"><TMPL_VAR NAME=CONTENT></textarea>
+                <p/>
+                <input type="submit" value="Save" />
+            </form>
+        </div>
+    </body>
+</html>
