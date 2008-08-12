@@ -5,8 +5,9 @@ use CGI;
 class Wiki {
 
     my  $.content_path       is rw;
-    # RAKUDO: For some reason, the addition of a second class attribute makes rakudo hang.
-    # Haven't been able to find out why. A simple -e program with two class attrs runs fine.
+    # RAKUDO: For some reason, the addition of a second class attribute makes
+    # rakudo hang. Haven't been able to find out why. A simple -e program with
+    # two class attrs runs fine.
 #    my  $.modifications_path is rw;
     has $.cgi                is rw;
 
