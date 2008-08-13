@@ -1,33 +1,58 @@
 #!perl6
 
+use Future;
+
 class CGI {
     has %.param is rw;
     #method param($param)      { return 'Main_Page' }
 
     # RAKUDO: BUILD method not supported
     method init() {
-        # Get the query string
-        my $debug = open('/tmp/debug.out', :w);
-        my $query_string = %*ENV<QUERY_STRING>;
-        if %*ENV<REQUEST_METHOD> eq 'POST' && %*ENV{CONTENT_LENGTH} > 0 {
-            # Maybe check content_length here and only take that many bytes?
-            $debug.say('POST');
-            $query_string ~= $*IN.slurp();
-        }
+        my %params = parse_params( %*ENV<QUERY_STRING> );
 
-        # Parse it
-        my @param_values = split('&' , $query_string);
+        #if %*ENV<REQUEST_METHOD> eq 'POST' && %*ENV{CONTENT_LENGTH} > 0 {
+        if %*ENV<REQUEST_METHOD> eq 'POST' {
+            # Maybe check content_length here and only take that many bytes?
+            my %post_params = parse_params( $*IN.slurp() );
+            for %post_params.kv -> $k, $v {
+                %params{$k} = $v;
+            }
+        }
+        $.param = %params;
+    }
+
+    # For debugging
+    method save_params() {
+        my $debug = open('/tmp/debug.out', :w);
+        for $.param.kv -> $k, $v {
+            $debug.say("$k => $v");
+        }
+        $debug.close;
+    }
+
+    sub parse_params($string is rw) {
+        my @param_values = split('&' , $string);
         my %param_temp;
         for @param_values -> $param_value {
             my @kvs = split('=', $param_value);
             # TODO: Check if key exists, if so make an array
-            %param_temp{@kvs[0]} = @kvs[1];
+            %param_temp{@kvs[0]} = unescape(@kvs[1]);
         }
-        $.param = %param_temp;
-        for %param_temp.kv -> $k, $v {
-            $debug.say("$k :: $v");
+        return %param_temp;
+    }
+
+    sub unescape($string is rw) {
+        # RAKUDO: :g plz
+        while $string ~~ /\+/ {
+            $string = $string.subst('+', ' ');
         }
-        $debug.close();
+        while ( $string ~~ /\%(..)/ ) {
+            my $match = $0;
+            my $character = chr(:16($match));
+            # RAKUDO: DOTTY
+            $string = $string.subst('%' ~ $match, $character);
+        }
+        return $string;
     }
 }
 
@@ -48,15 +73,15 @@ role HTML {
     method p                     { return '<p />' }
     method end_html              { return "\n</body>\n" }
     method textarea($opts,$text) { 
-        return '<textarea name="snubbe" cols="' ~ ($opts<cols> // 50) ~ '" rows="'
+        return '<textarea name="' ~ ( $opts<name> // 'textarea' )
+               ~ '" cols="' ~ ($opts<cols> // 50) ~ '" rows="'
                ~ ($opts<rows> // 4)
                ~ "\">$text</textarea>"
     }
     method start_form($opts) {
-        return '<form method="' ~ ($opts<action>  // 'post')
-               #~ '" action="'   ~ ($opts<method>  // '')
+        return '<form method="' ~ ($opts<method>  // 'post')
                ~ '" enctype="'  ~ ($opts<enctype> //
-                                   'application/x-www-form-urlencoded' )
+                                   'application/x-www-form-urlencoded' ) # Default anyway
                ~ '">'
     }
     method submit($opts) {
