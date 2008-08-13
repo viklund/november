@@ -63,12 +63,12 @@ use v6;
 #     h1 := h1 + b 
 #     h2 := h2 + c
 #     h3 := h3 + d
-
-var int digest := h0 append h1 append h2 append h3 //(expressed as little-endian)
-
-  //leftrotate function definition
-  leftrotate (x, c) 
-      return (x << c) or (x >> (32-c)); 
+#
+# var int digest := h0 append h1 append h2 append h3 //(expressed as little-endian)
+#
+#   //leftrotate function definition
+#   leftrotate (x, c) 
+#       return (x << c) or (x >> (32-c)); 
 
 
 class Digest::MD5 {
