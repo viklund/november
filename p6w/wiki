@@ -1,4 +1,5 @@
 #!perl6
+$*ERR.say('start');
 
 use CGI;
 use HTML::Template;
@@ -12,6 +13,7 @@ class Wiki {
 #    my  $.modifications_path is rw;
     has $.cgi                is rw;
     my $.template_path       is rw;
+    my $.recent_changes_path is rw;
 
     method init {
         # a rakudo bug prevents us from setting the attribute
@@ -19,6 +21,7 @@ class Wiki {
         $.content_path = 'data/articles/';
 #        $.modifications_path = 'data/modifications/';
         $.template_path = 'skin/';
+        $.recent_changes_path = 'data/recent-changes';
     }
 
     method handle_request(CGI $cgi) {
@@ -40,6 +43,7 @@ class Wiki {
     method view_page() {
         my $page = $.cgi.param<page> // 'Main_Page';
 
+        print "Content-Type: text/html\r\n\r\n";
         if !self.exists_wiki_page($page) {
             my $template = HTML::Template.new(
                 filename => $.template_path ~ 'not_found.tmpl');
@@ -69,6 +73,13 @@ class Wiki {
         my $old_content = $already_exists ?? self.read_page($page) !! '';
         my $title = "$action $page";
 
+        # Check if we have posted a new page
+        if $.cgi.param<articletext> {
+            my $new_text = $.cgi.param<articletext>;
+            self.modify_page($page,$new_text);
+            return self.view_page();
+        }
+
         my $template = HTML::Template.new(
             filename => $.template_path ~ 'edit.tmpl');
 
@@ -82,23 +93,13 @@ class Wiki {
 
     method exists_wiki_page($page) {
         # RAKUDO: use :e
-        my $exists = False;
-        try {
-            my $fh = open( $.content_path ~ $page );
-            $exists = True;
-        }
-        return $exists;
+        return file_exists($.content_path ~ $page );
     }
 
     method read_page_history($page) {
 
         my $file = $.content_path ~ $page;
-        my $exists = False;
-        try {
-            my $fh = open( $file );
-            $exists = True;
-        }
-        return [] unless $exists;
+        return [] unless file_exists( $file );
         my $page_history = eval( slurp($file) );
         return $page_history;
     }
@@ -111,18 +112,60 @@ class Wiki {
         return $latest_change[1];
     }
 
+    method modify_page($page, $new_text) {
+
+        my $author = 'anon';
+        my $modification_id = new_modification_id();
+
+        my $page_history = self.read_page_history($page);
+        $page_history.unshift( $modification_id );
+        self.write_page_history( $page, $page_history );
+
+        self.write_modification( $modification_id, 
+            [ $page, $new_text, $author] );
+
+        self.add_recent_change( $modification_id );
+    }
+
+    method read_recent_changes {
+        return [] unless file_exists( $.recent_changes_path );
+        return eval( slurp( $.recent_changes_path ) );
+    }
+
+    method write_recent_changes ( $recent_changes ) {
+        my $fh = open($.recent_changes_path, :w);
+        $fh.say($recent_changes.perl);
+        $fh.close;
+    }
+
+    method add_recent_change( $modification_id ) {
+        my $recent_changes = self.read_recent_changes();
+        $recent_changes.unshift($modification_id);
+        self.write_recent_changes( $recent_changes );
+    }
+
+    method write_page_history( $page, $page_history ) {
+        my $file = $.content_path ~ $page;
+        my $fh = open($file, :w);
+        $fh.say($page_history.perl);
+        $fh.close;
+    }
+
+    method write_modification ( $modification_id, $modification ) {
+
+        my $file = 'data/modifications/' ~ $modification_id;
+        my $fh = open( $file, :w );
+        $fh.say($modification.perl);
+        $fh.close();
+    }
+
     method read_modification($modification_id) {
 
         # RAKUDO: Had to inline this class variable because it wouldn't work
         # otherwise.
         my $file = 'data/modifications/' ~ $modification_id;
         # RAKUDO: use :e
-        my $exists = False;
-        try {
-            my $fh = open( $file );
-            $exists = True;
-        }
-        return [] unless $exists;
+        return [] unless file_exists( $file );
         return eval( slurp($file) );
     }
 
@@ -157,6 +200,8 @@ class Wiki {
                  }
                  $result ~= "</p>\n";
             }
+        } else {
+            $result = '<p>Could not parse...</p>';
         }
         return $result;
     }
@@ -175,6 +220,22 @@ class Wiki {
             $.cgi.h1('Action Not found'),
             $.cgi.end_html;
     }
+
+    sub file_exists( $file ) {
+        my $exists = False;
+        try {
+            my $fh = open( $file );
+            $exists = True;
+        }
+        return $exists;
+    }
+
+    sub new_modification_id {
+        # hopefully unique ID
+        return int(time%1000000/100) ~ time%100
+    }
+
+
 }
 
 grammar Wiki::Syntax {
@@ -205,7 +266,7 @@ grammar Wiki::Syntax {
 
     token metachar { '<' || '>' || '&' || \' };
 
-    token malformed { '[' || ']' }
+    token malformed { '[' || ']' || <!after \n> \n <!before \n> }
 }
 
 my Wiki $wiki = Wiki.new;
