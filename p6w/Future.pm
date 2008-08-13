@@ -1,4 +1,6 @@
+# Functions not in RAKUDO that we need
 
+# Extremely partial chr function, works for us at the moment, uses latin-15.
 sub chr($num) is export {
     my %chr = (
         1 => "",

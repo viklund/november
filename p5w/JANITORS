@@ -41,3 +41,5 @@ of the project:
 * Add ability to edit old revision pages. This should be accompanied by a
   "Warning: this is an old revision you're editing." and a link to editing
   the latest version of the page.
+
+* Don't save an edit unless anything is changed.
