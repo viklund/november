@@ -69,6 +69,7 @@ role HTML {
 </head>
 <body>\n" }
     method h1($text)             { return "<h1>$text</h1>" }
+    method cookie(%options)      { return "TODO" }
     method a($opts,$text)        { return '<a href="' ~ $opts<href> ~ "\">$text</a>" }
     method p                     { return '<p />' }
     method end_html              { return "\n</body>\n" }

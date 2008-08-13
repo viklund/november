@@ -1,7 +1,10 @@
 #!perl6
 
+use v6;
+
 use CGI;
 use HTML::Template;
+use Digest::MD5;
 
 class Wiki {
 
@@ -10,8 +13,11 @@ class Wiki {
     # rakudo hang. Haven't been able to find out why. A simple -e program with
     # two class attrs runs fine.
 #    my  $.modifications_path is rw;
-    has $.cgi                is rw;
     my $.template_path       is rw;
+    my $.userfile_path       is rw;
+
+    has $.cgi                is rw;
+    has %.sessions;
 
     method init {
         # a rakudo bug prevents us from setting the attribute
@@ -19,6 +25,7 @@ class Wiki {
         $.content_path = 'data/articles/';
 #        $.modifications_path = 'data/modifications/';
         $.template_path = 'skin/';
+        $.userfile_path = 'data/users';
     }
 
     method handle_request(CGI $cgi) {
@@ -30,6 +37,8 @@ class Wiki {
         given $action {
             when 'view' { self.view_page(); $handled = True }
             when 'edit' { self.edit_page(); $handled = True }
+            when 'log_in'  { self.log_in();  $handled = True }
+            when 'log_out' { self.log_out(); $handled = True }
         }
 
         if !$handled {
@@ -63,6 +72,11 @@ class Wiki {
     method edit_page() {
         my $page = $.cgi.param<page> // 'Main_Page';
 
+        my $session_id = $cgi.cookie('session_id');
+        if !$session_id || !exists %.sessions{$session_id} {
+            return self.not_authorized($cgi);
+        }
+
         my $already_exists
                         = self.exists_wiki_page($page);
         my $action      = $already_exists ?? 'Editing' !! 'Creating';
@@ -78,6 +92,19 @@ class Wiki {
 
         print #status_ok(),
               $template.output();
+    }
+
+    method not_authorized() {
+
+        my $template = HTML::Template.new(
+            filename => $.template_path ~ 'action_not_authorized.tmpl');
+
+        $template.param(DISALLOWED_ACTION => 'edit pages');
+
+        print #status_ok(),
+              $template.output();
+
+        return;
     }
 
     method exists_wiki_page($page) {
@@ -124,6 +151,17 @@ class Wiki {
         }
         return [] unless $exists;
         return eval( slurp($file) );
+    }
+
+    method read_users {
+        # RAKUDO: use :e
+        my $exists = False;
+        try {
+            my $fh = open( $.userfile_path );
+            $exists = True;
+        }
+        return {} unless $exists;
+        return eval( slurp( $.userfile_path ) );
     }
 
     method quote($metachar) {
@@ -174,6 +212,94 @@ class Wiki {
             $.cgi.start_html('Action Not found'),
             $.cgi.h1('Action Not found'),
             $.cgi.end_html;
+    }
+
+    method log_in {
+
+        if my $user_name = $.cgi.param<user_name> {
+
+            my $password = $.cgi.param<password>;
+
+            my %users = self.read_users();
+
+            if Digest::MD5::md5_base64(
+                   Digest::MD5::md5_base64($user_name) ~ $password
+#               ) eq %users{$user_name}<password> {
+               ) eq 'carlwhatever' {
+
+                my $template = HTML::Template.new(
+                    filename => $.template_path ~ 'login_succeeded.tmpl');
+
+                my $session_id = Digest::MD5::md5_base64(time);
+                my $session_cookie = $.cgi.cookie(
+                    {
+                        '-name'    => 'session_id',
+                        '-value'   => $session_id,
+                        '-expires' => '+1h'
+                    }
+                );
+
+                %.sessions{$session_id} = {
+                    'user_name' => $user_name,
+                };
+
+                print # "HTTP/1.0 200 OK\r\n",
+#                      $.cgi.header( '-cookie' => $session_cookie ),
+                      $template.output();
+
+                return;
+            }
+
+            my $template = HTML::Template.new(
+                filename => $.template_path ~ 'login_failed.tmpl');
+
+            print #status_ok(),
+                  $template.output();
+
+            return;
+        }
+
+        my $template = HTML::Template.new(
+            filename => $.template_path ~ 'log_in.tmpl');
+
+        print #status_ok(),
+              $template.output();
+
+        return;
+    }
+
+    method log_out {
+
+        if defined $.cgi.cookie('session_id') {
+            my $template = HTML::Template.new(
+                filename => $.template_path ~ 'logout_succeeded.tmpl');
+
+            my $session_id = $.cgi.cookie('session_id');
+            # RAKUDO: No 'delete' builtin
+#            delete %.sessions{$session_id};
+            %.sessions{$session_id} = "DELETED";
+
+            my $session_cookie = $.cgi.cookie(
+                {
+                    '-name'    => 'session_id',
+                    '-value'   => '',
+                }
+            );
+
+            print #"HTTP/1.0 200 OK\r\n",
+#                  $.cgi.header( '-cookie' => $session_cookie ),
+                  $template.output();
+
+            return;
+        }
+
+        my $template = HTML::Template.new(
+            filename => $.template_path ~ 'logout_succeeded.tmpl');
+
+        print #status_ok(),
+              $template.output();
+
+        return;
     }
 }
 
