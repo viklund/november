@@ -277,6 +277,9 @@ sub edit_page {
     my $action      = $already_exists ? 'Editing' : 'Creating';
     my $old_content = $already_exists ? read_page($page) : '';
 
+    # Hmmm... what happens, really, if someone includes a '</textarea>' in the
+    # page source?
+
     if ( my $article_text = $cgi->param('articletext') ) {
         my $author = $sessions{$session_id}{user_name};
         modify_page( $page, $article_text, $author );
@@ -341,6 +344,9 @@ sub view_history {
           $template->output();
 }
 
+sub ins { my ($type, $change) = @_; $type eq '+' ? $change : '' };
+sub del { my ($type, $change) = @_; $type eq '-' ? $change : '' };
+
 sub view_diff {
     my ($cgi) = @_;
     return if !ref $cgi;
@@ -356,8 +362,10 @@ sub view_diff {
 
     use Algorithm::Diff qw(diff);
     my @changes = map { {'indels' => [
-                             map { {type => $_->[0], line => $_->[1], change => $_->[2]} } @$_
-                         ]}
+                             map { { insertion => ins( $_->[0], $_->[2] ),
+                                     deletion  => del( $_->[0x], $_->[2] ),
+                                   } } @$_
+                         ] }
                   } diff(\@old_contents, \@new_contents);
 
     my $template = HTML::Template->new(
