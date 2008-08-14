@@ -2,6 +2,8 @@
 
 use v6;
 
+$*ERR.print();
+
 use CGI;
 use HTML::Template;
 
@@ -14,18 +16,27 @@ class Wiki {
 #    my  $.modifications_path is rw;
     my $.template_path       is rw;
     my $.userfile_path       is rw;
+    my $.sessionfile_path    is rw;
+    my $.sessions            is rw;
 
     has $.cgi                is rw;
-    has %.sessions;
+    #has $.sessions;
     my $.recent_changes_path is rw;
 
     method init {
         # RAKUDO: us from setting the attributes when declaring them
         $.content_path = 'data/articles/';
 #        $.modifications_path = 'data/modifications/';
+ 
+        # Trust us, this is required, at least it was when we put it in
+        $*ERR.print();
+        
+
         $.template_path = 'skin/';
         $.userfile_path = 'data/users';
+        $.sessionfile_path = 'data/sessions';
         $.recent_changes_path = 'data/recent-changes';
+        #$.sessions = %sessions;
     }
 
     method handle_request(CGI $cgi) {
@@ -40,28 +51,33 @@ class Wiki {
 
         my $action = $cgi.param<action> // 'view';
 
+        # Need to move this line somewhere
+        $*ERR.print();
         # RAKUDO: 'when' doesn't work properly yet
+        my $handled = False;
         given $action {
-            when 'view'  { self.view_page(); return; }
-            when 'edit'  { self.edit_page(); return; }
-            when 'log_in'   { self.log_in(); return; }
-            when 'log_out' { self.log_out(); return; }
+            when 'view'    { self.view_page(); $handled = True }
+            when 'edit'    { self.edit_page(); $handled = True }
+            when 'log_in'  { self.log_in();    $handled = True }
+            when 'log_out' { self.log_out();   $handled = True }
         }
 
-        self.not_found();
+        self.not_found() if !$handled;
     }
 
     method view_page() {
         my $page = $.cgi.param<page> // 'Main_Page';
 
-        print "Content-Type: text/html\r\n\r\n";
-        if !self.wiki_page_exists($page) {
+        $*ERR.print();
+        if !self.exists_wiki_page($page) {
             my $template = HTML::Template.new(
                 filename => $.template_path ~ 'not_found.tmpl');
 
             $template.param('PAGE' => $page);
 
-            print $template.output();
+            $.cgi.send_response(
+                $template.output(),
+            );
             return;
         }
 
@@ -71,15 +87,19 @@ class Wiki {
         $template.param('TITLE' => $page);
         $template.param('CONTENT' => self.format_html(self.read_page($page)));
 
-        print $template.output();
+        $.cgi.send_response(
+            $template.output(),
+        );
     }
 
     method edit_page() {
         my $page = $.cgi.param<page> // 'Main_Page';
 
-        my $session_id = $cgi.cookie('session_id');
-        if !$session_id || !exists %.sessions{$session_id} {
-            return self.not_authorized($cgi);
+        my $sessions = self.read_sessions();
+
+        my $session_id = $.cgi.cookie<session_id>;
+        if !$session_id || !$sessions{$session_id} {
+            return self.not_authorized();
         }
 
         my $already_exists
@@ -93,7 +113,8 @@ class Wiki {
         # parameter -- if there is one, the action is considered a save.
         if $.cgi.param<articletext> {
             my $new_text = $.cgi.param<articletext>;
-            self.modify_page($page,$new_text);
+            my $author = $sessions{$session_id}<user_name>;
+            self.modify_page($page, $new_text, $author);
             return self.view_page();
         }
 
@@ -104,17 +125,20 @@ class Wiki {
         $template.param('TITLE'   => $title);
         $template.param('CONTENT' => $old_content);
 
-        print $template.output();
+        $.cgi.send_response(
+            $template.output(),
+        );
     }
 
     method not_authorized() {
-
         my $template = HTML::Template.new(
             filename => $.template_path ~ 'action_not_authorized.tmpl');
 
         $template.param(DISALLOWED_ACTION => 'edit pages');
 
-        print $template.output();
+        $.cgi.send_response(
+            $template.output(),
+        );
 
         return;
     }
@@ -124,7 +148,6 @@ class Wiki {
     }
 
     method read_page_history($page) {
-
         my $file = $.content_path ~ $page;
         return [] unless file_exists( $file );
         my $page_history = eval( slurp($file) );
@@ -132,17 +155,14 @@ class Wiki {
     }
 
     method read_page($page) {
-
         my $page_history = self.read_page_history($page);
         return "" unless $page_history;
         my $latest_change = self.read_modification( $page_history.shift );
         return $latest_change[1];
     }
 
-    method modify_page($page, $new_text) {
-
-        my $author = 'anon';
-        my $modification_id = new_modification_id();
+    method modify_page($page, $new_text, $author) {
+        my $modification_id = get_unique_id();
 
         my $page_history = self.read_page_history($page);
         $page_history.unshift( $modification_id );
@@ -198,12 +218,7 @@ class Wiki {
 
     method read_users {
         # RAKUDO: use :e
-        my $exists = False;
-        try {
-            my $fh = open( $.userfile_path );
-            $exists = True;
-        }
-        return {} unless $exists;
+        return {} unless file_exists( $.userfile_path );
         return eval( slurp( $.userfile_path ) );
     }
 
@@ -245,18 +260,22 @@ class Wiki {
     }
 
     method make_link($page) {
-        if self.wiki_page_exists($page) {
-            return $.cgi.a({'href' => "?page=$page"}, $page);
+        if self.exists_wiki_page($page) {
+            return "<a href=\"?action=view&page=$page\">$page</a>"
         } 
-        return $.cgi.a({'href'  => "?action=edit&page=$page",
-                        'class' => 'new'}, $page);
+        return "<a href=\"?action=edit&page=$page\">$page</a>"
     }
 
     method not_found() {
-        say $.cgi.header,
-            $.cgi.start_html('Action Not found'),
-            $.cgi.h1('Action Not found'),
-            $.cgi.end_html;
+        my $template = HTML::Template.new(
+            filename => $.template_path ~ 'not_found.tmpl');
+
+        $template.param('PAGE' => 'Action Not found');
+
+        $.cgi.send_response(
+            $template.output(),
+        );
+        return;
     }
 
     method log_in {
@@ -264,9 +283,12 @@ class Wiki {
         if my $user_name = $.cgi.param<user_name> {
 
             my $password = $.cgi.param<password>;
+            $*ERR.say("USER='$user_name'");
+            $*ERR.say("PASS='$password'");
 
             my %users = self.read_users();
 
+            if $password eq %users{$user_name}<plain_text> {
 #            if Digest::MD5::md5_base64(
 #                   Digest::MD5::md5_base64($user_name) ~ $password
 #               ) eq %users{$user_name}<password> {
@@ -275,22 +297,15 @@ class Wiki {
                 my $template = HTML::Template.new(
                     filename => $.template_path ~ 'login_succeeded.tmpl');
 
-                my $session_id = Digest::MD5::md5_base64(time);
-                my $session_cookie = $.cgi.cookie(
-                    {
-                        '-name'    => 'session_id',
-                        '-value'   => $session_id,
-                        '-expires' => '+1h'
-                    }
+                my $session_id = get_unique_id();
+                my $session_cookie = "session_id=$session_id";
+                
+                self.add_session( $session_id, { user_name => $user_name } );
+
+                $.cgi.send_response(
+                    $template.output(),
+                    { cookie => $session_cookie }
                 );
-
-                %.sessions{$session_id} = {
-                    'user_name' => $user_name,
-                };
-
-                print 
-#                      $.cgi.header( '-cookie' => $session_cookie ),
-                      $template.output();
 
                 return;
             }
@@ -298,7 +313,9 @@ class Wiki {
             my $template = HTML::Template.new(
                 filename => $.template_path ~ 'login_failed.tmpl');
 
-            print $template.output();
+            $.cgi.send_response(
+                $template.output(),
+            );
 
             return;
         }
@@ -306,9 +323,37 @@ class Wiki {
         my $template = HTML::Template.new(
             filename => $.template_path ~ 'log_in.tmpl');
 
-        print $template.output();
+        $.cgi.send_response(
+            $template.output(),
+        );
 
         return;
+    }
+
+    method add_session( $id, %stuff) {
+        my $sessions = self.read_sessions();
+        $sessions{$id} = %stuff;
+        self.write_sessions($sessions);
+    }
+
+    method read_sessions {
+        return {} unless file_exists( $.sessionfile_path );
+        my $string = slurp( $.sessionfile_path );
+        my $stuff = eval( $string );
+        return $stuff;
+    }
+
+    method remove_session($id) {
+        my $sessions = self.read_sessions();
+        # RAKUDO: No 'delete' builtin
+        $sessions{$id} = 'DELETED';
+        self.write_sessions($sessions);
+    }
+
+    method write_sessions( $sessions ) {
+        my $fh = open($.sessionfile_path, :w);
+        $fh.say($sessions.perl);
+        $fh.close;
     }
 
     method log_out {
@@ -318,20 +363,14 @@ class Wiki {
                 filename => $.template_path ~ 'logout_succeeded.tmpl');
 
             my $session_id = $.cgi.cookie('session_id');
-            # RAKUDO: No 'delete' builtin
-#            delete %.sessions{$session_id};
-            %.sessions{$session_id} = "DELETED";
+            self.remove_session( $session_id );
 
-            my $session_cookie = $.cgi.cookie(
-                {
-                    '-name'    => 'session_id',
-                    '-value'   => '',
-                }
+            my $session_cookie = "session_id=''";
+
+            $.cgi.send_response(
+                $template.output(),
+                { :cookie($session_cookie) }
             );
-
-            print
-#                  $.cgi.header( '-cookie' => $session_cookie ),
-                  $template.output();
 
             return;
         }
@@ -339,7 +378,9 @@ class Wiki {
         my $template = HTML::Template.new(
             filename => $.template_path ~ 'logout_succeeded.tmpl');
 
-        print $template.output();
+        $.cgi.send_response(
+            $template.output(),
+        );
 
         return;
     }
@@ -354,7 +395,7 @@ class Wiki {
         return $exists;
     }
 
-    sub new_modification_id {
+    sub get_unique_id {
         # hopefully unique ID
         return int(time%1000000/100) ~ time%100
     }
@@ -393,6 +434,6 @@ grammar Wiki::Syntax {
 
 my Wiki $wiki = Wiki.new;
 $wiki.init();
-my $cgi = CGI.new does HTML; # mr. Ugly
+my $cgi = CGI.new;
 $cgi.init();
 $wiki.handle_request($cgi);

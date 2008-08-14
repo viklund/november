@@ -1,8 +1,10 @@
 {
   'johan' => {
-    'password' => 'hdm24HFlfrBgIX3bTsVLIQ'
+    'password' => 'hdm24HFlfrBgIX3bTsVLIQ',
+    'plain_text' => 'howdy'
   },
   'carl' => {
-    'password' => '3nRQWSNmQ/4jFD1w7AQMqg'
+    'password' => '3nRQWSNmQ/4jFD1w7AQMqg',
+    'plain_text' => 'howdy'
   }
 }
