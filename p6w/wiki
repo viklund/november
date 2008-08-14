@@ -1,8 +1,5 @@
 #!perl6
-
 use v6;
-
-$*ERR.print();
 
 use CGI;
 use HTML::Template;
@@ -29,7 +26,7 @@ class Wiki {
 #        $.modifications_path = 'data/modifications/';
  
         # Trust us, this is required, at least it was when we put it in
-        $*ERR.print();
+        #$*ERR.print();
         
 
         $.template_path = 'skin/';
@@ -42,34 +39,26 @@ class Wiki {
     method handle_request(CGI $cgi) {
         $.cgi = $cgi;
 
-        # TODO: Implement $.cgi.path_info()
-#        my $path = $.cgi.path_info();
-#        if ( $path eq '/spartan.css' ) {
-#            print read_file('skin/spartan.css');
-#            return;
-#        }
-
         my $action = $cgi.param<action> // 'view';
 
         # Need to move this line somewhere
-        $*ERR.print();
+        #$*ERR.print();
         # RAKUDO: 'when' doesn't work properly yet
-        my $handled = False;
         given $action {
-            when 'view'    { self.view_page(); $handled = True }
-            when 'edit'    { self.edit_page(); $handled = True }
-            when 'log_in'  { self.log_in();    $handled = True }
-            when 'log_out' { self.log_out();   $handled = True }
+            when 'view'    { self.view_page(); return;}
+            when 'edit'    { self.edit_page(); return;}
+            when 'log_in'  { self.log_in();    return;}
+            when 'log_out' { self.log_out();   return;}
         }
 
-        self.not_found() if !$handled;
+        self.not_found();
     }
 
     method view_page() {
         my $page = $.cgi.param<page> // 'Main_Page';
 
-        $*ERR.print();
-        if !self.exists_wiki_page($page) {
+        #$*ERR.print();
+        if !self.wiki_page_exists($page) {
             my $template = HTML::Template.new(
                 filename => $.template_path ~ 'not_found.tmpl');
 
@@ -134,7 +123,9 @@ class Wiki {
         my $template = HTML::Template.new(
             filename => $.template_path ~ 'action_not_authorized.tmpl');
 
-        $template.param(DISALLOWED_ACTION => 'edit pages');
+        # TODO: file bug, without "'" it is interpreted as named args and not
+        # as Pair
+        $template.param('DISALLOWED_ACTION' => 'edit pages');
 
         $.cgi.send_response(
             $template.output(),
@@ -260,7 +251,7 @@ class Wiki {
     }
 
     method make_link($page) {
-        if self.exists_wiki_page($page) {
+        if self.wiki_page_exists($page) {
             return "<a href=\"?action=view&page=$page\">$page</a>"
         } 
         return "<a href=\"?action=edit&page=$page\">$page</a>"
@@ -283,8 +274,8 @@ class Wiki {
         if my $user_name = $.cgi.param<user_name> {
 
             my $password = $.cgi.param<password>;
-            $*ERR.say("USER='$user_name'");
-            $*ERR.say("PASS='$password'");
+            #$*ERR.say("USER='$user_name'");
+            #$*ERR.say("PASS='$password'");
 
             my %users = self.read_users();
 
@@ -293,7 +284,6 @@ class Wiki {
 #                   Digest::MD5::md5_base64($user_name) ~ $password
 #               ) eq %users{$user_name}<password> {
 
-             if 1 {
                 my $template = HTML::Template.new(
                     filename => $.template_path ~ 'login_succeeded.tmpl');
 

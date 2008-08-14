@@ -15,7 +15,6 @@ class CGI {
         if %*ENV<REQUEST_METHOD> eq 'POST' {
             # Maybe check content_length here and only take that many bytes?
             my $input = $*IN.slurp();
-            $*ERR.say("POST='$input'");
             my %post_params = parse_params( $input );
             for %post_params.kv -> $k, $v {
                 %params{$k} = $v;
@@ -25,9 +24,9 @@ class CGI {
 
         my %cookie = parse_params(%*ENV<HTTP_COOKIE>);
         $.cookie = %cookie;
-        for $.cookie.kv -> $k,$v {
-            $*ERR.say("    $k => $v");
-        }
+        #for $.cookie.kv -> $k,$v {
+        #    $*ERR.say("    $k => $v");
+        #}
     }
 
     # For debugging
