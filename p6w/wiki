@@ -254,7 +254,7 @@ class Wiki {
         if self.wiki_page_exists($page) {
             return "<a href=\"?action=view&page=$page\">$page</a>"
         } 
-        return "<a href=\"?action=edit&page=$page\">$page</a>"
+        return "<a href=\"?action=edit&page=$page\" "~'class="nonexistent"'~">$page</a>"
     }
 
     method not_found() {

@@ -59,3 +59,7 @@ h1 {
     border: solid 1px #800;
     background: #f88;
 }
+
+a.nonexistent {
+    color: #F00;
+}
