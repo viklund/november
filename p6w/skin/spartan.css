@@ -1,5 +1,5 @@
 body {
-    background: white;
+    background: no-repeat 100% 0% url(skin/november-logo.png);
     margin: 0;
     padding: 0;
 }
@@ -13,8 +13,8 @@ h1 {
 }
 
 #toolbar {
-    border-bottom: solid #88f 1px;
-    background: #ccf;
+    border-bottom: solid #880 1px;
+    background: url(skin/november-tile.png);
     padding-top: 1em;
     list-style: none;
     margin: 0;
