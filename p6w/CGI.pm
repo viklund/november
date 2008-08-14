@@ -1,9 +1,10 @@
 #!perl6
 
-use Future;
+use Impatience;
 
 class CGI {
     has %.param is rw;
+    has %.cookie is rw;
     #method param($param)      { return 'Main_Page' }
 
     # RAKUDO: BUILD method not supported
@@ -13,12 +14,20 @@ class CGI {
         #if %*ENV<REQUEST_METHOD> eq 'POST' && %*ENV{CONTENT_LENGTH} > 0 {
         if %*ENV<REQUEST_METHOD> eq 'POST' {
             # Maybe check content_length here and only take that many bytes?
-            my %post_params = parse_params( $*IN.slurp() );
+            my $input = $*IN.slurp();
+            $*ERR.say("POST='$input'");
+            my %post_params = parse_params( $input );
             for %post_params.kv -> $k, $v {
                 %params{$k} = $v;
             }
         }
         $.param = %params;
+
+        my %cookie = parse_params(%*ENV<HTTP_COOKIE>);
+        $.cookie = %cookie;
+        for $.cookie.kv -> $k,$v {
+            $*ERR.say("    $k => $v");
+        }
     }
 
     # For debugging
@@ -28,6 +37,16 @@ class CGI {
             $debug.say("$k => $v");
         }
         $debug.close;
+    }
+
+    method send_response($contents, %opts?) {
+        # The header
+        print "Content-Type: text/html\r\n";
+        if %opts && %opts<cookie> {
+            print 'Set-Cookie: ' ~ %opts<cookie> ~ "; path=/;\r\n";
+        }
+        print "\r\n";
+        print $contents;
     }
 
     sub parse_params($string is rw) {
@@ -53,50 +72,6 @@ class CGI {
             $string = $string.subst('%' ~ $match, $character);
         }
         return $string;
-    }
-}
-
-role HTML {
-    method header                { return
-"Content-Type: text/html; charset=ISO-8859-1\r\n\r\n" }
-    method start_html($title)    { return "<!DOCTYPE html
-	PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
-	 \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
-<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en-US\" xml:lang=\"en-US\">
-<head>
-<title>$title</title>
-<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />
-</head>
-<body>\n" }
-    method h1($text)             { return "<h1>$text</h1>" }
-    method cookie(%options)      { return "TODO" }
-    method a($opts,$text)        { return '<a href="' ~ $opts<href> ~ "\">$text</a>" }
-    method p                     { return '<p />' }
-    method end_html              { return "\n</body>\n" }
-    method textarea($opts,$text) { 
-        return '<textarea name="' ~ ( $opts<name> // 'textarea' )
-               ~ '" cols="' ~ ($opts<cols> // 50) ~ '" rows="'
-               ~ ($opts<rows> // 4)
-               ~ "\">$text</textarea>"
-    }
-    method start_form($opts) {
-        return '<form method="' ~ ($opts<method>  // 'post')
-               ~ '" enctype="'  ~ ($opts<enctype> //
-                                   'application/x-www-form-urlencoded' ) # Default anyway
-               ~ '">'
-    }
-    method submit($opts) {
-        return '<input type="submit"' 
-               ~ val_check($opts, 'name')
-               ~ val_check($opts, 'value')
-               ~ '>';
-    }
-    method end_form              { return '</form>' }
-    sub val_check($opts, $name) {
-        if $opts{$name} {
-            return " $name=\"$opts{$name}'\"";
-        }
-        return ''
     }
 }
 
