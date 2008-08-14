@@ -13,8 +13,8 @@ h1 {
 }
 
 #toolbar {
-    border-bottom: solid #88f 1px;
-    background: #ccf;
+    border-bottom: solid #330 2px;
+    background: #863;
     padding-top: 1em;
     list-style: none;
     margin: 0;
@@ -32,10 +32,19 @@ h1 {
     padding: .4em 1em 0;
 }
 
-#toolbar a:link    { background: #bbe; }
-#toolbar a:visited { background: #bbe; }
-#toolbar a:hover   { background: #ffc; }
-#toolbar a:active  { background: #cca; }
+#toolbar a:link    { background: #dc8; }
+#toolbar a:visited { background: #dc8; }
+#toolbar a:hover   { background: #ee8; }
+#toolbar a:active  { background: #ffa; }
+
+#logo {
+    position: absolute;
+    top: 5px;
+    right: 35px;
+    background: no-repeat 100% 0% url(november-logo.png);
+    width: 70px;
+    height: 70px;
+}
 
 #content {
     padding: 20px 40px 0;
