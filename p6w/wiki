@@ -6,19 +6,20 @@ use HTML::Template;
 
 class Wiki {
 
+    # TODO: This is a bit ridiculous. We really should have a hash attribute
+    # called %.path_to instead.
     my $.content_path        is rw;
     my $.modifications_path  is rw;
     my $.template_path       is rw;
     my $.userfile_path       is rw;
     my $.sessionfile_path    is rw;
-    my $.sessions            is rw;
     my $.recent_changes_path is rw;
 
+    has $.sessions           is rw;
     has $.cgi                is rw;
-    #has $.sessions;
 
     method init {
-        # RAKUDO: us from setting the attributes when declaring them
+        # RAKUDO: set the attributes when declaring them
         $.content_path = 'data/articles/';
         $.modifications_path = 'data/modifications/';
  
@@ -34,12 +35,14 @@ class Wiki {
 
         my $action = $cgi.param<action> // 'view';
 
-        # RAKUDO: 'when' doesn't work properly yet
+        # Maybe we should consider turning this given into a lookup hash.
+        # RAKUDO: 'when' doesn't break out by default yet
         given $action {
-            when 'view'    { self.view_page(); return;}
-            when 'edit'    { self.edit_page(); return;}
-            when 'log_in'  { self.log_in();    return;}
-            when 'log_out' { self.log_out();   return;}
+            when 'view'           { self.view_page();           return; }
+            when 'edit'           { self.edit_page();           return; }
+            when 'log_in'         { self.log_in();              return; }
+            when 'log_out'        { self.log_out();             return; }
+            when 'recent_changes' { self.list_recent_changes(); return; }
         }
 
         self.not_found();
@@ -263,6 +266,7 @@ class Wiki {
 
             my %users = self.read_users();
 
+            # Yes, this is cheating. Stand by for a real MD5 hasher.
             if $password eq %users{$user_name}<plain_text> {
 #            if Digest::MD5::md5_base64(
 #                   Digest::MD5::md5_base64($user_name) ~ $password
@@ -361,6 +365,29 @@ class Wiki {
         return;
     }
 
+    method list_recent_changes {
+
+        # RAKUDO: Seemingly impossible to get the right number of list
+        # containers using an array variable @recent_changes here.
+        my $recent_changes = self.read_recent_changes();
+
+        my @changes;
+        for $recent_changes -> $modification_id {
+            my $modification = self.read_modification($modification_id);
+            push @changes, { 'page' => self.make_link( $modification[0] ),
+                             'time' => $modification_id,
+                             'author' => $modification[2] || 'somebody' };
+        }
+        die @changes.perl;
+
+        my $template = HTML::Template.new(
+                filename => $.template_path ~ 'recent_changes.tmpl');
+    
+        $template.param('CHANGES' => @changes);
+
+        print $template.output();
+    }
+
     sub file_exists( $file ) {
         # RAKUDO: use ~~ :e
         my $exists = False;
@@ -388,9 +415,8 @@ grammar Wiki::Syntax {
     # RAKUDO: a token may not be called 'text' [perl #57864]
     token twext { [ <alnum> || <otherchar> || <sp> ]+ };
 
-    # RAKUDO: sequences of quoted characters don't work [perl #57870
-#    token otherchar { <[ '!'..'%' '('..'/' ':' ';' '?' '@'
-#                      '\' '^'..'`' '{'..'~' ]> };
+    # TODO: Need to test this before replacing it with the long variant below.
+#    token otherchar { <[ !..% (../ : ; ? @ \ ^..` {..~ ]> };
     token otherchar {
       [ '!' | '#' | '$' | '%' | '(' | ')' | '*' | '+'
       | ',' | '-' | '.' | '/' | ':' | ';' | '=' | '?'
