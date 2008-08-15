@@ -7,28 +7,21 @@ use HTML::Template;
 class Wiki {
 
     my $.content_path        is rw;
-    # RAKUDO: For some reason, the addition of a second class attribute makes
-    # rakudo hang. Haven't been able to find out why. A simple -e program with
-    # two class attrs runs fine.
-#    my  $.modifications_path is rw;
+    my $.modifications_path  is rw;
     my $.template_path       is rw;
     my $.userfile_path       is rw;
     my $.sessionfile_path    is rw;
     my $.sessions            is rw;
+    my $.recent_changes_path is rw;
 
     has $.cgi                is rw;
     #has $.sessions;
-    my $.recent_changes_path is rw;
 
     method init {
         # RAKUDO: us from setting the attributes when declaring them
         $.content_path = 'data/articles/';
-#        $.modifications_path = 'data/modifications/';
+        $.modifications_path = 'data/modifications/';
  
-        # Trust us, this is required, at least it was when we put it in
-        #$*ERR.print();
-        
-
         $.template_path = 'skin/';
         $.userfile_path = 'data/users';
         $.sessionfile_path = 'data/sessions';
@@ -41,8 +34,6 @@ class Wiki {
 
         my $action = $cgi.param<action> // 'view';
 
-        # Need to move this line somewhere
-        #$*ERR.print();
         # RAKUDO: 'when' doesn't work properly yet
         given $action {
             when 'view'    { self.view_page(); return;}
@@ -57,7 +48,6 @@ class Wiki {
     method view_page() {
         my $page = $.cgi.param<page> // 'Main_Page';
 
-        #$*ERR.print();
         if !self.wiki_page_exists($page) {
             my $template = HTML::Template.new(
                 filename => $.template_path ~ 'not_found.tmpl');
@@ -190,18 +180,14 @@ class Wiki {
     }
 
     method write_modification ( $modification_id, $modification ) {
-
-        my $file = 'data/modifications/' ~ $modification_id;
+        my $file =  $.modifications_path ~ $modification_id;
         my $fh = open( $file, :w );
         $fh.say($modification.perl);
         $fh.close();
     }
 
     method read_modification($modification_id) {
-
-        # RAKUDO: Had to inline this class variable because it wouldn't work
-        # otherwise.
-        my $file = 'data/modifications/' ~ $modification_id;
+        my $file = $.modifications_path ~ $modification_id;
         # RAKUDO: use :e
         return [] unless file_exists( $file );
         return eval( slurp($file) );
@@ -274,8 +260,6 @@ class Wiki {
         if my $user_name = $.cgi.param<user_name> {
 
             my $password = $.cgi.param<password>;
-            #$*ERR.say("USER='$user_name'");
-            #$*ERR.say("PASS='$password'");
 
             my %users = self.read_users();
 
@@ -336,6 +320,8 @@ class Wiki {
     method remove_session($id) {
         my $sessions = self.read_sessions();
         # RAKUDO: No 'delete' builtin
+        # TODO: File bug, this dosnt work either, cant assign string to a
+        #       hash-container type smth...
         $sessions{$id} = 'DELETED';
         self.write_sessions($sessions);
     }
@@ -386,7 +372,7 @@ class Wiki {
     }
 
     sub get_unique_id {
-        # hopefully unique ID
+        # hopefully pretty unique ID
         return int(time%1000000/100) ~ time%100
     }
 }

@@ -17,6 +17,7 @@ class CGI {
             my $input = $*IN.slurp();
             my %post_params = parse_params( $input );
             for %post_params.kv -> $k, $v {
+            # TODO: Check if key exists, if so make an array
                 %params{$k} = $v;
             }
         }
@@ -24,9 +25,6 @@ class CGI {
 
         my %cookie = parse_params(%*ENV<HTTP_COOKIE>);
         $.cookie = %cookie;
-        #for $.cookie.kv -> $k,$v {
-        #    $*ERR.say("    $k => $v");
-        #}
     }
 
     # For debugging
