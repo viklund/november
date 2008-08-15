@@ -29,8 +29,11 @@ follow instructions there. See instructions on the parrot site:
 REPOSITORY LAYOUT
 -----------------
 
-p6w/ -- Perl 6 wiki implemntation
-p5w/ -- Perl 5 reference implemntation
+/
+|
++--p6w/    Perl 6 wiki implementation
+|
++--p5w/    Perl 5 reference implemntation
 
 RUNNING NOVEMBER
 ----------------
@@ -53,7 +56,7 @@ RUNNING NOVEMBER
 
   The other actions we have so far are edit, log_in and log_out. 
 
-* On a webbserver
+* On a web server
 
   We have only tested it on Apache. You need to put these files and
   directories in the cgi-bin directory of apache:
@@ -68,7 +71,7 @@ RUNNING NOVEMBER
 
   And make sure that the files and directories below data are readable and
   writable by the webbserver. Also, if you want a pretty wiki you need to copy
-  these files into the root of your webbserver
+  these files into the root of your web server
   
     skin/spartan.css
     skin/november-logo.png
@@ -77,8 +80,8 @@ RUNNING NOVEMBER
 
   Edit the file wiki.sh and update the PARROT_PATH variable.
 
-  After this, you can direct your browser to the wiki, probably the URL will
-  be something on the lines of:
+  After this, you can direct your browser to the wiki. The URL will
+  look something like this:
 
     http://localhost/cgi-bin/wiki.sh
 
