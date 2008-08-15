@@ -1,0 +1,97 @@
+This is November
+----------------
+
+November Copyright (C) 2008, Carl Mäsak & Johan Viklund
+
+LICENSE INFORMATION
+-------------------
+
+...
+
+ABSTRACT
+--------
+
+This file describes the structure of the repository and instructions on how to
+run the wiki, both from the command line and on a webbserver.
+
+CONTRIBUTE
+----------
+
+We will be liberal commiter bits. If you want to contribute, create an account
+on github.org and send your github handle to Johan (johan.viklund@gmail.com).
+Of course, if you don't want to commit directly, we will accept patches as
+well.
+
+PREREQUISITES
+-------------
+
+You need Parrot and Rakudo. Check it out from the Parrot svn repository and
+follow instructions there. See instructions on the parrot site:
+
+ <http://www.parrotcode.org/>
+
+REPOSITORY LAYOUT
+-----------------
+
+p6w -- Perl 6 implemntation of the wiki
+p5w -- Perl 5 implemntation of the wiki
+
+RUNNING PERL 6 NOVEMBER
+-----------------------
+
+* From the command line
+  
+  First set the PARROT_PATH variable to the path of your parrot directory.
+
+  This will generate the Main_Page on STDOUT:
+
+    $ ./test_wiki.sh
+
+  To specify which page to view you need to specify the get paramters on the
+  command line like this:
+
+    $ ./test_wiki.sh 'action=view&page=Main_Page'
+
+  You can actually skip the 'action=view' part since viewing is the default
+  action.
+
+  The other actions we have so far are edit, log_in and log_out. 
+
+* On a webbserver
+
+  We have only tested it on Apache. You need to put these files and
+  directories in the cgi-bin directory of apache:
+
+    wiki.sh
+    wiki
+    skin/
+    HTML
+    CGI.pm
+    Impatience.pm
+    data/
+
+  And make sure that the files and directories below data are readable and
+  writable by the webbserver. Also, if you want a pretty wiki you need to copy
+  these files into the root of your webbserver
+  
+    skin/spartan.css
+    skin/november-logo.png
+
+  No, we are not kidding, this will change though.
+
+  Edit the file wiki.sh and update the PARROT_PATH variable.
+
+  After this, you can direct your browser to the wiki, probably the URL will
+  be something on the lines of:
+
+    http://localhost/cgi-bin/wiki.sh
+
+CONTACT
+-------
+
+Carl Masak
+    irc: masak
+    e-mail: cmasak@gmail.com
+Johan Viklund
+    irc: viklund
+    e-mail: johan.viklund@gmail.com
