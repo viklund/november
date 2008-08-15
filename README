@@ -6,21 +6,17 @@ November Copyright (C) 2008, Carl Mäsak & Johan Viklund
 LICENSE INFORMATION
 -------------------
 
-...
+November is free software; you can redistribute it and/or modify it under the
+terms of the Artistic License 2.0.  (Note that, unlike the Artistic License
+1.0, version 2.0 is GPL compatible by itself, hence there is no benefit to
+having an Artistic 2.0 / GPL disjunction.)
 
-ABSTRACT
---------
+CONTRIBUTING
+------------
 
-This file describes the structure of the repository and instructions on how to
-run the wiki, both from the command line and on a webbserver.
-
-CONTRIBUTE
-----------
-
-We will be liberal commiter bits. If you want to contribute, create an account
-on github.org and send your github handle to Johan (johan.viklund@gmail.com).
-Of course, if you don't want to commit directly, we will accept patches as
-well.
+We'll hand out commit bits liberally. If you want to contribute, create an
+account on github.org and send your github handle to Johan
+(johan.viklund@gmail.com).  Patches are ok too, if you prefer those.
 
 PREREQUISITES
 -------------
@@ -33,15 +29,15 @@ follow instructions there. See instructions on the parrot site:
 REPOSITORY LAYOUT
 -----------------
 
-p6w -- Perl 6 implemntation of the wiki
-p5w -- Perl 5 implemntation of the wiki
+p6w/ -- Perl 6 wiki implemntation
+p5w/ -- Perl 5 reference implemntation
 
-RUNNING PERL 6 NOVEMBER
------------------------
+RUNNING NOVEMBER
+----------------
 
 * From the command line
   
-  First set the PARROT_PATH variable to the path of your parrot directory.
+  Set the PARROT_PATH variable to the path of your parrot directory.
 
   This will generate the Main_Page on STDOUT:
 
@@ -77,7 +73,7 @@ RUNNING PERL 6 NOVEMBER
     skin/spartan.css
     skin/november-logo.png
 
-  No, we are not kidding, this will change though.
+  Seriously. (This will change, though.)
 
   Edit the file wiki.sh and update the PARROT_PATH variable.
 
@@ -89,7 +85,7 @@ RUNNING PERL 6 NOVEMBER
 CONTACT
 -------
 
-Carl Masak
+Carl Mäsak
     irc: masak
     e-mail: cmasak@gmail.com
 Johan Viklund
