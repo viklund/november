@@ -1,17 +1,19 @@
 #!perl6
-
+use v6;
 use Impatience;
 
 class CGI {
     has %.param is rw;
     has %.cookie is rw;
-    #method param($param)      { return 'Main_Page' }
 
     # RAKUDO: BUILD method not supported
     method init() {
         my %params = parse_params( %*ENV<QUERY_STRING> );
 
-        #if %*ENV<REQUEST_METHOD> eq 'POST' && %*ENV{CONTENT_LENGTH} > 0 {
+        # It's prudent to handle CONTENT_LENGTH too, but right now that's not
+        # a priority. It would make our tests scripts more complicated, with
+        # little gains. It would look like this:
+        # if %*ENV<REQUEST_METHOD> eq 'POST' && %*ENV{CONTENT_LENGTH} > 0 {
         if %*ENV<REQUEST_METHOD> eq 'POST' {
             # Maybe check content_length here and only take that many bytes?
             my $input = $*IN.slurp();
@@ -51,7 +53,8 @@ class CGI {
         my %param_temp;
         for @param_values -> $param_value {
             my @kvs = split('=', $param_value);
-            # TODO: Check if key exists, if so make an array
+            # TODO: Check if that key already exists; make an array if it does.
+            # TODO: Is the case of 'page=' handled correctly?
             %param_temp{@kvs[0]} = unescape(@kvs[1]);
         }
         return %param_temp;
@@ -62,6 +65,7 @@ class CGI {
         while $string ~~ /\+/ {
             $string = $string.subst('+', ' ');
         }
+        # RAKUDO: This could also be rewritten as a single .subst :g call.
         while ( $string ~~ /\%(..)/ ) {
             my $match = $0;
             my $character = chr(:16($match));
