@@ -1,5 +1,5 @@
-This is November
-----------------
+November
+========
 
 November Copyright (C) 2008, Carl Mäsak & Johan Viklund
 
@@ -30,10 +30,10 @@ REPOSITORY LAYOUT
 -----------------
 
 /
-|
-+--p6w/    Perl 6 wiki implementation
-|
-+--p5w/    Perl 5 reference implemntation
+│
+├─p6w/    Perl 6 wiki implementation
+│
+└─p5w/    Perl 5 reference implemntation
 
 RUNNING NOVEMBER
 ----------------
