@@ -4,30 +4,177 @@ use v6;
 use CGI;
 use HTML::Template;
 
-class Wiki {
+sub file_exists( $file ) {
+    # RAKUDO: use ~~ :e
+    my $exists = False;
+    try {
+        my $fh = open( $file );
+        $exists = True;
+    }
+    return $exists;
+}
+
+sub get_unique_id {
+    # hopefully pretty unique ID
+    return int(time%1000000/100) ~ time%100
+}
+
+role Session {
+    has $.sessionfile_path  is rw;
+    has $.sessions          is rw;
+
+    method init {
+        $.sessionfile_path = 'data/sessions';
+    }
+
+    method add_session( $id, %stuff) {
+        my $sessions = self.read_sessions();
+        $sessions{$id} = %stuff;
+        self.write_sessions($sessions);
+    }
+
+    method read_sessions {
+        return {} unless file_exists( $.sessionfile_path );
+        my $string = slurp( $.sessionfile_path );
+        my $stuff = eval( $string );
+        return $stuff;
+    }
+
+    method remove_session($id) {
+        my $sessions = self.read_sessions();
+        # RAKUDO: No 'delete' builtin
+        # TODO: File bug, this dosnt work either, cant assign string to a
+        #       hash-container type smth...
+        $sessions{$id} = 'DELETED';
+        self.write_sessions($sessions);
+    }
+
+    method write_sessions( $sessions ) {
+        my $fh = open($.sessionfile_path, :w);
+        $fh.say($sessions.perl);
+        $fh.close;
+    }
+
+    method new_session($user_name) {
+        my $session_id = get_unique_id();
+        self.add_session( $session_id, { user_name => $user_name } );
+        return $session_id;
+    }
+}
+
+class Store {
+    # These should be overridden in a subclass
+    method wiki_page_exists($page)                               {die}
+
+    method read_recent_changes                                   {die}
+    method write_recent_changes( $recent_changes )               {die}
+
+    method read_page_history($page)                              {die}
+    method write_page_history( $page, $page_history )            {die}
+
+    method read_modification($modification_id)                   {die}
+    method write_modification( $modification_id, $modification ) {die}
+
+    method save_page($page, $new_text, $author) {
+        my $modification_id = get_unique_id();
+
+        my $page_history = self.read_page_history($page);
+        $page_history.unshift( $modification_id );
+        self.write_page_history( $page, $page_history );
+
+        self.write_modification( $modification_id, 
+            [ $page, $new_text, $author] );
+
+        self.add_recent_change( $modification_id );
+    }
+
+    method add_recent_change( $modification_id ) {
+        my $recent_changes = self.read_recent_changes();
+        $recent_changes.unshift($modification_id);
+        self.write_recent_changes( $recent_changes );
+    }
+
+    method read_page($page) {
+        my $page_history = self.read_page_history($page);
+        return "" unless $page_history;
+        my $latest_change = self.read_modification( $page_history.shift );
+        return $latest_change[1];
+    }
+}
+
+# TODO: Submit bug (again) about inheritence and namespaced classes
+class Store__File is Store {
+    my $.content_path        is rw;
+    my $.modifications_path  is rw;
+    my $.recent_changes_path is rw;
+
+    method init {
+        $.content_path = 'data/articles/';
+        $.modifications_path = 'data/modifications/';
+        $.recent_changes_path = 'data/recent-changes';
+    }
+
+    method wiki_page_exists($page) {
+        return file_exists($.content_path ~ $page );
+    }
+
+    method read_recent_changes {
+        return [] unless file_exists( $.recent_changes_path );
+        return eval( slurp( $.recent_changes_path ) );
+    }
+
+    method write_recent_changes ( $recent_changes ) {
+        my $fh = open($.recent_changes_path, :w);
+        $fh.say($recent_changes.perl);
+        $fh.close;
+    }
+
+    method read_page_history($page) {
+        my $file = $.content_path ~ $page;
+        return [] unless file_exists( $file );
+        my $page_history = eval( slurp($file) );
+        return $page_history;
+    }
+
+    method write_page_history( $page, $page_history ) {
+        my $file = $.content_path ~ $page;
+        my $fh = open($file, :w);
+        $fh.say($page_history.perl);
+        $fh.close;
+    }
+
+    method read_modification($modification_id) {
+        my $file = $.modifications_path ~ $modification_id;
+        # RAKUDO: use :e
+        return [] unless file_exists( $file );
+        return eval( slurp($file) );
+    }
+
+    method write_modification ( $modification_id, $modification ) {
+        my $file =  $.modifications_path ~ $modification_id;
+        my $fh = open( $file, :w );
+        $fh.say($modification.perl);
+        $fh.close();
+    }
+}
+
+class Wiki is Store__File does Session {
 
     # TODO: This is a bit ridiculous. We really should have a hash attribute
     # called %.path_to instead.
-    my $.content_path        is rw;
-    my $.modifications_path  is rw;
     my $.template_path       is rw;
     my $.userfile_path       is rw;
-    my $.sessionfile_path    is rw;
-    my $.recent_changes_path is rw;
 
-    has $.sessions           is rw;
     has $.cgi                is rw;
 
     method init {
         # RAKUDO: set the attributes when declaring them
-        $.content_path = 'data/articles/';
-        $.modifications_path = 'data/modifications/';
- 
         $.template_path = 'skin/';
         $.userfile_path = 'data/users';
-        $.sessionfile_path = 'data/sessions';
-        $.recent_changes_path = 'data/recent-changes';
-        #$.sessions = %sessions;
+
+        # Multiple dispatch dosn't work
+        Store__File::init(self);
+        Session::init(self);
     }
 
     method handle_request(CGI $cgi) {
@@ -96,7 +243,7 @@ class Wiki {
         if $.cgi.param<articletext> {
             my $new_text = $.cgi.param<articletext>;
             my $author = $sessions{$session_id}<user_name>;
-            self.modify_page($page, $new_text, $author);
+            self.save_page($page, $new_text, $author);
             return self.view_page();
         }
 
@@ -125,75 +272,6 @@ class Wiki {
         );
 
         return;
-    }
-
-    method wiki_page_exists($page) {
-        return file_exists($.content_path ~ $page );
-    }
-
-    method read_page_history($page) {
-        my $file = $.content_path ~ $page;
-        return [] unless file_exists( $file );
-        my $page_history = eval( slurp($file) );
-        return $page_history;
-    }
-
-    method read_page($page) {
-        my $page_history = self.read_page_history($page);
-        return "" unless $page_history;
-        my $latest_change = self.read_modification( $page_history.shift );
-        return $latest_change[1];
-    }
-
-    method modify_page($page, $new_text, $author) {
-        my $modification_id = get_unique_id();
-
-        my $page_history = self.read_page_history($page);
-        $page_history.unshift( $modification_id );
-        self.write_page_history( $page, $page_history );
-
-        self.write_modification( $modification_id, 
-            [ $page, $new_text, $author] );
-
-        self.add_recent_change( $modification_id );
-    }
-
-    method read_recent_changes {
-        return [] unless file_exists( $.recent_changes_path );
-        return eval( slurp( $.recent_changes_path ) );
-    }
-
-    method write_recent_changes ( $recent_changes ) {
-        my $fh = open($.recent_changes_path, :w);
-        $fh.say($recent_changes.perl);
-        $fh.close;
-    }
-
-    method add_recent_change( $modification_id ) {
-        my $recent_changes = self.read_recent_changes();
-        $recent_changes.unshift($modification_id);
-        self.write_recent_changes( $recent_changes );
-    }
-
-    method write_page_history( $page, $page_history ) {
-        my $file = $.content_path ~ $page;
-        my $fh = open($file, :w);
-        $fh.say($page_history.perl);
-        $fh.close;
-    }
-
-    method write_modification ( $modification_id, $modification ) {
-        my $file =  $.modifications_path ~ $modification_id;
-        my $fh = open( $file, :w );
-        $fh.say($modification.perl);
-        $fh.close();
-    }
-
-    method read_modification($modification_id) {
-        my $file = $.modifications_path ~ $modification_id;
-        # RAKUDO: use :e
-        return [] unless file_exists( $file );
-        return eval( slurp($file) );
     }
 
     method read_users {
@@ -259,7 +337,6 @@ class Wiki {
     }
 
     method log_in {
-
         if my $user_name = $.cgi.param<user_name> {
 
             my $password = $.cgi.param<password>;
@@ -275,10 +352,8 @@ class Wiki {
                 my $template = HTML::Template.new(
                     filename => $.template_path ~ 'login_succeeded.tmpl');
 
-                my $session_id = get_unique_id();
+                my $session_id = self.new_session();
                 my $session_cookie = "session_id=$session_id";
-                
-                self.add_session( $session_id, { user_name => $user_name } );
 
                 $.cgi.send_response(
                     $template.output(),
@@ -308,36 +383,7 @@ class Wiki {
         return;
     }
 
-    method add_session( $id, %stuff) {
-        my $sessions = self.read_sessions();
-        $sessions{$id} = %stuff;
-        self.write_sessions($sessions);
-    }
-
-    method read_sessions {
-        return {} unless file_exists( $.sessionfile_path );
-        my $string = slurp( $.sessionfile_path );
-        my $stuff = eval( $string );
-        return $stuff;
-    }
-
-    method remove_session($id) {
-        my $sessions = self.read_sessions();
-        # RAKUDO: No 'delete' builtin
-        # TODO: File bug, this dosnt work either, cant assign string to a
-        #       hash-container type smth...
-        $sessions{$id} = 'DELETED';
-        self.write_sessions($sessions);
-    }
-
-    method write_sessions( $sessions ) {
-        my $fh = open($.sessionfile_path, :w);
-        $fh.say($sessions.perl);
-        $fh.close;
-    }
-
     method log_out {
-
         if defined $.cgi.cookie('session_id') {
             my $template = HTML::Template.new(
                 filename => $.template_path ~ 'logout_succeeded.tmpl');
@@ -386,21 +432,6 @@ class Wiki {
         $template.param('CHANGES' => @changes);
 
         print $template.output();
-    }
-
-    sub file_exists( $file ) {
-        # RAKUDO: use ~~ :e
-        my $exists = False;
-        try {
-            my $fh = open( $file );
-            $exists = True;
-        }
-        return $exists;
-    }
-
-    sub get_unique_id {
-        # hopefully pretty unique ID
-        return int(time%1000000/100) ~ time%100
     }
 }
 
