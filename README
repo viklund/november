@@ -33,7 +33,7 @@ REPOSITORY LAYOUT
 │
 ├─p6w/    Perl 6 wiki implementation
 │
-└─p5w/    Perl 5 reference implemntation
+└─p5w/    Perl 5 reference implementation
 
 RUNNING NOVEMBER
 ----------------
