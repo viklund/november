@@ -158,13 +158,14 @@ class Store__File is Store {
     }
 }
 
-class Wiki is Store__File does Session {
+class Wiki does Session {
 
     # TODO: This is a bit ridiculous. We really should have a hash attribute
     # called %.path_to instead.
     my $.template_path       is rw;
     my $.userfile_path       is rw;
 
+    has Store $.store        is rw;
     has $.cgi                is rw;
 
     method init {
@@ -173,7 +174,11 @@ class Wiki is Store__File does Session {
         $.userfile_path = 'data/users';
 
         # Multiple dispatch dosn't work
-        Store__File::init(self);
+        $.store = Store__File.new();
+        $.store.init();
+        $.store = Store__File.new();
+        $.store.init();
+        #Store__File::init(self);
         Session::init(self);
     }
 
@@ -198,7 +203,7 @@ class Wiki is Store__File does Session {
     method view_page() {
         my $page = $.cgi.param<page> // 'Main_Page';
 
-        if !self.wiki_page_exists($page) {
+        if !$.store.wiki_page_exists($page) {
             my $template = HTML::Template.new(
                 filename => $.template_path ~ 'not_found.tmpl');
 
@@ -214,7 +219,7 @@ class Wiki is Store__File does Session {
             filename => $.template_path ~ 'view.tmpl');
 
         $template.param('TITLE' => $page);
-        $template.param('CONTENT' => self.format_html(self.read_page($page)));
+        $template.param('CONTENT' => self.format_html($.store.read_page($page)));
 
         $.cgi.send_response(
             $template.output(),
@@ -232,9 +237,9 @@ class Wiki is Store__File does Session {
         }
 
         my $already_exists
-                        = self.wiki_page_exists($page);
+                        = $.store.wiki_page_exists($page);
         my $action      = $already_exists ?? 'Editing' !! 'Creating';
-        my $old_content = $already_exists ?? self.read_page($page) !! '';
+        my $old_content = $already_exists ?? $.store.read_page($page) !! '';
         my $title = "$action $page";
 
         # The 'edit' action handles both showing the form and accepting the
@@ -243,7 +248,7 @@ class Wiki is Store__File does Session {
         if $.cgi.param<articletext> {
             my $new_text = $.cgi.param<articletext>;
             my $author = $sessions{$session_id}<user_name>;
-            self.save_page($page, $new_text, $author);
+            $.store.save_page($page, $new_text, $author);
             return self.view_page();
         }
 
@@ -318,7 +323,7 @@ class Wiki is Store__File does Session {
     }
 
     method make_link($page) {
-        if self.wiki_page_exists($page) {
+        if $.store.wiki_page_exists($page) {
             return "<a href=\"?action=view&page=$page\">$page</a>"
         } 
         return "<a href=\"?action=edit&page=$page\" "~'class="nonexistent"'~">$page</a>"
@@ -415,11 +420,11 @@ class Wiki is Store__File does Session {
 
         # RAKUDO: Seemingly impossible to get the right number of list
         # containers using an array variable @recent_changes here.
-        my $recent_changes = self.read_recent_changes();
+        my $recent_changes = $.store.read_recent_changes();
 
         my @changes;
         for $recent_changes -> $modification_id {
-            my $modification = self.read_modification($modification_id);
+            my $modification = $.store.read_modification($modification_id);
             push @changes, { 'page' => self.make_link( $modification[0] ),
                              'time' => $modification_id,
                              'author' => $modification[2] || 'somebody' };
