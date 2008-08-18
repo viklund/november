@@ -37,8 +37,10 @@ role Session {
     method remove_session($id) {
         my $sessions = self.read_sessions();
         # RAKUDO: No 'delete' builtin
-        # TODO: File bug, this dosnt work either, cant assign string to a
-        #       hash-container type smth...
+        # TODO: File bug, this dosnt work either: when putting a scalar in
+        #       a hash slot where there used to be a hash, the error message
+        #       "Odd number of elements found where hash expected"
+        #       is shown.
         $sessions{$id} = 'DELETED';
         self.write_sessions($sessions);
     }
@@ -65,6 +67,7 @@ role Session {
 
 class Store {
     # These should be overridden in a subclass
+    # RAKUDO: This is really a job for '...', which is not implemented yet.
     method wiki_page_exists($page)                               {die}
 
     method read_recent_changes                                   {die}
@@ -270,7 +273,7 @@ class Wiki does Session {
             filename => $.template_path ~ 'action_not_authorized.tmpl');
 
         # TODO: file bug, without "'" it is interpreted as named args and not
-        # as Pair
+        #       as Pair
         $template.param('DISALLOWED_ACTION' => 'edit pages');
 
         $.cgi.send_response(
@@ -287,7 +290,7 @@ class Wiki does Session {
     }
 
     method quote($metachar) {
-        # RAKUDO: Tried chained trinary. Saw the result and cried.
+        # RAKUDO: Chained trinary operators do not do what we mean yet.
         return '&#039;' if $metachar eq '\'';
         return '&lt;'   if $metachar eq '<';
         return '&gt;'   if $metachar eq '>';
