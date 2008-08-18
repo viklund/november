@@ -327,10 +327,12 @@ class Wiki does Session {
     }
 
     method make_link($page) {
-        if $.store.wiki_page_exists($page) {
-            return "<a href=\"?action=view&page=$page\">$page</a>"
-        } 
-        return "<a href=\"?action=edit&page=$page\" "~'class="nonexistent"'~">$page</a>"
+        return sprintf('<a href="?action=edit&page=%s"%s>%s</a>',
+                       $page,
+                       $.store.wiki_page_exists($page)
+                         ?? ''
+                         !! ' class="nonexistent"',
+                       $page);
     }
 
     method not_found() {
