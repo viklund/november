@@ -34,13 +34,6 @@ role Session {
         self.write_sessions($sessions);
     }
 
-    method read_sessions {
-        return {} unless file_exists( $.sessionfile_path );
-        my $string = slurp( $.sessionfile_path );
-        my $stuff = eval( $string );
-        return $stuff;
-    }
-
     method remove_session($id) {
         my $sessions = self.read_sessions();
         # RAKUDO: No 'delete' builtin
@@ -48,6 +41,13 @@ role Session {
         #       hash-container type smth...
         $sessions{$id} = 'DELETED';
         self.write_sessions($sessions);
+    }
+
+    method read_sessions {
+        return {} unless file_exists( $.sessionfile_path );
+        my $string = slurp( $.sessionfile_path );
+        my $stuff = eval( $string );
+        return $stuff;
     }
 
     method write_sessions( $sessions ) {
