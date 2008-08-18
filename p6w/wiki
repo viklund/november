@@ -316,6 +316,10 @@ class Wiki does Session {
         return $text.substr(0, $clb) ~ "\n" ~ wrap($rest_of_string, $length);
     }
 
+    sub indent($text, $length) {
+        return join("\n", map { ' ' x $length ~ $_ }, split("\n", $text));
+    }
+
     method format_html($text is rw) {
         if $text ~~ Wiki::Syntax::TOP {
             # RAKDUO: Must match again. [perl #57858]
@@ -337,11 +341,10 @@ class Wiki does Session {
                         when 'metachar'  { $result ~= self.quote($text) }
                         when 'malformed' { $result ~= $text }
                     }
-                 }
-                 $result ~= "</p>";
+                }
+                $result ~= "</p>";
 
-                 push @pars, join("\n", map { ' ' x 12 ~ $_ },
-                             split("\n", wrap($result, 66)));
+                push @pars, indent( wrap($result, 60), 12 );
             }
 
             return join "\n\n", @pars;
