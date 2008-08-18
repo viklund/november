@@ -2,10 +2,13 @@
 
 QS=$1
 if [ "$PARROT_DIR" == "" ]; then
-  echo Hello, we\'d like you to set your PARROT_DIR first.
-  echo If you\'re using bash, you do it like this:
-  echo export PARROT_DIR=/path/to/your/installation/of/parrot/
-  echo Also consider putting this line into your \~/.bashrc for great justice.
+  cat <<EXPLANATION
+In order to run this script, you need to set your PARROT_DIR first.
+If you\'re using bash, you can do it like this:
+export PARROT_DIR=/path/to/your/installation/of/parrot/
+Also consider putting this line into your \~/.bashrc -- that way,
+PARROT_DIR will be automatically set for you in every bash session.
+EXPLANATION
   exit
 fi
 REQUEST_METHOD=GET \
