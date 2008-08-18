@@ -298,16 +298,36 @@ class Wiki does Session {
         return $metachar;
     }
 
+    sub convenient_line_break($text, $length) {
+        return $text.chars if $text.chars < $length;
+        for reverse(0 .. $length), $length .. $text.chars -> $pos {
+            return $pos if $text.substr( $pos, 1 ) eq ' ';
+        }
+        return $text.chars;
+    }
+
+    sub wrap($text, $length) {
+        my $clb = convenient_line_break($text, $length);
+
+        return $text if $clb >= $text.chars;
+
+        my $rest_of_string = $text.substr($clb).subst(/^ \s+/, '');
+
+        return $text.substr(0, $clb) ~ "\n" ~ wrap($rest_of_string, $length);
+    }
+
     method format_html($text is rw) {
-        # RAKUDO: When 'gather' is implemented, we can to this a bit nicer with
-        # `join '', gather { ... }` instead.
-        my $result = '';
         if $text ~~ Wiki::Syntax::TOP {
             # RAKDUO: Must match again. [perl #57858]
-            $text ~~ Wiki::Syntax::TOP;
+            $text ~~ Wiki::Syntax::TOP;	
+
+            # RAKUDO: When 'gather' is implemented, we can to this a bit nicer
+            # with `join '', gather { ... }` instead.
+            my @pars;
+
             for $/<paragraph> -> $p {
 
-                $result ~= '<p>';
+                my $result = '<p>';
                 for $p<parchunk> {
                     my $text = $_.values[0];
                     given $_.keys[0] {
@@ -318,12 +338,16 @@ class Wiki does Session {
                         when 'malformed' { $result ~= $text }
                     }
                  }
-                 $result ~= "</p>\n";
+                 $result ~= "</p>";
+
+                 push @pars, join("\n", map { ' ' x 12 ~ $_ },
+                             split("\n", wrap($result, 66)));
             }
+
+            return join "\n\n", @pars;
         } else {
-            $result = '<p>Could not parse...</p>';
+            return '<p>Could not parse markup.</p>';
         }
-        return $result;
     }
 
     method make_link($page) {
