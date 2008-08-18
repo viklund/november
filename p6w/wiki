@@ -459,14 +459,7 @@ grammar Wiki::Syntax {
     token twext { [ <alnum> || <otherchar> || <sp> ]+ };
 
     # TODO: Need to test this before replacing it with the long variant below.
-#    token otherchar { <[ !..% (../ : ; ? @ \ ^..` {..~ ]> };
-    token otherchar {
-      [ '!' | '#' | '$' | '%' | '(' | ')' | '*' | '+'
-      | ',' | '-' | '.' | '/' | ':' | ';' | '=' | '?'
-      | '@' | '^' | '_' | '`' | '{' | '|' | '}' | '~'
-      | '\\'
-      ]
-    };
+    token otherchar { <[ !..% (../ : ; ? @ \\ ^..` {..~ ]> };
 
     token sp { ' ' };
 
