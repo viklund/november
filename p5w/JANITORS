@@ -1,5 +1,9 @@
-A few things that need to be done, but that are not critical to the success
-of the project:
+This is the JANITORS file, where small tasks are written down so that they are
+not forgotten. Since the tasks are often fairly low-hanging fruit, many of
+them are likely to be good starting-points for volunteers.
+
+If there's an item appearing here which has already been implemented, feel
+free to remove it.
 
 * Hide "Log in" when logged in and "Log out" when logged out.
 

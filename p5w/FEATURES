@@ -1,28 +1,28 @@
 == Essential features
 (without which not even we would consider it a wiki)
 
-* Linking [2008-06-28]
-* Editing [2008-07-02]
+* Linking . . . . . . . . . . . . . . . . . . . . . . . . . . . . [2008-06-28]
+* Editing . . . . . . . . . . . . . . . . . . . . . . . . . . . . [2008-07-02]
 
 == Important features
 (without which other people might not consider it a wiki)
 
-* Creating new pages (without resorting to URL rewriting) [2008-07-02]
+* Creating new pages (without resorting to URL rewriting) . . . . [2008-07-02]
 
-* User authentication [2008-08-07]
-* Logging in [2008-08-07], logging out [2008-08-07]
+* User authentication . . . . . . . . . . . . . . . . . . . . . . [2008-08-07]
+* Logging in logging out. . . . . . . . . . . . . . . . . . . . . [2008-08-07]
 
-* The concept of a user authoring an edit [2008-08-07]
+* The concept of a user authoring an edit . . . . . . . . . . . . [2008-08-07]
 
-* Collision prevention -- the second person simultaneously editing a page
-  should get at least a warning
+* Collision prevention -- warning people
+  who are editing at the same time
 
-* Article history [2008-08-10]
-** Ability to view old revisions of pages [2008-08-10]
-** Diffs between consequtive revisions [2008-08-11]
+* Article history . . . . . . . . . . . . . . . . . . . . . . . . [2008-08-10]
+** Ability to view old revisions of pages . . . . . . . . . . . . [2008-08-10]
+** Diffs between consequtive revisions. . . . . . . . . . . . . . [2008-08-11]
 ** Diffs between arbritary revisions (a la Mediawiki)
 
-* Recent changes [2008-07-02]
+* Recent changes. . . . . . . . . . . . . . . . . . . . . . . . . [2008-07-02]
 
 * Images (and other files)
 
@@ -30,7 +30,7 @@
 
 * Unicode support
 
-* A decent default CSS layout [2008-07-31]
+* A decent default CSS layout . . . . . . . . . . . . . . . . . . [2008-07-31]
 ** Pluggable layouts
 
 == Desirable features
@@ -42,5 +42,6 @@
 
 * A plug-in system
 
-(See also the JANITORS file, for desired smaller-than-feature changes and
-additions.)
+(There's also a JANITORS file, for desired smaller-than-feature changes and
+additions. Additionally, there's a LOOKINTO file, with possibly worthwhile
+not-yet-features to be investigated.)
