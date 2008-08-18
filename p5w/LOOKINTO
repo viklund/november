@@ -1,0 +1,9 @@
+* Using Parrot NCI to wrap SQLite.
+* Using svk as a storage backend.
+* Packaging for CPAN.
+* Tagging system.
+* Caching.
+* Support of ";" as well as "&" in URIs.
+* Markups. (MediaWiki, Textile, Markdown, POD, kwid, Socialtext, PhpWiki, UseModWiki)
+* RSS feeds.
+* Mirroring into svn repositories.
