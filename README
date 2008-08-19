@@ -26,6 +26,13 @@ follow instructions there. See instructions on the parrot site:
 
  <http://www.parrotcode.org/>
 
+Depending on the current contents of the rakudo-patch/ folder, you may also
+need to patch rakudo yourself with a few proposed patches that have not gone
+into rakudo yet.
+
+$ cd $PARROT_DIR
+$ patch -p0 < /your/path/to/november/rakudo-patches/*.patch
+
 REPOSITORY LAYOUT
 -----------------
 
