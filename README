@@ -50,9 +50,13 @@ REPOSITORY LAYOUT
 RUNNING NOVEMBER
 ----------------
 
+It's a bit slow running everything through the interpreter every time. To
+speed things up run make in the p6w directory. You need to update the
+PARROT_DIR macro in the Makefile to point to your parrot directory.
+
 * From the command line
   
-  Set the PARROT_PATH variable to the path of your parrot directory.
+  Set the PARROT_DIR variable to the path of your parrot directory.
 
   This will generate the Main_Page on STDOUT:
 
@@ -90,7 +94,7 @@ RUNNING NOVEMBER
 
   Seriously. (This will change, though.)
 
-  Edit the file wiki.sh and update the PARROT_PATH variable.
+  Edit the file wiki.sh and update the PARROT_DIR variable.
 
   After this, you can direct your browser to the wiki. The URL will
   look something like this:
