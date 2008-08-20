@@ -65,7 +65,7 @@ role Session {
     }
 }
 
-class Store {
+class Storage {
     # These should be overridden in a subclass
     # RAKUDO: This is really a job for '...', which is not implemented yet.
     method wiki_page_exists($page)                               {die}
@@ -107,7 +107,7 @@ class Store {
 }
 
 # TODO: Submit bug (again) about inheritence and namespaced classes
-class Store__File is Store {
+class Storage__File is Storage {
     my $.content_path        is rw;
     my $.modifications_path  is rw;
     my $.recent_changes_path is rw;
@@ -169,7 +169,7 @@ class Wiki does Session {
     my $.template_path       is rw;
     my $.userfile_path       is rw;
 
-    has Store $.store        is rw;
+    has Storage $.storage    is rw;
     has $.cgi                is rw;
 
     method init {
@@ -178,11 +178,11 @@ class Wiki does Session {
         $.userfile_path = 'data/users';
 
         # Multiple dispatch dosn't work
-        $.store = Store__File.new();
-        $.store.init();
-        $.store = Store__File.new();
-        $.store.init();
-        #Store__File::init(self);
+        $.storage = Storage__File.new();
+        $.storage.init();
+        $.storage = Storage__File.new();
+        $.storage.init();
+        #Storage__File::init(self);
         Session::init(self);
     }
 
@@ -207,7 +207,7 @@ class Wiki does Session {
     method view_page() {
         my $page = $.cgi.param<page> // 'Main_Page';
 
-        if !$.store.wiki_page_exists($page) {
+        if !$.storage.wiki_page_exists($page) {
             my $template = HTML::Template.new(
                 filename => $.template_path ~ 'not_found.tmpl');
 
@@ -223,7 +223,7 @@ class Wiki does Session {
             filename => $.template_path ~ 'view.tmpl');
 
         $template.param('TITLE' => $page);
-        $template.param('CONTENT' => self.format_html($.store.read_page($page)));
+        $template.param('CONTENT' => self.format_html($.storage.read_page($page)));
 
         $.cgi.send_response(
             $template.output(),
@@ -241,9 +241,9 @@ class Wiki does Session {
         }
 
         my $already_exists
-                        = $.store.wiki_page_exists($page);
+                        = $.storage.wiki_page_exists($page);
         my $action      = $already_exists ?? 'Editing' !! 'Creating';
-        my $old_content = $already_exists ?? $.store.read_page($page) !! '';
+        my $old_content = $already_exists ?? $.storage.read_page($page) !! '';
         my $title = "$action $page";
 
         # The 'edit' action handles both showing the form and accepting the
@@ -252,7 +252,7 @@ class Wiki does Session {
         if $.cgi.param<articletext> {
             my $new_text = $.cgi.param<articletext>;
             my $author = $sessions{$session_id}<user_name>;
-            $.store.save_page($page, $new_text, $author);
+            $.storage.save_page($page, $new_text, $author);
             return self.view_page();
         }
 
@@ -356,7 +356,7 @@ class Wiki does Session {
     method make_link($page) {
         return sprintf('<a href="?action=edit&page=%s"%s>%s</a>',
                        $page,
-                       $.store.wiki_page_exists($page)
+                       $.storage.wiki_page_exists($page)
                          ?? ''
                          !! ' class="nonexistent"',
                        $page);
@@ -453,13 +453,13 @@ class Wiki does Session {
 
         # RAKUDO: Seemingly impossible to get the right number of list
         # containers using an array variable @recent_changes here.
-        my $recent_changes = $.store.read_recent_changes();
+        my $recent_changes = $.storage.read_recent_changes();
 
         my @changes;
         # RAKDUO: It's impossible to iterate over an array!
         for 0..^$recent_changes.elems -> $i {
             my $modification_id = $recent_changes[$i];
-            my $modification = $.store.read_modification($modification_id);
+            my $modification = $.storage.read_modification($modification_id);
             push @changes, { 'page' => self.make_link( $modification[0] ),
                              'time' => $modification_id,
                              'author' => $modification[2] || 'somebody' };
