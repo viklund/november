@@ -300,6 +300,7 @@ class Wiki does Session {
 
     sub convenient_line_break($text, $length) {
         return $text.chars if $text.chars < $length;
+        # RAKUDO: This should of course be done with rindex, once that's in place.
         for reverse(0 .. $length), $length .. $text.chars -> $pos {
             return $pos if $text.substr( $pos, 1 ) eq ' ';
         }
@@ -325,8 +326,7 @@ class Wiki does Session {
             # RAKDUO: Must match again. [perl #57858]
             $text ~~ Wiki::Syntax::TOP;	
 
-            # RAKUDO: When 'gather' is implemented, we can to this a bit nicer
-            # with `join '', gather { ... }` instead.
+            # RAKUDO: Perhaps use 'gather' instead, once rakudo has that.
             my @pars;
 
             for $/<paragraph> -> $p {

@@ -33,6 +33,11 @@ into rakudo yet.
 $ cd $PARROT_DIR
 $ patch -p0 < /your/path/to/november/rakudo-patches/*.patch
 
+...and recompile rakudo.
+
+$ cd $PARROT_DIR/languages/perl6
+$ make
+
 REPOSITORY LAYOUT
 -----------------
 
