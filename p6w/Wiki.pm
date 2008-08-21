@@ -469,7 +469,11 @@ class Wiki does Session {
     
         $template.param('CHANGES' => @changes);
 
-        print $template.output();
+        $.cgi.send_response(
+            $template.output()
+        );
+
+        return;
     }
 }
 
