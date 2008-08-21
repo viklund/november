@@ -27,13 +27,13 @@ follow instructions there. See instructions on the parrot site:
  <http://www.parrotcode.org/>
 
 Depending on the current contents of the rakudo-patch/ folder, you may also
-need to patch rakudo yourself with a few proposed patches that have not gone
-into rakudo yet.
+need to patch Rakudo yourself with a few proposed patches that have not gone
+into Rakudo yet.
 
 $ cd $PARROT_DIR
 $ patch -p0 < /your/path/to/november/rakudo-patches/*.patch
 
-...and recompile rakudo.
+...and recompile Rakudo.
 
 $ cd $PARROT_DIR/languages/perl6
 $ make
@@ -70,7 +70,8 @@ PARROT_DIR macro in the Makefile to point to your parrot directory.
   You can actually skip the 'action=view' part since viewing is the default
   action.
 
-  The other actions we have so far are edit, log_in and log_out. 
+  The other actions we have so far are edit, log_in, log_out and
+  recent_changes. 
 
 * On a web server
 
