@@ -353,11 +353,10 @@ class Wiki does Session {
     }
 
     method make_link($page) {
-        return sprintf('<a href="?action=edit&page=%s"%s>%s</a>',
-                       $page,
+        return sprintf('<a href="?action=%s&page=%s"%s>%s</a>',
                        $.storage.wiki_page_exists($page)
-                         ?? ''
-                         !! ' class="nonexistent"',
+                         ?? ('view', $page, '')
+                         !! ('edit', $page, ' class="nonexistent"'),
                        $page);
     }
 
