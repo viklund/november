@@ -105,8 +105,7 @@ class Storage {
     }
 }
 
-# TODO: Submit bug (again) about inheritence and namespaced classes
-class Storage__File is Storage {
+class Storage::File is Storage {
     my $.content_path        is rw;
     my $.modifications_path  is rw;
     my $.recent_changes_path is rw;
@@ -177,11 +176,11 @@ class Wiki does Session {
         $.userfile_path = 'data/users';
 
         # Multiple dispatch dosn't work
-        $.storage = Storage__File.new();
+        $.storage = Storage::File.new();
         $.storage.init();
-        $.storage = Storage__File.new();
+        $.storage = Storage::File.new();
         $.storage.init();
-        #Storage__File::init(self);
+        #Storage::File::init(self);
         Session::init(self);
     }
 
