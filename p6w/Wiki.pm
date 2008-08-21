@@ -178,8 +178,6 @@ class Wiki does Session {
         # Multiple dispatch dosn't work
         $.storage = Storage::File.new();
         $.storage.init();
-        $.storage = Storage::File.new();
-        $.storage.init();
         #Storage::File::init(self);
         Session::init(self);
     }
