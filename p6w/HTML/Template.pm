@@ -69,9 +69,7 @@ class HTML::Template {
     method serialize_loop($text is rw, @hashes) {
         my $result = "";
 
-        # RAKUDO: Cannot iterate over an array.
-        for 0..^@hashes -> $i {
-            my $hash = @hashes[$i];
+        for @hashes.values -> $hash {
             $result ~= self.serialize_iteration($text, $hash);
         }
         return $result;

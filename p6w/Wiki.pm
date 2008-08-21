@@ -296,7 +296,8 @@ class Wiki does Session {
 
     sub convenient_line_break($text, $length) {
         return $text.chars if $text.chars < $length;
-        # RAKUDO: This should of course be done with rindex, once that's in place.
+        # RAKUDO: This should of course be done with rindex, once that's
+        # in place.
         for reverse(0 .. $length), $length .. $text.chars -> $pos {
             return $pos if $text.substr( $pos, 1 ) eq ' ';
         }
@@ -451,9 +452,7 @@ class Wiki does Session {
         my $recent_changes = $.storage.read_recent_changes();
 
         my @changes;
-        # RAKDUO: It's impossible to iterate over an array!
-        for 0..^$recent_changes.elems -> $i {
-            my $modification_id = $recent_changes[$i];
+        for $recent_changes.values -> $modification_id {
             my $modification = $.storage.read_modification($modification_id);
             push @changes, { 'page' => self.make_link( $modification[0] ),
                              'time' => $modification_id,
@@ -462,7 +461,7 @@ class Wiki does Session {
 
         my $template = HTML::Template.new(
                 filename => $.template_path ~ 'recent_changes.tmpl');
-    
+
         $template.param('CHANGES' => @changes);
 
         print $template.output();
@@ -480,7 +479,6 @@ grammar Wiki::Syntax {
     # RAKUDO: a token may not be called 'text' [perl #57864]
     token twext { [ <alnum> || <otherchar> || <sp> ]+ };
 
-    # TODO: Need to test this before replacing it with the long variant below.
     token otherchar { <[ !..% (../ : ; ? @ \\ ^..` {..~ ]> };
 
     token sp { ' ' };
