@@ -24,7 +24,7 @@ class HTML::Template {
     method serialize($text is rw) {
         my @loops;
 
-        while ( $text ~~ / '<TMPL_' (<alnum>+) ' NAME=' (<alnum>+) '>' / ) {
+        while ( $text ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' / ) {
             my $directive = $0;
             my $name = $1;
 
@@ -38,14 +38,14 @@ class HTML::Template {
             if $directive eq 'LOOP' {
 
                 # TODO: In the presence of nested loops: this is wrong.
-                unless $text ~~ / '<TMPL_LOOP NAME=' <alnum>+ '>' (.*?)
+                unless $text ~~ / '<TMPL_LOOP NAME=' \w+ '>' (.*?)
                                   '</TMPL_LOOP>' / {
                     die "No closing </TMPL_LOOP>"
                 }
                 my $loop_inside = $0;
 
                 # RAKUDO: Dotty methods don't work.
-                $text = $text.subst( / '<TMPL_LOOP NAME=' <alnum>+ '>' .*?
+                $text = $text.subst( / '<TMPL_LOOP NAME=' \w+ '>' .*?
                                        '</TMPL_LOOP>' /,
                                      self.serialize_loop(
                                          $loop_inside,
@@ -53,7 +53,7 @@ class HTML::Template {
             }
             else { # it's TMPL_VAR
                 # RAKUDO: Dotty methods don't work.
-                $text = $text.subst( / '<TMPL_VAR NAME=' <alnum>+ '>' /,
+                $text = $text.subst( / '<TMPL_VAR NAME=' \w+ '>' /,
                                      $value );
             }
         }
@@ -79,7 +79,7 @@ class HTML::Template {
 
     method serialize_iteration($text, %hash) {
         my $result = $text;
-        while ( $result ~~ / '<TMPL_' (<alnum>+) ' NAME=' (<alnum>+) '>' / ) {
+        while ( $result ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' / ) {
             my $directive = $0;
             my $name = $1;
 
@@ -97,14 +97,14 @@ class HTML::Template {
             if $directive eq 'LOOP' {
 
                 # TODO: In the presence of nested loops: this is wrong.
-                unless $result ~~ / '<TMPL_LOOP NAME=' <alnum>+ '>' (.*?)
+                unless $result ~~ / '<TMPL_LOOP NAME=' \w+ '>' (.*?)
                                   '</TMPL_LOOP>' / {
                     die "No closing </TMPL_LOOP>"
                 }
                 my $loop_inside = $0;
 
                 # RAKUDO: Dotty methods don't work.
-                $result = $result.subst( / '<TMPL_LOOP NAME=' <alnum>+ '>' .*?
+                $result = $result.subst( / '<TMPL_LOOP NAME=' \w+ '>' .*?
                                        '</TMPL_LOOP>' /,
                                      self.serialize_loop(
                                          $loop_inside,
@@ -112,8 +112,8 @@ class HTML::Template {
             }
             else { # it's TMPL_VAR
                 # RAKUDO: Dotty methods don't work.
-                $result = $result.subst( / '<TMPL_VAR NAME=' <alnum>+ '>' /,
-                                     $value );
+                $result = $result.subst( / '<TMPL_VAR NAME=' \w+ '>' /,
+                                         $value );
             }
         }
 
