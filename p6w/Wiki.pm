@@ -219,11 +219,22 @@ class Wiki does Session {
             filename => $.template_path ~ 'view.tmpl');
 
         $template.param('TITLE' => $page);
-        $template.param('CONTENT' => self.format_html($.storage.read_page($page)));
+        $template.param('CONTENT' => self.format_html(
+                                         $.storage.read_page($page)
+                                     ));
+        $template.param('LOGGED_IN' => self.logged_in());
 
         $.cgi.send_response(
             $template.output(),
         );
+    }
+
+    method logged_in() {
+        my $sessions = self.read_sessions();
+        my $session_id = $.cgi.cookie<session_id>;
+        # RAKUDO: 'defined' should maybe be 'exists', although here it doesn't
+        # matter.
+        return defined $session_id && defined $sessions{$session_id};
     }
 
     method edit_page() {
@@ -231,10 +242,7 @@ class Wiki does Session {
 
         my $sessions = self.read_sessions();
 
-        my $session_id = $.cgi.cookie<session_id>;
-        if !$session_id || !$sessions{$session_id} {
-            return self.not_authorized();
-        }
+        return self.not_authorized() unless logged_in();
 
         my $already_exists
                         = $.storage.wiki_page_exists($page);
@@ -247,6 +255,7 @@ class Wiki does Session {
         # parameter -- if there is one, the action is considered a save.
         if $.cgi.param<articletext> {
             my $new_text = $.cgi.param<articletext>;
+            my $session_id = $.cgi.cookie<session_id>;
             my $author = $sessions{$session_id}<user_name>;
             $.storage.save_page($page, $new_text, $author);
             return self.view_page();
@@ -255,9 +264,10 @@ class Wiki does Session {
         my $template = HTML::Template.new(
             filename => $.template_path ~ 'edit.tmpl');
 
-        $template.param('PAGE'    => $page);
-        $template.param('TITLE'   => $title);
-        $template.param('CONTENT' => $old_content);
+        $template.param('PAGE'      => $page);
+        $template.param('TITLE'     => $title);
+        $template.param('CONTENT'   => $old_content);
+        $template.param('LOGGED_IN' => True);
 
         $.cgi.send_response(
             $template.output(),
@@ -362,7 +372,8 @@ class Wiki does Session {
         my $template = HTML::Template.new(
             filename => $.template_path ~ 'not_found.tmpl');
 
-        $template.param('PAGE' => 'Action Not found');
+        $template.param('PAGE'      => 'Action Not found');
+        $template.param('LOGGED_IN' => self.logged_in());
 
         $.cgi.send_response(
             $template.output(),
@@ -462,7 +473,8 @@ class Wiki does Session {
         my $template = HTML::Template.new(
                 filename => $.template_path ~ 'recent_changes.tmpl');
 
-        $template.param('CHANGES' => @changes);
+        $template.param('CHANGES'   => @changes);
+        $template.param('LOGGED_IN' => self.logged_in());
 
         print $template.output();
     }

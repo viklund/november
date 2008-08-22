@@ -30,7 +30,8 @@ class HTML::Template {
 
             # `$s ne $a & $b` means `$s ne $a || $s ne $b`,
             # which is confusing, so we'll write it like this instead:
-            die "Unrecognized directive" if !($directive eq 'VAR' | 'LOOP');
+            die "Unrecognized directive: TMPL_$directive"
+              if !($directive eq 'VAR' | 'LOOP' | 'IF');
 
             my $value = %!params{$name}
               // die "$name is defined in the template but undefined in source";
@@ -50,6 +51,28 @@ class HTML::Template {
                                      self.serialize_loop(
                                          $loop_inside,
                                          $value ));
+            }
+            elsif $directive eq 'IF' {
+
+                # TODO: In the presence of nested ifs: this is wrong.
+                unless $text ~~ / '<TMPL_IF NAME=' \w+ '>' (.*?)
+                                  '</TMPL_IF>' / {
+                    die "No closing </TMPL_IF>"
+                }
+                my $text_inside = $0;
+                my $if_inside = $text_inside;
+                my $else_inside = '';
+                if $text_inside ~~ / ^ (.*?) '<TMPL_ELSE>' (.*) $ / {
+                    # RAKUDO: Need to match again.
+                    $text_inside ~~ / ^ (.*?) '<TMPL_ELSE>' (.*) $ /;
+                    $if_inside = $0;
+                    $else_inside = $1;
+                }
+                # TODO: In a perfect world, the contents should also be
+                # parsed and substituted.
+                $text = $text.subst( / '<TMPL_IF NAME=' \w+ '>' .*?
+                                       '</TMPL_IF>' /,
+                                       $value ?? $if_inside !! $else_inside );
             }
             else { # it's TMPL_VAR
                 # RAKUDO: Dotty methods don't work.
@@ -85,40 +108,28 @@ class HTML::Template {
 
             # `$s ne $a & $b` means `$s ne $a || $s ne $b`,
             # which is confusing, so we'll write it like this instead:
-            die "Unrecognized directive" if !($directive eq 'VAR' | 'LOOP');
+            die "Unrecognized directive: TMPL_$directive"
+              if !($directive eq 'VAR' | 'LOOP');
 
             # TODO: Converting it to lowercase here is definitely wrong.
             # But it works for now.
             my $value = %hash{$name.lc}
               // die "$name is defined in the template but undefined in source";
 
-            if $directive eq 'LOOP' {
-
-                # TODO: In the presence of nested loops: this is wrong.
-                unless $result ~~ / '<TMPL_LOOP NAME=' \w+ '>' (.*?)
-                                  '</TMPL_LOOP>' / {
-                    die "No closing </TMPL_LOOP>"
-                }
-                my $loop_inside = $0;
-
-                # RAKUDO: Dotty methods don't work.
-                $result = $result.subst( / '<TMPL_LOOP NAME=' \w+ '>' .*?
-                                       '</TMPL_LOOP>' /,
-                                     self.serialize_loop(
-                                         $loop_inside,
-                                         $value ));
-            }
-            else { # it's TMPL_VAR
+            if $directive eq 'VAR' {
                 # RAKUDO: Dotty methods don't work.
                 $result = $result.subst( / '<TMPL_VAR NAME=' \w+ '>' /,
                                          $value );
+            }
+            else {
+                die("I haven't implemented TMPL_$directive in loops yet.");
             }
         }
 
         # Also need to check whether some parameters went unused during the
         # substitution. This might be best to do here, or in param(), I don't
         # know. Probably in param, with the allowed parameters pre-cached.
-        # It's a little bit tricky, though, once you take <TEMPL_LOOP> into
+        # It's a little bit tricky, though, once you take <TMPL_LOOP> into
         # account. Need to think about that.
         return $result;
     }

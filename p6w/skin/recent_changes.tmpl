@@ -6,8 +6,11 @@
     </head>
     <body>
         <ul id="toolbar">
-            <li><a href="?action=log_in">Log in</a></li>
-            <li><a href="?action=log_out">Log out</a></li>
+            <TMPL_IF NAME=LOGGED_IN>
+                <li><a href="?action=log_out">Log out</a></li>
+            <TMPL_ELSE>
+                <li><a href="?action=log_in">Log in</a></li>
+            </TMPL_IF>
         </ul>
         <div id="content">
             <h1>Recent changes</h1>
