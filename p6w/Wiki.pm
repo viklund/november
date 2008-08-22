@@ -247,7 +247,7 @@ class Wiki does Session {
 
         my $sessions = self.read_sessions();
 
-        return self.not_authorized() unless logged_in();
+        return self.not_authorized() unless self.logged_in();
 
         my $already_exists
                         = $.storage.wiki_page_exists($page);
