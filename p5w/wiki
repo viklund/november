@@ -114,8 +114,41 @@ sub format_html {
         my $page = $1;
         my $link = make_link($page);
 
-        $text =~ s{ \[\[ (\w*) \]\] }{$link}x;
+        $text =~ s{ \[\[ \w* \]\] }{$link}x;
     }
+
+    while ( $text =~ m{ ==        # starting marker
+                        ([^\n]+)  # anything but a newline
+                        ==        # ending marker
+                      }msx ) {
+        my $heading = $1;
+        my $html = "<h2>$heading</h2>";
+
+        $text =~ s{ == [^\n]+ == }{$html}msx;
+    }
+
+    while ( $text =~ m{ \&\#039;\&\#039;  # starting marker
+                        ([^\n]+)          # anything but a newline
+                        \&\#039;\&\#039;  # ending marker
+                      }msx ) {
+        my $contained_text = $1;
+        my $html = "<em>$contained_text</em>";
+
+        $text =~ s{ \&\#039;\&\#039; [^\n]+ \&\#039;\&\#039; }{$html}msx;
+    }
+
+    while ( $text =~ m{ \*         # starting marker
+                        ([^\n]+)   # anything but a newline
+                        $          # end-of-line
+                      }msx ) {
+        my $contained_text = $1;
+        my $html = "<li>$contained_text</li>";
+
+        $text =~ s{ \* [^\n]+ $ }{$html}msx;
+    }
+
+    # NB: This only works when there's only one list on the page.
+    $text =~ s{ <li> (.*) </li> }{<ul><li>$1</li></ul>}msx;
 
     # Add paragraphs
     $text =~ s{\n\s*\n}{\n<p>}xg;
