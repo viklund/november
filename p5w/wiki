@@ -128,7 +128,7 @@ sub format_html {
     }
 
     while ( $text =~ m{ \&\#039;\&\#039;  # starting marker
-                        ([^\n]+)          # anything but a newline
+                        ([^\n]+?)         # anything but a newline
                         \&\#039;\&\#039;  # ending marker
                       }msx ) {
         my $contained_text = $1;
