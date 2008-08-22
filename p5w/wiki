@@ -150,6 +150,8 @@ sub format_html {
     # NB: This only works when there's only one list on the page.
     $text =~ s{ <li> (.*) </li> }{<ul><li>$1</li></ul>}msx;
 
+    $text =~ s{ \&amp;mdash; }{&mdash;}msxg;
+
     # Add paragraphs
     $text =~ s{\n\s*\n}{\n<p>}xg;
 
