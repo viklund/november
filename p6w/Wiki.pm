@@ -65,18 +65,23 @@ role Session {
 }
 
 class Storage {
-    # These should be overridden in a subclass
+    sub yadda() {
+        die "This method should never be called directly in Storage, but "
+            ~ "should instead\nbe overridden by a deriving class."
+    }
+
+    # These should be overridden in a deriving class
     # RAKUDO: This is really a job for '...', which is not implemented yet.
-    method wiki_page_exists($page)                               {die}
+    method wiki_page_exists($page)                               {yadda}
 
-    method read_recent_changes                                   {die}
-    method write_recent_changes( $recent_changes )               {die}
+    method read_recent_changes()                                 {yadda}
+    method write_recent_changes( $recent_changes )               {yadda}
 
-    method read_page_history($page)                              {die}
-    method write_page_history( $page, $page_history )            {die}
+    method read_page_history($page)                              {yadda}
+    method write_page_history( $page, $page_history )            {yadda}
 
-    method read_modification($modification_id)                   {die}
-    method write_modification( $modification_id, $modification ) {die}
+    method read_modification($modification_id)                   {yadda}
+    method write_modification( $modification_id, $modification ) {yadda}
 
     method save_page($page, $new_text, $author) {
         my $modification_id = get_unique_id();
