@@ -389,7 +389,8 @@ class Wiki does Session {
             my %users = self.read_users();
 
             # Yes, this is cheating. Stand by for a real MD5 hasher.
-            if $password eq %users{$user_name}<plain_text> {
+            if (defined %users{$user_name} 
+               and $password eq %users{$user_name}<plain_text>) {
 #            if Digest::MD5::md5_base64(
 #                   Digest::MD5::md5_base64($user_name) ~ $password
 #               ) eq %users{$user_name}<password> {
@@ -397,7 +398,7 @@ class Wiki does Session {
                 my $template = HTML::Template.new(
                     filename => $.template_path ~ 'login_succeeded.tmpl');
 
-                my $session_id = self.new_session();
+                my $session_id = self.new_session($user_name);
                 my $session_cookie = "session_id=$session_id";
 
                 $.cgi.send_response(
@@ -476,7 +477,11 @@ class Wiki does Session {
         $template.param('CHANGES'   => @changes);
         $template.param('LOGGED_IN' => self.logged_in());
 
-        print $template.output();
+        $.cgi.send_response(
+            $template.output()
+        );
+
+        return;
     }
 }
 
