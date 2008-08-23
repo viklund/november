@@ -32,7 +32,7 @@ As one of the first large-scale applications written in Perl 6, it is also a nic
 
 == Longing for Christmas? ==
 
-\'\'"when it\'s ready, every day will be christmas" &mdash; Roger Hale (<spinclad>)\'\'
+\'\'"when it\'s ready, every day will be christmas" &mdash; Roger Hale (<spinclad>) on Perl 6\'\'
 
 Are you eager to see Perl 6 being released, so you can write cool programs in it without worrying if the language is "done" yet? \'\'You\'\' can help make faster progress. If you show up on #perl6 @ freenode and offer to give a helping hand, someone will greet you and give directions. No prior knowledge of Perl 6 required. Most likely, your help will consist in diving into the Synopses, finding a feature that you like, and making sure that the test suites cover it in sufficient detail. Before you know it, you\'ll be humming along, fudging tests, writing little Perl 6 scripts, [mailto:rakudobug@perl.org submitting bugs], and generally being very happy. Scientists have proved that Perl 6 programmers are 23% more harmonic than people in general. Become a Perl 6 hacker today!
 
