@@ -28,6 +28,9 @@ my $CONTENT_PATH = 'data/articles/';
 my $RECENT_CHANGES_PATH = 'data/recent-changes';
 my $MODIFICATIONS_PATH = 'data/modifications/';
 my $USERFILE_PATH = 'data/users';
+my $PUGS_PATH = '/Users/masak/svn-work/hobbies/pugs';
+
+my $PUGS_PREFIX = 'pugs';
 
 my %sessions;
 
@@ -80,7 +83,10 @@ sub escape {
 sub exists_wiki_page {
     my ($page) = @_;
 
-    return $page && -e $CONTENT_PATH . $page;
+    if ( my ($path) = $page =~ m[ ^ $PUGS_PREFIX \b (.*) $ ]x ) {
+        return -e $PUGS_PATH.$path;
+    }
+    return $page && -e $CONTENT_PATH.$page;
 }
 
 sub make_link {
@@ -303,10 +309,26 @@ sub view_page {
         filename => $TEMPLATE_PATH.'view.tmpl');
 
     $template->param(TITLE => $page);
-    my $raw_contents = defined $revision
-        ? read_old_page($page, $revision)
-        : read_page($page);
-    my $contents = format_html(escape($raw_contents));
+    my $contents;
+    if ( my ($path) = $page =~ m[ ^ $PUGS_PREFIX \b (.*) $ ]x ) {
+        if ( -d (my $file = $PUGS_PATH.$path) ) {
+            $contents = join '<br/>',
+                        map { my $name = substr($_, length($file)+1);
+                              make_link( $page.'/'.$name,
+                                         $name.(-d $_ ? '/' : '') ); }
+                        glob($file.'/*');
+        }
+        else {
+            my $raw_contents = read_file($PUGS_PATH.$path);
+            $contents = '<pre>'.escape($raw_contents).'</pre>';
+        }
+    }
+    else {
+        my $raw_contents = defined $revision
+           ? read_old_page($page, $revision)
+           : read_page($page);
+        $contents = format_html(escape($raw_contents));
+    }
     $template->param(CONTENT => $contents);
     $template->param(LOGGED_IN => logged_in($cgi));
 
