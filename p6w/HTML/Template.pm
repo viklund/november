@@ -33,8 +33,10 @@ class HTML::Template {
             die "Unrecognized directive: TMPL_$directive"
               if !($directive eq 'VAR' | 'LOOP' | 'IF');
 
-            my $value = %!params{$name}
-              // die "$name is defined in the template but undefined in source";
+            my $value = %!params{$name};
+            if !defined($value) && $directive ne 'IF' {
+                die "$name is defined in the template but undefined in source";
+            }
 
             if $directive eq 'LOOP' {
 
