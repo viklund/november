@@ -4,9 +4,9 @@
 
 * Packaging for CPAN.
 
-* Tagging system.
+* A tagging system.
 
-* Caching.
+* Server-side caching.
 
 * Support of ";" as well as "&" in URIs.
 
@@ -20,7 +20,5 @@
 ** Socialtext
 ** PhpWiki
 ** UseModWiki
-
-* RSS feeds.
 
 * Mirroring of the pugs and parrot svn repositories.

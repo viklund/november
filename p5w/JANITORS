@@ -12,7 +12,7 @@ free to remove it.
 * Refine the time indications in recent changes. (Right now they are just
   seconds since epoch.)
 
-* Add 'returnto' links for the login and logout actions. And maybe redirects,
+* Add 'return_to' links for the login and logout actions. And maybe redirects,
   or at least manual links.
 
 * Cosmetically remove the underscores in link titles.
@@ -30,7 +30,8 @@ free to remove it.
   to the view-old-revision pages.
 
 * Add nice little '<- go to previous edition' and 'go to next revision ->'
-  to the view-old-revision pages.
+  to the view-old-revision pages. Provided such previous/next revisions
+  exist, of course.
 
 * Make the CSS stylesheet adhere to a baseline grid
   <http://webtypography.net/Rhythm_and_Proportion/Vertical_Motion/2.2.2/>

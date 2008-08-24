@@ -50,3 +50,8 @@ not-yet-features to be investigated.)
 
 * A plug-in system, so that formatting capabilities
   can be extended by the wiki owner
+
+* RSS/Atom feeds
+** ...for site-wide recent changes
+** ...for individual pages
+** ...for a group of pages subscribed to by the user
