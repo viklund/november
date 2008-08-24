@@ -84,11 +84,19 @@ sub exists_wiki_page {
 }
 
 sub make_link {
-    my ($page) = @_;
+    my ($page, $title) = @_;
 
+    $title ||= $page;
     return exists_wiki_page( $page )
-           ? "<a href='/?page=$page'>$page</a>"
-           : "<a href='/?page=$page&action=edit' style='color: red'>$page</a>";
+           ? "<a href='/?page=$page'>$title</a>"
+           : "<a href='/?page=$page&action=edit' style='color: red'>$title</a>";
+}
+
+sub make_external_link {
+    my ($url, $title) = @_;
+
+    $title ||= $url;
+    return "<a href='$url'>$title</a>";
 }
 
 sub make_old_href {
@@ -115,6 +123,19 @@ sub format_html {
         my $link = make_link($page);
 
         $text =~ s{ \[\[ \w* \]\] }{$link}x;
+    }
+
+    while ( $text =~ m{ \[     # starting marker
+                        (\S+)  # a URL
+                        \s+
+                        (.*?)  # a link title
+                        \]     # ending marker
+                      }x ) {
+        my $url = $1;
+        my $title = $2;
+        my $link = make_external_link($url, $title);
+
+        $text =~ s{ \[ \S+ \s+ .*? \] }{$link}x;
     }
 
     while ( $text =~ m{ ==        # starting marker
