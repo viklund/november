@@ -35,12 +35,7 @@ role Session {
 
     method remove_session($id) {
         my $sessions = self.read_sessions();
-        # RAKUDO: No 'delete' builtin
-        # TODO: File bug, this dosnt work either: when putting a scalar in
-        #       a hash slot where there used to be a hash, the error message
-        #       "Odd number of elements found where hash expected"
-        #       is shown.
-        $sessions{$id} = 'DELETED';
+        $sessions.delete($id);
         self.write_sessions($sessions);
     }
 
