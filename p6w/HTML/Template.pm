@@ -25,7 +25,7 @@ class HTML::Template {
         my @loops;
 
         while ( $text ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' / ) {
-            # RAKUDO: Need to match again inside while loop.
+            # RAKUDO: Need to match again inside while loop. [perl #58352]
             $text ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' /;
 
             my $directive = $0;
@@ -68,7 +68,7 @@ class HTML::Template {
                 my $if_inside = $text_inside;
                 my $else_inside = '';
                 if $text_inside ~~ / ^ (.*?) '<TMPL_ELSE>' (.*) $ / {
-                    # RAKUDO: Need to match again.
+                    # RAKUDO: Need to match again. [perl #57858]
                     $text_inside ~~ / ^ (.*?) '<TMPL_ELSE>' (.*) $ /;
                     $if_inside = $0;
                     $else_inside = $1;
@@ -106,7 +106,7 @@ class HTML::Template {
     method serialize_iteration($text, %hash) {
         my $result = $text;
         while ( $result ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' / ) {
-            # RAKUDO: Need to match again inside while loop.
+            # RAKUDO: Need to match again inside while loop. [perl #58352]
             $result ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' /;
 
             my $directive = $0;
