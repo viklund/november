@@ -25,6 +25,9 @@ class HTML::Template {
         my @loops;
 
         while ( $text ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' / ) {
+            # RAKUDO: Need to match again inside while loop.
+            $text ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' /;
+
             my $directive = $0;
             my $name = $1;
 
@@ -103,6 +106,9 @@ class HTML::Template {
     method serialize_iteration($text, %hash) {
         my $result = $text;
         while ( $result ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' / ) {
+            # RAKUDO: Need to match again inside while loop.
+            $result ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' /;
+
             my $directive = $0;
             my $name = $1;
 

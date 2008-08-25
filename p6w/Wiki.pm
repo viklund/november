@@ -24,6 +24,7 @@ role Session {
     has $.sessions          is rw;
 
     method init {
+        # RAKUDO: set the attributes when declaring them
         $.sessionfile_path = 'data/sessions';
     }
 
@@ -47,8 +48,8 @@ role Session {
     }
 
     method write_sessions( $sessions ) {
-        my $fh = open($.sessionfile_path, :w);
-        $fh.say($sessions.perl);
+        my $fh = open( $.sessionfile_path, :w );
+        $fh.say( $sessions.perl );
         $fh.close;
     }
 
@@ -86,7 +87,7 @@ class Storage {
         self.write_page_history( $page, $page_history );
 
         self.write_modification( $modification_id, 
-            [ $page, $new_text, $author] );
+                                 [ $page, $new_text, $author] );
 
         self.add_recent_change( $modification_id );
     }
@@ -117,7 +118,7 @@ class Storage::File is Storage {
     }
 
     method wiki_page_exists($page) {
-        return file_exists($.content_path ~ $page );
+        return file_exists( $.content_path ~ $page );
     }
 
     method read_recent_changes {
@@ -141,7 +142,7 @@ class Storage::File is Storage {
     method write_page_history( $page, $page_history ) {
         my $file = $.content_path ~ $page;
         my $fh = open($file, :w);
-        $fh.say($page_history.perl);
+        $fh.say( $page_history.perl );
         $fh.close;
     }
 
@@ -155,27 +156,25 @@ class Storage::File is Storage {
     method write_modification ( $modification_id, $modification ) {
         my $file =  $.modifications_path ~ $modification_id;
         my $fh = open( $file, :w );
-        $fh.say($modification.perl);
+        $fh.say( $modification.perl );
         $fh.close();
     }
 }
 
 class Wiki does Session {
 
-    # TODO: This is a bit ridiculous. We really should have a hash attribute
-    # called %.path_to instead.
     my $.template_path       is rw;
     my $.userfile_path       is rw;
 
     has Storage $.storage    is rw;
-    has $.cgi                is rw;
+    has CGI     $.cgi        is rw;
 
     method init {
         # RAKUDO: set the attributes when declaring them
         $.template_path = 'skin/';
         $.userfile_path = 'data/users';
 
-        # Multiple dispatch dosn't work
+        # Multiple dispatch doesn't work
         $.storage = Storage::File.new();
         $.storage.init();
         #Storage::File::init(self);
@@ -218,10 +217,10 @@ class Wiki does Session {
         my $template = HTML::Template.new(
             filename => $.template_path ~ 'view.tmpl');
 
-        $template.param('TITLE' => $page);
-        $template.param('CONTENT' => self.format_html(
-                                         $.storage.read_page($page)
-                                     ));
+        $template.param('TITLE'     => $page);
+        $template.param('CONTENT'   => self.format_html(
+                                           $.storage.read_page($page)
+                                       ));
         $template.param('LOGGED_IN' => self.logged_in());
 
         $.cgi.send_response(
@@ -395,11 +394,11 @@ class Wiki does Session {
 #                   Digest::MD5::md5_base64($user_name) ~ $password
 #               ) eq %users{$user_name}<password> {
 
-                my $template = HTML::Template.new(
-                    filename => $.template_path ~ 'login_succeeded.tmpl');
-
                 my $session_id = self.new_session($user_name);
                 my $session_cookie = "session_id=$session_id";
+
+                my $template = HTML::Template.new(
+                    filename => $.template_path ~ 'login_succeeded.tmpl');
 
                 $.cgi.send_response(
                     $template.output(),
@@ -431,13 +430,14 @@ class Wiki does Session {
 
     method log_out {
         if defined $.cgi.cookie('session_id') {
-            my $template = HTML::Template.new(
-                filename => $.template_path ~ 'logout_succeeded.tmpl');
 
             my $session_id = $.cgi.cookie('session_id');
             self.remove_session( $session_id );
 
             my $session_cookie = "session_id=''";
+
+            my $template = HTML::Template.new(
+                filename => $.template_path ~ 'logout_succeeded.tmpl');
 
             $.cgi.send_response(
                 $template.output(),
