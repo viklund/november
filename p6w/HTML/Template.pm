@@ -1,144 +1,101 @@
 use v6;
 
+grammar HTML::Template::Substitution {
+    regex TOP   { ^ <contents> $ };
+
+    regex contents { <plain> <chunk>* };
+    regex chunk { <directive> <plain> };
+    regex plain { [ <!before '<TMPL_' >. ]* };
+
+    token directive  {
+                     | <insertion>
+                     | <if_statement>
+                     | <for_statement>
+                     };
+
+    regex insertion {
+        <.tag_start> 'VAR' <attributes> '>'
+    };
+
+    regex if_statement { 
+        <.tag_start> 'IF' <attributes> '>' 
+        <contents>
+        '</TMPL_IF>' 
+    };
+
+    regex for_statement {
+        <.tag_start> 'FOR' <attributes> '>'
+        <contents>
+        '</TMPL_FOR>'
+    };
+
+    token tag_start  { '<TMPL_' };
+    token name       { \w+ };
+    token escape     { 'NONE' | 'HTML' | 'URL' | 'JS' | 'JAVASCRIPT' };
+    token attributes { \s+ 'NAME='? <name> [\s+ 'ESCAPE=' <escape> ]? };
+};
+
 class HTML::Template {
+    has $.input;
+    has $.parameters is rw;
 
-    has $.filename;
-    has %!params;
+    method from_string($input) {
+        return self.new(input => $input);
+    }
 
-    method param( Pair $param ) {
-        %!params{$param.key} = $param.value;
+    method with_param($parameter) {
+        die "Need to test/implement with_param";
+    }
+
+    method with_params($parameters) {
+        $.parameters = $parameters;
+        return self;
+    }
+
+    # RAKUDO: We eventually want to do this using {*} ties.
+    sub substitute( $contents, $parameters ) {
+        my $output = $contents<plain>;
+
+        for ($contents<chunk> // ()) -> $chunk {
+
+            if $chunk<directive><insertion> {
+                my $key = $chunk<directive><insertion><attributes><name>;
+                my $value = $parameters{$key};
+                $output ~= $value;
+            }
+            elsif $chunk<directive><if_statement> {
+                my $key = $chunk<directive><if_statement><attributes><name>;
+                my $condition = $parameters{$key};
+                if $condition {
+                    # TODO: Test that recursive if works
+                    $output ~= substitute(
+                                 $chunk<directive><if_statement><contents>,
+                                 $parameters
+                               );
+                }
+            }
+            elsif $chunk<directive><for_statement> {
+                my $key = $chunk<directive><for_statement><attributes><name>;
+                my $iterations = $parameters{$key};
+                for $iterations.values -> $iteration {
+                    # TODO: Test that recursive for works
+                    $output ~= substitute(
+                                 $chunk<directive><for_statement><contents>,
+                                 $iteration
+                               );
+                }
+            }
+
+            $output ~= $chunk<plain>;
+        }
+        return $output;
     }
 
     method output() {
-        # RAKUDO: Poor man's CATCH.
-        my $worked = False;
-        my $template;
-        try {
-            $template = slurp( $.filename );
-            $worked = True;
-        }
-        die "Could not open $.filename" if !$worked;
-        return self.serialize($template);
-    }
+        $.input ~~ HTML::Template::Substitution::TOP;
 
-    method serialize($text is rw) {
-        my @loops;
+        die("No match") unless $/;
 
-        while ( $text ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' / ) {
-            # RAKUDO: Need to match again inside while loop. [perl #58352]
-            $text ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' /;
-
-            my $directive = $0;
-            my $name = $1;
-
-            # `$s ne $a & $b` means `$s ne $a || $s ne $b`,
-            # which is confusing, so we'll write it like this instead:
-            die "Unrecognized directive: TMPL_$directive"
-              if !($directive eq 'VAR' | 'LOOP' | 'IF');
-
-            my $value = %!params{$name};
-            if !defined($value) && $directive ne 'IF' {
-                die "$name is defined in the template but undefined in source";
-            }
-
-            if $directive eq 'LOOP' {
-
-                # TODO: In the presence of nested loops: this is wrong.
-                unless $text ~~ / '<TMPL_LOOP NAME=' \w+ '>' (.*?)
-                                  '</TMPL_LOOP>' / {
-                    die "No closing </TMPL_LOOP>"
-                }
-                my $loop_inside = $0;
-
-                # RAKUDO: Dotty methods don't work.
-                $text = $text.subst( / '<TMPL_LOOP NAME=' \w+ '>' .*?
-                                       '</TMPL_LOOP>' /,
-                                     self.serialize_loop(
-                                         $loop_inside,
-                                         $value ));
-            }
-            elsif $directive eq 'IF' {
-
-                # TODO: In the presence of nested ifs: this is wrong.
-                unless $text ~~ / '<TMPL_IF NAME=' \w+ '>' (.*?)
-                                  '</TMPL_IF>' / {
-                    die "No closing </TMPL_IF>"
-                }
-                my $text_inside = $0;
-                my $if_inside = $text_inside;
-                my $else_inside = '';
-                if $text_inside ~~ / ^ (.*?) '<TMPL_ELSE>' (.*) $ / {
-                    # RAKUDO: Need to match again. [perl #57858]
-                    $text_inside ~~ / ^ (.*?) '<TMPL_ELSE>' (.*) $ /;
-                    $if_inside = $0;
-                    $else_inside = $1;
-                }
-                # TODO: In a perfect world, the contents should also be
-                # parsed and substituted.
-                $text = $text.subst( / '<TMPL_IF NAME=' \w+ '>' .*?
-                                       '</TMPL_IF>' /,
-                                       $value ?? $if_inside !! $else_inside );
-            }
-            else { # it's TMPL_VAR
-                # RAKUDO: Dotty methods don't work.
-                $text = $text.subst( / '<TMPL_VAR NAME=' \w+ '>' /,
-                                     $value );
-            }
-        }
-
-        # Also need to check whether some parameters went unused during the
-        # substitution. This might be best to do here, or in param(), I don't
-        # know. Probably in param, with the allowed parameters pre-cached.
-        # It's a little bit tricky, though, once you take <TEMPL_LOOP> into
-        # account. Need to think about that.
-        return $text;
-    }
-
-    method serialize_loop($text is rw, @hashes) {
-        my $result = "";
-
-        for @hashes.values -> $hash {
-            $result ~= self.serialize_iteration($text, $hash);
-        }
-        return $result;
-    }
-
-    method serialize_iteration($text, %hash) {
-        my $result = $text;
-        while ( $result ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' / ) {
-            # RAKUDO: Need to match again inside while loop. [perl #58352]
-            $result ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' /;
-
-            my $directive = $0;
-            my $name = $1;
-
-            die "Nested TMPL_LOOPs not supported" if $directive eq 'LOOP';
-
-            # `$s ne $a & $b` means `$s ne $a || $s ne $b`,
-            # which is confusing, so we'll write it like this instead:
-            die "Unrecognized directive: TMPL_$directive"
-              if !($directive eq 'VAR' | 'LOOP');
-
-            # TODO: Converting it to lowercase here is definitely wrong.
-            # But it works for now.
-            my $value = %hash{$name.lc}
-              // die "$name is defined in the template but undefined in source";
-
-            if $directive eq 'VAR' {
-                # RAKUDO: Dotty methods don't work.
-                $result = $result.subst( / '<TMPL_VAR NAME=' \w+ '>' /,
-                                         $value );
-            }
-            else {
-                die("I haven't implemented TMPL_$directive in loops yet.");
-            }
-        }
-
-        # Also need to check whether some parameters went unused during the
-        # substitution. This might be best to do here, or in param(), I don't
-        # know. Probably in param, with the allowed parameters pre-cached.
-        # It's a little bit tricky, though, once you take <TMPL_LOOP> into
-        # account. Need to think about that.
-        return $result;
+        return substitute( $/<contents>, $.parameters );
     }
 }
