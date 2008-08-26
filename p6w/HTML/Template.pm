@@ -1,17 +1,17 @@
 use v6;
 
 grammar HTML::Template::Substitution {
-    regex TOP   { ^ <contents> $ };
+    regex TOP { ^ <contents> $ };
 
-    regex contents { <plain> <chunk>* };
-    regex chunk { <directive> <plain> };
-    regex plain { [ <!before '<TMPL_' >. ]* };
+    regex contents  { <plaintext> <chunk>* };
+    regex chunk     { <directive> <plaintext> };
+    regex plaintext { [ <!before '<TMPL_' ><!before '</TMPL_' >. ]* };
 
-    token directive  {
-                     | <insertion>
-                     | <if_statement>
-                     | <for_statement>
-                     };
+    token directive {
+                    | <insertion>
+                    | <if_statement>
+                    | <for_statement>
+                    };
 
     regex insertion {
         <.tag_start> 'VAR' <attributes> '>'
@@ -54,7 +54,7 @@ class HTML::Template {
 
     # RAKUDO: We eventually want to do this using {*} ties.
     sub substitute( $contents, $parameters ) {
-        my $output = $contents<plain>;
+        my $output = $contents<plaintext>;
 
         for ($contents<chunk> // ()) -> $chunk {
 
@@ -67,7 +67,6 @@ class HTML::Template {
                 my $key = $chunk<directive><if_statement><attributes><name>;
                 my $condition = $parameters{$key};
                 if $condition {
-                    # TODO: Test that recursive if works
                     $output ~= substitute(
                                  $chunk<directive><if_statement><contents>,
                                  $parameters
@@ -77,8 +76,10 @@ class HTML::Template {
             elsif $chunk<directive><for_statement> {
                 my $key = $chunk<directive><for_statement><attributes><name>;
                 my $iterations = $parameters{$key};
+                # RAKUDO: This should exhibit the correct behaviour, but due
+                # to a bug having to do with for loops and recursion, it
+                # doesn't.
                 for $iterations.values -> $iteration {
-                    # TODO: Test that recursive for works
                     $output ~= substitute(
                                  $chunk<directive><for_statement><contents>,
                                  $iteration
@@ -86,7 +87,7 @@ class HTML::Template {
                 }
             }
 
-            $output ~= $chunk<plain>;
+            $output ~= $chunk<plaintext>;
         }
         return $output;
     }

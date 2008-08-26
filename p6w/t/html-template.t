@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 9;
+plan 13;
 
 use HTML::Template;
 
@@ -37,6 +37,29 @@ my @tests = (
       { 'YUCK' => 1 },
       undef,
       'an if directive without a closing tag' ],
+
+    [ '<TMPL_IF NAME=FOO>a<TMPL_IF NAME=BAR>b</TMPL_IF>c</TMPL_IF>',
+      { 'FOO' => 1 },
+      'ac',
+      'nested if directives, inner one false' ],
+
+    [ '<TMPL_IF NAME=FOO>a<TMPL_IF NAME=BAR>b</TMPL_IF>c</TMPL_IF>',
+      { 'FOO' => 1, BAR => 1 },
+      'abc',
+      'nested if directives, inner one false' ],
+
+    [
+      '<TMPL_FOR FOO><TMPL_IF BAR><TMPL_VAR BAR></TMPL_IF></TMPL_FOR>',
+      { FOO => [ { 'BAR' => '1' }, {}, { 'BAR' => '3' } ] },
+      '13',
+      'an if inside a for, with the condition set only sometimes' ],
+
+    [ '<TMPL_FOR FOO>[<TMPL_FOR BAR><TMPL_VAR VAL></TMPL_FOR>]</TMPL_FOR>',
+      { 'FOO' => [ { 'BAR' => [ map { { 'VAL' => "a$_" } }, 1..3 ] },
+                   { 'BAR' => [ map { { 'VAL' => "b$_" } }, 1..4 ] },
+                   { 'BAR' => [ map { { 'VAL' => "c$_" } }, 1..2 ] } ] },
+      '[a1a2a3][b1b2b3b4][c1c2]',
+      'nested for loops' ],
 );
 
 for @tests -> $test {
