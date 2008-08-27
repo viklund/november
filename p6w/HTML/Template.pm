@@ -43,6 +43,10 @@ class HTML::Template {
         return self.new(input => $input);
     }
 
+    method from_file($file_path) {
+        return self.from_string( slurp($file_path) );
+    }
+
     method with_param($parameter) {
         die "Need to test/implement with_param";
     }
