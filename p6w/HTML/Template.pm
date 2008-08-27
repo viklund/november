@@ -78,7 +78,7 @@ class HTML::Template {
                 my $iterations = $parameters{$key};
                 # RAKUDO: This should exhibit the correct behaviour, but due
                 # to a bug having to do with for loops and recursion, it
-                # doesn't.
+                # doesn't. [perl #58392]
                 for $iterations.values -> $iteration {
                     $output ~= substitute(
                                  $chunk<directive><for_statement><contents>,
