@@ -58,6 +58,10 @@ class HTML::Template {
 
         for ($contents<chunk> // ()) -> $chunk {
 
+            # RAKUDO: The following blocks will be greatly de-cluttered by
+            # making use of the future ability in Rakudo to specify closure
+            # parameters in if statements. [perl #58396]
+            #if $chunk<directive><insertion> -> $_ { # and so on for the others
             if $chunk<directive><insertion> {
                 my $key = $chunk<directive><insertion><attributes><name>;
                 my $value = $parameters{$key};
