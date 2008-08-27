@@ -203,28 +203,24 @@ class Wiki does Session {
         my $page = $.cgi.param<page> // 'Main_Page';
 
         if !$.storage.wiki_page_exists($page) {
-            my $template = HTML::Template.new(
-                filename => $.template_path ~ 'not_found.tmpl');
-
-            $template.param('PAGE' => $page);
-
             $.cgi.send_response(
-                $template.output(),
+                HTML::Template.from_file(
+                    $.template_path ~ 'not_found.tmpl').with_params(
+                        { 'PAGE' => $page }
+                    ).output()
             );
             return;
         }
 
-        my $template = HTML::Template.new(
-            filename => $.template_path ~ 'view.tmpl');
-
-        $template.param('TITLE'     => $page);
-        $template.param('CONTENT'   => self.format_html(
-                                           $.storage.read_page($page)
-                                       ));
-        $template.param('LOGGED_IN' => self.logged_in());
-
         $.cgi.send_response(
-            $template.output(),
+            HTML::Template.from_file(
+                $.template_path ~ 'view.tmpl').with_params(
+                    { 'TITLE'     => $page,
+                      'CONTENT'   => self.format_html(
+                                         $.storage.read_page($page)
+                                     ),
+                      'LOGGED_IN' => self.logged_in() }
+                ).output()
         );
     }
 
@@ -260,29 +256,23 @@ class Wiki does Session {
             return self.view_page();
         }
 
-        my $template = HTML::Template.new(
-            filename => $.template_path ~ 'edit.tmpl');
-
-        $template.param('PAGE'      => $page);
-        $template.param('TITLE'     => $title);
-        $template.param('CONTENT'   => $old_content);
-        $template.param('LOGGED_IN' => True);
-
         $.cgi.send_response(
-            $template.output(),
+            HTML::Template.from_file(
+                $.template_path ~ 'edit.tmpl' ).with_params(
+                { 'PAGE'      => $page,
+                  'TITLE'     => $title,
+                  'CONTENT'   => $old_content,
+                  'LOGGED_IN' => True }
+            ).output()
         );
     }
 
     method not_authorized() {
-        my $template = HTML::Template.new(
-            filename => $.template_path ~ 'action_not_authorized.tmpl');
-
-        # TODO: file bug, without "'" it is interpreted as named args and not
-        #       as Pair
-        $template.param('DISALLOWED_ACTION' => 'edit pages');
-
         $.cgi.send_response(
-            $template.output(),
+            HTML::Template.from_file(
+                $.template_path ~ 'action_not_authorized.tmpl' ).with_params(
+                { 'DISALLOWED_ACTION' => 'edit pages' }
+            ).output()
         );
 
         return;
@@ -368,14 +358,12 @@ class Wiki does Session {
     }
 
     method not_found() {
-        my $template = HTML::Template.new(
-            filename => $.template_path ~ 'not_found.tmpl');
-
-        $template.param('PAGE'      => 'Action Not found');
-        $template.param('LOGGED_IN' => self.logged_in());
-
         $.cgi.send_response(
-            $template.output(),
+            HTML::Template.from_file(
+                $.template_path ~ 'not_found.tmpl' ).with_param(
+                    { 'PAGE'      => 'Action not found',
+                      'LOGGED_IN' => self.logged_in() }
+                ).output()
         );
         return;
     }
@@ -397,32 +385,29 @@ class Wiki does Session {
                 my $session_id = self.new_session($user_name);
                 my $session_cookie = "session_id=$session_id";
 
-                my $template = HTML::Template.new(
-                    filename => $.template_path ~ 'login_succeeded.tmpl');
-
                 $.cgi.send_response(
-                    $template.output(),
+                    HTML::Template.from_file(
+                        $.template_path ~ 'login_succeeded.tmpl'
+                    ).output(),
                     { cookie => $session_cookie }
                 );
 
                 return;
             }
 
-            my $template = HTML::Template.new(
-                filename => $.template_path ~ 'login_failed.tmpl');
-
             $.cgi.send_response(
-                $template.output(),
+                HTML::Template.from_file(
+                    $.template_path ~ 'login_failed.tmpl'
+                ).output()
             );
 
             return;
         }
 
-        my $template = HTML::Template.new(
-            filename => $.template_path ~ 'log_in.tmpl');
-
         $.cgi.send_response(
-            $template.output(),
+            HTML::Template.from_file(
+                $.template_path ~ 'log_in.tmpl'
+            ).output()
         );
 
         return;
@@ -436,22 +421,20 @@ class Wiki does Session {
 
             my $session_cookie = "session_id=''";
 
-            my $template = HTML::Template.new(
-                filename => $.template_path ~ 'logout_succeeded.tmpl');
-
             $.cgi.send_response(
-                $template.output(),
+                HTML::Template.from_file(
+                    $.template_path ~ 'logout_succeeded.tmpl'
+                ).output(),
                 { :cookie($session_cookie) }
             );
 
             return;
         }
 
-        my $template = HTML::Template.new(
-            filename => $.template_path ~ 'logout_succeeded.tmpl');
-
         $.cgi.send_response(
-            $template.output(),
+            HTML::Template.from_file(
+                $.template_path ~ 'logout_succeeded.tmpl'
+            )
         );
 
         return;
@@ -471,14 +454,12 @@ class Wiki does Session {
                              'author' => $modification[2] || 'somebody' };
         }
 
-        my $template = HTML::Template.new(
-                filename => $.template_path ~ 'recent_changes.tmpl');
-
-        $template.param('CHANGES'   => @changes);
-        $template.param('LOGGED_IN' => self.logged_in());
-
         $.cgi.send_response(
-            $template.output()
+            HTML::Template.from_file(
+                $.template_path ~ 'recent_changes.tmpl').with_params(
+                { 'CHANGES'   => @changes,
+                  'LOGGED_IN' => self.logged_in() }
+            ).output()
         );
 
         return;
