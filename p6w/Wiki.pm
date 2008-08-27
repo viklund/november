@@ -3,6 +3,7 @@ use v6;
 
 use CGI;
 use HTML::Template;
+use Text::Escape;
 
 sub file_exists( $file ) {
     # RAKUDO: use ~~ :e
@@ -284,15 +285,6 @@ class Wiki does Session {
         return eval( slurp( $.userfile_path ) );
     }
 
-    method quote($metachar) {
-        # RAKUDO: Chained trinary operators do not do what we mean yet.
-        return '&#039;' if $metachar eq '\'';
-        return '&lt;'   if $metachar eq '<';
-        return '&gt;'   if $metachar eq '>';
-        return '&amp;'  if $metachar eq '&';
-        return $metachar;
-    }
-
     sub convenient_line_break($text, $length) {
         return $text.chars if $text.chars < $length;
         # RAKUDO: This should of course be done with rindex, once that's
@@ -334,7 +326,8 @@ class Wiki does Session {
                         when 'twext'     { $result ~= $text }
                         when 'wikimark'  { my $page = substr($text, 2, -2);
                                            $result ~= self.make_link($page) }
-                        when 'metachar'  { $result ~= self.quote($text) }
+                        when 'metachar'
+                                    { $result ~= self.escape($text, 'html') }
                         when 'malformed' { $result ~= $text }
                     }
                 }
