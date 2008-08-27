@@ -20,6 +20,7 @@ grammar HTML::Template::Substitution {
     regex if_statement { 
         <.tag_start> 'IF' <attributes> '>' 
         <contents>
+        [ '<TMPL_ELSE>' <else=contents> ]?
         '</TMPL_IF>' 
     };
 
@@ -77,6 +78,12 @@ class HTML::Template {
                 if $condition {
                     $output ~= substitute(
                                  $chunk<directive><if_statement><contents>,
+                                 $parameters
+                               );
+                }
+                elsif $chunk<directive><if_statement><else> {
+                    $output ~= substitute(
+                                 $chunk<directive><if_statement><else>,
                                  $parameters
                                );
                 }
