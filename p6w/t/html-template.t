@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 13;
+plan 14;
 
 use HTML::Template;
 
@@ -82,3 +82,10 @@ for @tests -> $test {
                    $parameters).output() }, $description );
     }
 }
+
+my $output = HTML::Template.from_file( 't/test-templates/1.tmpl' ).with_params(
+                 { 'TITLE' => 'Mmm, pie' } ).output();
+is( $output, "<html>\n    <head>\n        <title>Mmm, pie</title>\n"
+           ~ "    </head>\n    <body>\n        <h1>Mmm, pie</h1>\n"
+           ~ "    </body>\n</html>\n",
+    'reading from file' );
