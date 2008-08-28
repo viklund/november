@@ -327,7 +327,7 @@ class Wiki does Session {
                         when 'wikimark'  { my $page = substr($text, 2, -2);
                                            $result ~= self.make_link($page) }
                         when 'metachar'
-                                    { $result ~= self.escape($text, 'html') }
+                                         { $result ~= escape($text, 'html') }
                         when 'malformed' { $result ~= $text }
                     }
                 }
