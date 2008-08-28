@@ -1,4 +1,3 @@
-#!perl6
 use v6;
 
 use CGI;
@@ -328,35 +327,56 @@ class Wiki does Session {
     }
 
     method format_html($text is rw) {
-        if $text ~~ Wiki::Syntax::TOP {
-            # RAKDUO: Must match again. [perl #57858]
-            $text ~~ Wiki::Syntax::TOP;	
+        # RAKUDO: $text.split( /\n\n/ )
+        my @pars = grep { $_ ne "" },
+                   map { $_.subst( / ^ \n /, '' ) },
+                   $text.split("\r\n\r\n");
 
-            # RAKUDO: Perhaps use 'gather' instead, once rakudo has that.
-            my @pars;
+        my @formatted;
+        for @pars -> $par {
+            if $par ~~ Wiki::Syntax::paragraph {
+                # RAKDUO: Must match again. [perl #57858]
+                $par ~~ Wiki::Syntax::paragraph;
 
-            for $/<paragraph> -> $p {
+                my $result;
 
-                my $result = '<p>';
-                for $p<parchunk> {
-                    my $text = $_.values[0];
-                    given $_.keys[0] {
-                        when 'twext'     { $result ~= $text }
-                        when 'wikimark'  { my $page = substr($text, 2, -2);
-                                           $result ~= self.make_link($page) }
-                        when 'metachar'  { $result ~= self.quote($text) }
-                        when 'malformed' { $result ~= $text }
-                    }
+                if $/<heading> {
+                    # RAKDUO: Must match again. [perl #57858]
+                    $par ~~ Wiki::Syntax::paragraph;
+
+                    $result = '<h1>'
+                        ~ $/<heading>.values[0].subst( / ^ \s+ /, '' ).subst(
+                          / \s+ $ /, '')
+                        ~ '</h1>';
                 }
-                $result ~= "</p>";
+                else {
+                    # RAKDUO: Must match again. [perl #57858]
+                    $par ~~ Wiki::Syntax::paragraph;
 
-                push @pars, indent( wrap($result, 60), 12 );
+                    $result = '<p>';
+
+                    for $/<parchunk> -> $chunk {
+                        my $text = $chunk.values[0];
+                        given $chunk.keys[0] {
+                            when 'twext'     { $result ~= $text }
+                            when 'wikimark'  { my $page = substr($text, 2, -2);
+                                               $result ~= self.make_link($page) }
+                            when 'metachar'  { $result ~= self.quote($text) }
+                            when 'malformed' { $result ~= $text }
+                        }
+                    }
+                    $result ~= "</p>";
+
+                    push @formatted, indent( wrap($result, 60), 12 );
+                }
             }
-
-            return join "\n\n", @pars;
-        } else {
-            return '<p>Could not parse markup.</p>';
+            else {
+                push @formatted, indent( '<p>Could not parse paragraph.</p>',
+                                         12 );
+            }
         }
+
+        return join "\n\n", @formatted;
     }
 
     method make_link($page) {
@@ -486,10 +506,8 @@ class Wiki does Session {
 }
 
 grammar Wiki::Syntax {
-    token TOP { ^ [ <paragraph> | <newlines> ]* $ };
 
-    token paragraph { <parchunk>+ };
-    token newlines { \n ** {2..*} };
+    token paragraph { ^ <parchunk>+ $ };
 
     token parchunk { <twext> || <wikimark> || <metachar> || <malformed> };
 
@@ -498,12 +516,12 @@ grammar Wiki::Syntax {
 
     token otherchar { <[ !..% (../ : ; ? @ \\ ^..` {..~ ]> };
 
-    token sp { ' ' };
+    token sp { ' ' | \n };
 
     token wikimark { '[[' <twext> ']]' };
 
     token metachar { '<' || '>' || '&' || \' };
 
-    token malformed { '[' || ']' || <!after \n> \n <!before \n> }
+    token malformed { '[' || ']' }
 }
 
