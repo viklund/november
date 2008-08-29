@@ -1,4 +1,4 @@
-SOURCES=Impatience.pm HTML/Template.pm CGI.pm Wiki.pm
+SOURCES=Impatience.pm HTML/Template.pm CGI.pm Wiki.pm Text/Escape.pm
 PIRS=$(SOURCES:.pm=.pir)
 PARROT_DIR=/home/johan/Perl6/parrot-svn
 

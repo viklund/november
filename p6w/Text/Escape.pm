@@ -1,7 +1,10 @@
+use Impatience;
+
 sub escape($str, $how) {
     my $m = $how.lc;
     return $str if $m eq 'none';
     return escape_str($str, &escape_html_char) if $m eq 'html';
+    return escape_str($str, &escape_uri_char ) if $m eq 'url' | 'uri';
     die "Don't know how to escape format '$how' yet";
 }
 
@@ -15,6 +18,15 @@ sub escape_html_char($c) {
     %escapes{$c} // $c;
 }
 
+sub escape_uri_char($c) {
+    my $allowed = 'abcdefghijklmnopqrstuvwxyz'
+                ~ 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+                ~ '0123456789'
+                ~ '-_.!~*\'()';
+    return $c if defined $allowed.index($c);
+    return sprintf('%%%x', ord($c));
+
+}
 
 sub escape_str($str, $callback) {
     my $result = '';
