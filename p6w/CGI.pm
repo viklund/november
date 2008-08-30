@@ -19,8 +19,7 @@ class CGI {
             my $input = $*IN.slurp();
             my %post_params = parse_params( $input );
             for %post_params.kv -> $k, $v {
-            # TODO: Check if key exists, if so make an array
-                %params{$k} = $v;
+                add_param( %params, $k, $v);
             }
         }
         $.param = %params;
@@ -53,9 +52,8 @@ class CGI {
         my %param_temp;
         for @param_values -> $param_value {
             my @kvs = split('=', $param_value);
-            # TODO: Check if that key already exists; make an array if it does.
             # TODO: Is the case of 'page=' handled correctly?
-            %param_temp{@kvs[0]} = unescape(@kvs[1]);
+            add_param( %param_temp, @kvs[0], unescape(@kvs[1]) );
         }
         return %param_temp;
     }
@@ -73,6 +71,21 @@ class CGI {
             $string = $string.subst('%' ~ $match, $character);
         }
         return $string;
+    }
+
+    sub add_param ( Hash %params is rw, Str $key, $value ) {
+        # RAKUDO: Hash.:exists not implemented yet
+        # TODO: Make code work properly with an existing but undefined $key
+        # if %params.:exists{$key} {
+        if %params{$key} ~~ Str | Int {
+            %params{$key} = [ %params{$key}, $value ];
+        } 
+        elsif %params{$key} ~~ Array {
+            %params{$key}.push( $value );
+        } 
+        else {
+            %params{$key} = $value;
+        }
     }
 }
 
