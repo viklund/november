@@ -1,7 +1,5 @@
 use v6;
 
-use Text::Escape;
-
 grammar HTML::Template::Substitution {
     regex TOP { ^ <contents> $ };
 
@@ -72,9 +70,6 @@ class HTML::Template {
             if $chunk<directive><insertion> {
                 my $key = $chunk<directive><insertion><attributes><name>;
                 my $value = $parameters{$key};
-
-                my $escape = $chunk<directive><insertion><attributes><escape>;
-                $value = escape($value, ~$escape) if $escape;
 
                 $output ~= $value;
             }
