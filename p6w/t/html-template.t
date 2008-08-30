@@ -5,7 +5,7 @@ plan 14;
 
 use HTML::Template;
 
-my @tests = (
+my @inputs_that_should_parse = (
     [ 'pre<TMPL_VAR NAME=BAR>post', { 'BAR' => 50 },
       'pre50post', 'simple TMPL_VAR' ],
 
@@ -33,11 +33,6 @@ my @tests = (
       { 'BLUBB' => [] },
       'prepost', 'an empty for loop' ],
 
-    [ 'pre<TMPL_IF NAME=YUCK>no tmpl_if',
-      { 'YUCK' => 1 },
-      undef,
-      'an if directive without a closing tag' ],
-
     [ '<TMPL_IF NAME=FOO>a<TMPL_IF NAME=BAR>b</TMPL_IF>c</TMPL_IF>',
       { 'FOO' => 1 },
       'ac',
@@ -62,30 +57,47 @@ my @tests = (
       'nested for loops' ],
 );
 
-for @tests -> $test {
+my @inputs_that_should_not_parse = (
+    [ 'pre<TMPL_IF NAME=YUCK>no tmpl_if',
+      { 'YUCK' => 1 },
+      'an if directive without a closing tag' ],
+);
+
+for @inputs_that_should_parse -> $test {
     # RAKUDO: List assignment not implemented yet
     my $input           = $test[0];
     my $parameters      = $test[1];
     my $expected_output = $test[2];
     my $description     = $test[3];
 
-    if defined $expected_output {
-        # RAKUDO: Break this line with long dots.
-        my $actual_output
-          = HTML::Template.from_string($input).with_params(
-              $parameters).output();
+    # RAKUDO: Break this line with long dots.
+    my $actual_output
+      = HTML::Template.from_string($input).with_params(
+          $parameters).output();
 
-        ok( $expected_output eq $actual_output, $description );
-    }
-    else {
-        dies_ok( { HTML::Template.from_string($input).with_params(
-                   $parameters).output() }, $description );
-    }
+    ok( $expected_output eq $actual_output, $description );
+}
+
+for @inputs_that_should_not_parse -> $test {
+    # RAKUDO: List assignment not implemented yet
+    my $input           = $test[0];
+    my $parameters      = $test[1];
+    my $description     = $test[2];
+
+    dies_ok( { HTML::Template.from_string($input).with_params(
+               $parameters).output() }, $description );
 }
 
 my $output = HTML::Template.from_file( 't/test-templates/1.tmpl' ).with_params(
                  { 'TITLE' => 'Mmm, pie' } ).output();
-is( $output, "<html>\n    <head>\n        <title>Mmm, pie</title>\n"
-           ~ "    </head>\n    <body>\n        <h1>Mmm, pie</h1>\n"
-           ~ "    </body>\n</html>\n",
+is( $output, (join "\n",
+                  '<html>',
+                  '    <head>',
+                  '        <title>Mmm, pie</title>',
+                  '    </head>',
+                  '    <body>',
+                  '        <h1>Mmm, pie</h1>',
+                  '    </body>',
+                  '</html>',
+                  ''),
     'reading from file' );
