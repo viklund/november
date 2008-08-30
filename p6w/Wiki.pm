@@ -449,6 +449,7 @@ class Wiki does Session {
     }
 
     method log_out {
+        # TODO: Fix 500 error on server
         if defined $.cgi.cookie('session_id') {
 
             my $session_id = $.cgi.cookie('session_id');
