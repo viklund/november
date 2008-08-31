@@ -84,7 +84,7 @@ class HTML::Template {
                 }
                 elsif $chunk<directive><if_statement><else> {
                     $output ~= substitute(
-                                 $chunk<directive><if_statement><else>,
+                                 $chunk<directive><if_statement><else>[0],
                                  $parameters
                                );
                 }
