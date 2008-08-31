@@ -1,29 +1,29 @@
 use v6;
 
 use Test;
-plan 14;
+plan 17;
 
 use HTML::Template;
 
 my @inputs_that_should_parse = (
     [ 'pre<TMPL_VAR NAME=BAR>post', { 'BAR' => 50 },
-      'pre50post', 'simple TMPL_VAR' ],
+      'pre50post', 'simple variable insertion' ],
 
     [ 'pre<TMPL_VAR BAR ESCAPE=HTML>post', { 'BAR' => '<' },
-       'pre&lt;post', 'TMPL_VAR with ESCAPE in it' ],
+       'pre&lt;post', 'variable insertion with ESCAPE in it' ],
 
     [ 'pre<TMPL_VAR NAME=BAR>between<TMPL_VAR NAME=BAZ>post',
       { 'BAR' => '!', 'BAZ' => '!!' },
-      'pre!between!!post', 'two TMPL_VAR' ],
+      'pre!between!!post', 'two variable insertions' ],
 
     [ 'pre<TMPL_IF NAME=FOO>bar</TMPL_IF>post', { 'FOO' => 1 },
-       'prebarpost', 'true TMPL_IF' ],
+       'prebarpost', 'true condition' ],
 
     [ 'pre<TMPL_IF NAME=FOO>bar</TMPL_IF>post', { 'FOO' => 0 },
-      'prepost', 'false TMPL_IF (because the parameter was false)' ],
+      'prepost', 'false condition (because the parameter was false)' ],
 
     [ 'pre<TMPL_IF NAME=FOO>bar</TMPL_IF>post', {},
-      'prepost', 'false TMPL_IF (because the parameter was not declared)' ],
+      'prepost', 'false condition (because the parameter was not declared)' ],
 
     [ 'pre<TMPL_FOR NAME=BLUBB>[<TMPL_VAR FOO>]</TMPL_FOR>post',
       { 'BLUBB' => [ { 'FOO' => 'a' }, { 'FOO' => 'b' }, { 'FOO' => 'c' } ] },
@@ -55,6 +55,21 @@ my @inputs_that_should_parse = (
                    { 'BAR' => [ map { { 'VAL' => "c$_" } }, 1..2 ] } ] },
       '[a1a2a3][b1b2b3b4][c1c2]',
       'nested for loops' ],
+
+    [ 'pre <TMPL_IF A>a<TMPL_ELSE>b</TMPL_IF>c<TMPL_VAR D> post',
+      { 'A' => 1, 'D' => 'd' },
+      'pre acd post',
+      'true if/else followed by a variable insertion' ],
+
+    [ 'pre <TMPL_IF A>a<TMPL_ELSE>b</TMPL_IF>c<TMPL_VAR D> post',
+      { 'A' => 0, 'D' => 'd' },
+      'pre bcd post',
+      'false (but defined) if/else followed by a variable insertion' ],
+
+    [ 'pre <TMPL_IF A>a<TMPL_ELSE>b</TMPL_IF>c<TMPL_VAR D> post',
+      { 'D' => 'd' },
+      'pre bcd post',
+      'false (undefined) if/else followed by a variable insertion' ],
 );
 
 my @inputs_that_should_not_parse = (
