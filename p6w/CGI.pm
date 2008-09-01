@@ -1,4 +1,8 @@
 #!perl6
+#
+# Perl6 CGI.pm developed as a part of November (http://github.com/viklund/november/).
+# v 0.0.1
+#
 use v6;
 use Impatience;
 
@@ -94,4 +98,10 @@ class CGI {
         }
     }
 }
+
+# Contributors
+#
+# Carl Mäsak 
+# Johan Viklund
+# Ilya Belikin <forihrd@gmail.com>
 
