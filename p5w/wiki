@@ -94,8 +94,8 @@ sub make_link {
 
     $title ||= $page;
     return exists_wiki_page( $page )
-           ? "<a href='/?page=$page'>$title</a>"
-           : "<a href='/?page=$page&action=edit' style='color: red'>$title</a>";
+           ? qq|<a href="/?page=$page">$title</a>|
+           : qq|<a href="/?page=$page&action=edit" class="nonexistent">$title</a>|;
 }
 
 sub make_external_link {
