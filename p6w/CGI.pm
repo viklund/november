@@ -108,7 +108,7 @@ class CGI {
 
 # Contributors
 #
-# Carl Mäsak 
+# Carl Mäsak
 # Johan Viklund
 # Ilya Belikin <forihrd@gmail.com>
 
