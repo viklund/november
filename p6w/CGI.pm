@@ -12,7 +12,7 @@ class CGI {
 
     # RAKUDO: BUILD method not supported
     method init() {
-        my %params = parse_params( %*ENV<QUERY_STRING> );
+        my %params = self.parse_params( %*ENV<QUERY_STRING> );
 
         # It's prudent to handle CONTENT_LENGTH too, but right now that's not
         # a priority. It would make our tests scripts more complicated, with
@@ -21,14 +21,14 @@ class CGI {
         if %*ENV<REQUEST_METHOD> eq 'POST' {
             # Maybe check content_length here and only take that many bytes?
             my $input = $*IN.slurp();
-            my %post_params = parse_params( $input );
+            my %post_params = self.parse_params( $input );
             for %post_params.kv -> $k, $v {
-                add_param( %params, $k, $v);
+                self.add_param( %params, $k, $v);
             }
         }
         $.param = %params;
 
-        my %cookie = parse_params(%*ENV<HTTP_COOKIE>);
+        my %cookie = self.parse_params(%*ENV<HTTP_COOKIE>);
         $.cookie = %cookie;
     }
 
@@ -58,13 +58,13 @@ class CGI {
         print "\r\n\r\n";
     }
 
-    sub parse_params($string is rw) {
+    method parse_params($string is rw) {
         my @param_values = split('&' , $string);
         my %param_temp;
         for @param_values -> $param_value {
             my @kvs = split('=', $param_value);
             # TODO: Is the case of 'page=' handled correctly?
-            add_param( %param_temp, @kvs[0], unescape(@kvs[1]) );
+            self.add_param( %param_temp, @kvs[0], unescape(@kvs[1]) );
         }
         return %param_temp;
     }
@@ -75,7 +75,8 @@ class CGI {
             $string = $string.subst('+', ' ');
         }
         # RAKUDO: This could also be rewritten as a single .subst :g call.
-        while ( $string ~~ /\%(..)/ ) {
+        while $string ~~ /\%(..)/ {
+            $string ~~ /\%(..)/;
             my $match = $0;
             my $character = chr(:16($match));
             # RAKUDO: DOTTY
@@ -84,7 +85,7 @@ class CGI {
         return $string;
     }
 
-    sub add_param ( Hash %params is rw, Str $key, $value ) {
+    method add_param ( Hash %params is rw, Str $key, $value ) {
 
         # TODO: Довести до ума, чтобы корректно работало с
         #       существующими но не определенными $key
