@@ -1,4 +1,8 @@
 #!perl6
+#
+# Perl6 CGI.pm developed as a part of November (http://github.com/viklund/november/).
+# v 0.0.2
+#
 use v6;
 use Impatience;
 
@@ -45,6 +49,13 @@ class CGI {
         }
         print "\r\n";
         print $contents;
+    }
+
+    method redirect($uri, %opts?) {
+        my $status = '302 Moved' || %opts<status>;
+        print "Status: $status\r\n";
+        print "Location: $uri";
+        print "\r\n\r\n";
     }
 
     sub parse_params($string is rw) {
@@ -94,4 +105,10 @@ class CGI {
         }
     }
 }
+
+# Contributors
+#
+# Carl Mäsak
+# Johan Viklund
+# Ilya Belikin <forihrd@gmail.com>
 
