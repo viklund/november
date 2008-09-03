@@ -31,16 +31,16 @@ for @parse_params_test -> $each {
     my $param = $each[0];
     my $result = $each[1];
     my %res = $cgi.parse_params( $param );
-    is_hash_eq(%res, $result, $param);
+    is_hash_eq(%res, $result, 'Parse param: ' ~ $param);
 }
 
 my %start = {};
 my @add_params_test = (
-    [ :key<val> , { :key<val> } ],
-    [ :key2<val>, { :key<val>, :key2<val> } ],
-    [ :key<val2>, { :key<val val2>, :key2<val> } ],
-    [ :key3<4>  , { :key<val val2>, :key2<val>, :key3<4> } ],
-    [ :key4<4.1>, { :key<val val2>, :key2<val>, :key3<4>, :key4<4.1> } ],
+    [ :key1<val> , { :key1<val> } ],
+    [ :key2<val> , { :key1<val>,      :key2<val> } ],
+    [ :key1<val2>, { :key1<val val2>, :key2<val> } ],
+    [ :key3<4>   , { :key1<val val2>, :key2<val>, :key3<4> } ],
+    [ :key4<4.1> , { :key1<val val2>, :key2<val>, :key3<4>, :key4<4.1> } ],
 );
 
 for @add_params_test -> $each {
@@ -48,7 +48,7 @@ for @add_params_test -> $each {
     my $val = $each[0].value;
     my $result = $each[1];
     $cgi.add_param( %start, $key, $val);
-    is_hash_eq( %start, $result, $val );
+    is_hash_eq( %start, $result, "Add kv: :$key<$val>" );
 }
 
 # Ugly, ugly, ugly
