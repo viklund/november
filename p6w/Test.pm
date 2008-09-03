@@ -140,6 +140,59 @@ multi sub eval_lives_ok($code) {
 }
 
 
+
+multi sub is_deeply($this, $that, $reason) {
+    my $val = _is_deeply( $this, $that );
+    proclaim( $val, $reason );
+}
+
+multi sub is_deeply($this, $that) {
+    my $val = _is_deeply( $this, $that );
+    proclaim( $val, '' );
+}
+
+sub _is_deeply( $this, $that) {
+    # is_deeply needs these stringified subs to work around rakudo bug #58392
+    my $_is_array_deeply = 'sub { 
+        my $this = @_[0];
+        my $that = @_[1];
+        for $this Z $that -> $a,$b {
+            if ! _is_deeply( $a, $b ) {
+                return "";
+            }
+        }
+        return 1;
+    }';
+    my $_is_hash_deeply = 'sub {
+        my $this = @_[0];
+        my $that = @_[1];
+        for $this.keys.sort Z $that.keys.sort -> $a,$b {
+            return "" if $a ne $b;
+            if ! _is_deeply( $this{$a}, $that{$b} ) {
+                return "";
+            }
+        }
+        return 1;
+    }';
+
+    if $this ~~ Array && $that ~~ Array {
+        my $s = eval $_is_array_deeply;
+        return $s( $this, $that );
+    }
+    elsif $this ~~ Hash && $that ~~ Hash {
+        my $s = eval $_is_hash_deeply;
+        return $s( $this, $that );
+    }
+    elsif $this ~~ Str | Num | Int && $that ~~ Str | Num | Int {
+        return $this eq $that;
+    }
+    elsif $this ~~ Pair && $that ~~ Pair {
+        return $this.key eq $that.key 
+               && _is_deeply( $this.value, $this.value );
+    }
+    return '';
+}
+
 ## 'private' subs
 
 sub eval_exception($code) {
