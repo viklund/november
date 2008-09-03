@@ -31,7 +31,7 @@ for @parse_params_test -> $each {
     my $param = $each[0];
     my $result = $each[1];
     my %res = $cgi.parse_params( $param );
-    is_hash_eq(%res, $result, 'Parse param: ' ~ $param);
+    is_deeply(%res, $result, 'Parse param: ' ~ $param);
 }
 
 my %start = {};
@@ -48,27 +48,6 @@ for @add_params_test -> $each {
     my $val = $each[0].value;
     my $result = $each[1];
     $cgi.add_param( %start, $key, $val);
-    is_hash_eq( %start, $result, "Add kv: :$key<$val>" );
+    is_deeply( %start, $result, "Add kv: :$key<$val>" );
 }
 
-# Ugly, ugly, ugly
-sub is_hash_eq($hash1, $hash2, $test_name='') {
-    for ($hash1.keys, $hash2.keys) -> $key {
-        my $v1 = $hash1{$key};
-        my $v2 = $hash2{$key};
-
-        if $v1 ~~ Array && $v2 ~~ Array {
-            for $v1 Z $v2 -> $a1,$a2 {
-                if $a1 != $a2 {
-                    ok(0, $test_name);
-                    return;
-                }
-            }
-        }
-        if $hash1{$key} != $hash2{$key} {
-            ok(0, $test_name); # bail out
-            return;
-        }
-    }
-    ok(1, $test_name)
-}
