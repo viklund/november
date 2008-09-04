@@ -85,23 +85,19 @@ class CGI {
     }
 
     sub add_param ( Hash %params is rw, Str $key, $value ) {
-
-        # TODO: Довести до ума, чтобы корректно работало с
-        #       существующими но не определенными $key
-        #       (Make code work properly with an existing but
-        #       undefined $key)
-
         # RAKUDO: Hash.:exists еще не релизован (Hash.:exists not
         #         implemented yet)
         # if %params.:exists{$key} {
 
-        # RAKUDO: ~~ Scalar
-        if %params{$key} ~~ Str | Int {
-            %params{$key} = [ %params{$key}, $value ];
-        } 
-        elsif %params{$key} ~~ Array {
-            %params{$key}.push( $value );
-        } 
+        if %params.exists($key) {
+            # RAKUDO: ~~ Scalar
+            if %params{$key} ~~ Str | Int {
+                %params{$key} = [ %params{$key}, $value ];
+            } 
+            elsif %params{$key} ~~ Array {
+                %params{$key}.push( $value );
+            } 
+        }
         else {
             %params{$key} = $value;
         }
