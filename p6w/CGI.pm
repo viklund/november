@@ -94,6 +94,8 @@ class CGI {
         # RAKUDO: Hash.:exists еще не релизован (Hash.:exists not
         #         implemented yet)
         # if %params.:exists{$key} {
+
+        # RAKUDO: ~~ Scalar
         if %params{$key} ~~ Str | Int {
             %params{$key} = [ %params{$key}, $value ];
         } 
