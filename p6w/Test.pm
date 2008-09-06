@@ -143,12 +143,12 @@ multi sub eval_lives_ok($code) {
 
 multi sub is_deeply($this, $that, $reason) {
     my $val = _is_deeply( $this, $that );
-    proclaim( $val, $reason );
+    proclaim( $val, $reason, $this, $that );
 }
 
 multi sub is_deeply($this, $that) {
     my $val = _is_deeply( $this, $that );
-    proclaim( $val, '' );
+    proclaim( $val, '', $this, $that );
 }
 
 sub _is_deeply( $this, $that) {
@@ -201,12 +201,14 @@ sub eval_exception($code) {
     $eval_exception // $!;
 }
 
-sub proclaim($cond, $desc) {
+sub proclaim($cond, $desc, $this?, $that?) {
     $testing_started  = 1;
     $num_of_tests_run = $num_of_tests_run + 1;
 
     unless $cond {
         print "not ";
+        # Rakudo: exists not implimented yet
+        say "\ngot: " ~$this.perl~ "\nexpected: " ~ $that.perl if $this; # if $this.exists;
         $num_of_tests_failed = $num_of_tests_failed + 1
             unless  $num_of_tests_run <= $todo_upto_test_num;
     }
