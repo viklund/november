@@ -16,4 +16,4 @@ nok( _is_deeply( {foo => 'bar'}, {foo => 'her', bar => 'moo'} ), 'Two not equal 
 nok( _is_deeply( {foo => 'bar'}, ['foo', 'her'] ), 'Hash and Array' );
 ok( _is_deeply( {foo => 'bar', her => 'boo'},  {foo => 'bar', her => 'boo'} ), 'Two equal hashes with two key' );
 nok( _is_deeply( {foo => 'bar', her => 'boo'},  {foo => 'bar', her => 'boooooh'} ), 'Two not equal hashes with two key' );
-
+ok( _is_deeply( {key2 => ["val", undef]}, {key2 => ["val", undef]}), '{key2 => ["val", undef]}' );
