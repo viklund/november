@@ -2,7 +2,7 @@
 
 use Test;
 
-plan 13;
+plan 15;
 
 use CGI;
 ok(1);
@@ -15,6 +15,8 @@ $cgi.init();
 isa_ok( $cgi, 'CGI', '...still' );
 
 my @parse_params_test = (
+    [ 'test=',
+      { test => undef } ],
     [ 'test=1',
       { :test<1> } ],
     [ 'test=2&params=2',
@@ -41,6 +43,8 @@ my @add_params_test = (
     [ :key1<val2>, { :key1<val val2>, :key2<val> } ],
     [ :key3<4>   , { :key1<val val2>, :key2<val>, :key3<4> } ],
     [ :key4<4.1> , { :key1<val val2>, :key2<val>, :key3<4>, :key4<4.1> } ],
+    # Do not consistency :( but looks like I can`t use :key<val> syntax with undef 
+    [ key2 => undef , { :key1<val val2>, key2 => ["val", undef], :key3<4>, :key4<4.1> } ],
 );
 
 for @add_params_test -> $each {
