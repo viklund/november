@@ -16,7 +16,7 @@ isa_ok( $cgi, 'CGI', '...still' );
 
 my @parse_params_test = (
     [ 'test=',
-      { test => undef } ],
+      { test => "" } ],
     [ 'test=1',
       { :test<1> } ],
     [ 'test=2&params=2',
