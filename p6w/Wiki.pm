@@ -2,6 +2,7 @@ use v6;
 
 use CGI;
 use HTML::Template;
+use Wiki::Markup::Minimal;
 
 sub file_exists( $file ) {
     # RAKUDO: use ~~ :e
@@ -334,15 +335,15 @@ class Wiki does Session {
 
         my @formatted;
         for @pars -> $par {
-            if $par ~~ Wiki::Syntax::paragraph {
+            if $par ~~ Wiki::Markup::Minimal::Syntax::paragraph {
                 # RAKDUO: Must match again. [perl #57858]
-                $par ~~ Wiki::Syntax::paragraph;
+                $par ~~ Wiki::Markup::Minimal::Syntax::paragraph;
 
                 my $result;
 
                 if $/<heading> {
                     # RAKDUO: Must match again. [perl #57858]
-                    $par ~~ Wiki::Syntax::paragraph;
+                    $par ~~ Wiki::Markup::Minimal::Syntax::paragraph;
 
                     $result = '<h1>'
                         ~ $/<heading>.values[0].subst( / ^ \s+ /, '' ).subst(
@@ -351,7 +352,7 @@ class Wiki does Session {
                 }
                 else {
                     # RAKDUO: Must match again. [perl #57858]
-                    $par ~~ Wiki::Syntax::paragraph;
+                    $par ~~ Wiki::Markup::Minimal::Syntax::paragraph;
 
                     $result = '<p>';
 
@@ -505,24 +506,3 @@ class Wiki does Session {
         return;
     }
 }
-
-grammar Wiki::Syntax {
-
-    token paragraph { ^ <parchunk>+ $ };
-
-    token parchunk { <twext> || <wikimark> || <metachar> || <malformed> };
-
-    # RAKUDO: a token may not be called 'text' [perl #57864]
-    token twext { [ <alnum> || <otherchar> || <sp> ]+ };
-
-    token otherchar { <[ !..% (../ : ; ? @ \\ ^..` {..~ ]> };
-
-    token sp { ' ' | \n };
-
-    token wikimark { '[[' <twext> ']]' };
-
-    token metachar { '<' || '>' || '&' || \' };
-
-    token malformed { '[' || ']' }
-}
-
