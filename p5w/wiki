@@ -189,7 +189,7 @@ sub read_page_history {
     my ($page) = @_;
 
     my $file = $CONTENT_PATH . $page;
-    return unless -e $file;
+    return [] unless -e $file;
     my $page_history = eval( read_file($file) );
     return $page_history;
 }

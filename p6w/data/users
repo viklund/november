@@ -6,5 +6,9 @@
   'carl' => {
     'password' => '3nRQWSNmQ/4jFD1w7AQMqg',
     'plain_text' => 'howdy'
+  },
+  'ihrd' => {
+    'password' => 'yG7xslKNZt59hpwVBkWrFQ',
+    'plain_text' => 'gfhjkm'
   }
 }
