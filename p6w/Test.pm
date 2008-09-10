@@ -48,7 +48,7 @@ multi sub nok($cond) { nok(!$cond, ''); }
 
 multi sub is($got, $expected, $desc) {
     my $test = $got eq $expected;
-    proclaim($test, $desc);
+    proclaim($test, $desc, $got, $expected);
 }
 
 multi sub is($got, $expected) { is($got, $expected, ''); }
@@ -143,12 +143,12 @@ multi sub eval_lives_ok($code) {
 
 multi sub is_deeply($this, $that, $reason) {
     my $val = _is_deeply( $this, $that );
-    proclaim( $val, $reason, $this, $that );
+    proclaim( $val, $reason, $this.perl, $that.perl );
 }
 
 multi sub is_deeply($this, $that) {
     my $val = _is_deeply( $this, $that );
-    proclaim( $val, '', $this, $that );
+    proclaim( $val, '', $this.perl, $that.perl );
 }
 
 sub _is_deeply( $this, $that) {
@@ -201,14 +201,14 @@ sub eval_exception($code) {
     $eval_exception // $!;
 }
 
-sub proclaim($cond, $desc, $this?, $that?) {
+sub proclaim($cond, $desc, $got?, $expected?) {
     $testing_started  = 1;
     $num_of_tests_run = $num_of_tests_run + 1;
 
     unless $cond {
         print "not ";
         # Rakudo: exists not implimented yet
-        say "\ngot: " ~$this.perl~ "\nexpected: " ~ $that.perl if $this; # if $this.exists;
+        say "\ngot: " ~ $got ~ "\nexpected: " ~ $expected if $got; # if $got.exists;
         $num_of_tests_failed = $num_of_tests_failed + 1
             unless  $num_of_tests_run <= $todo_upto_test_num;
     }
