@@ -1,7 +1,7 @@
 #!perl6
 #
 # Perl6 CGI.pm developed as a part of November (http://github.com/viklund/november/).
-# v 0.0.2
+# v 0.0.3
 #
 use v6;
 use Impatience;
@@ -12,7 +12,8 @@ class CGI {
 
     # RAKUDO: BUILD method not supported
     method init() {
-        my %params = self.parse_params( %*ENV<QUERY_STRING> );
+        my %params;
+        self.parse_params(%params, %*ENV<QUERY_STRING>);
 
         # It's prudent to handle CONTENT_LENGTH too, but right now that's not
         # a priority. It would make our tests scripts more complicated, with
@@ -21,14 +22,12 @@ class CGI {
         if %*ENV<REQUEST_METHOD> eq 'POST' {
             # Maybe check content_length here and only take that many bytes?
             my $input = $*IN.slurp();
-            my %post_params = self.parse_params( $input );
-            for %post_params.kv -> $k, $v {
-                self.add_param( %params, $k, $v);
-            }
+            self.parse_params(%params, $input);
         }
         $.param = %params;
 
-        my %cookie = self.parse_params(%*ENV<HTTP_COOKIE>);
+        my %cookie; 
+        self.parse_params(%cookie, %*ENV<HTTP_COOKIE>);
         $.cookie = %cookie;
     }
 
@@ -58,15 +57,13 @@ class CGI {
         print "\r\n\r\n";
     }
 
-    method parse_params($string is rw) {
+    method parse_params(%params is rw, $string) {
         my @param_values = split('&' , $string);
-        my %param_temp;
         for @param_values -> $param_value {
             my @kvs = split('=', $param_value);
             # TODO: Is the case of 'page=' handled correctly?
-            self.add_param( %param_temp, @kvs[0], unescape(@kvs[1]) );
+            self.add_param( %params, @kvs[0], unescape(@kvs[1]) );
         }
-        return %param_temp;
     }
 
     sub unescape($string is rw) {

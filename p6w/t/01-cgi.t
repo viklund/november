@@ -34,7 +34,8 @@ my @parse_params_test = (
 for @parse_params_test -> $each {
     my $param = $each[0];
     my $result = $each[1];
-    my %res = $cgi.parse_params( $param );
+    my %res;
+    $cgi.parse_params( $param, %res );
     is_deeply(%res, $result, 'Parse param: ' ~ $param);
 }
 

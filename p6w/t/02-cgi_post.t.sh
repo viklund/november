@@ -16,4 +16,3 @@ REQUEST_METHOD='POST' \
 TEST_RESULT='{"test" => ["foo", "bar"] }' \
 TEST_NAME='Post test=foo&test=bar' \
 ./t/cgi_post_test; 
-
