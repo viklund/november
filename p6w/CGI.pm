@@ -57,7 +57,7 @@ class CGI {
         print "\r\n\r\n";
     }
 
-    method parse_params(%params is rw, $string) {
+    method parse_params(Hash %params is rw, $string) {
         my @param_values = split('&' , $string);
         for @param_values -> $param_value {
             my @kvs = split('=', $param_value);
