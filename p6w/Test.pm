@@ -1,8 +1,14 @@
+# Based on:
 # Copyright (C) 2007, The Perl Foundation.
 # $Id: Test.pm 30592 2008-08-27 14:31:45Z moritz $
 
 ## This is a temporary Test.pm to get us started until we get pugs's Test.pm
 ## working. It's shamelessly stolen & adapted from MiniPerl6 in the pugs repo.
+
+# This version of Test.pm used in November (http://github.com/viklund/november/)
+# Changes:
+# - implementation of is_deeply (by viklund) 
+# - proclaim can say got and expected (by ihrd)
 
 # globals to keep track of our tests
 our $num_of_tests_run = 0;
