@@ -66,10 +66,15 @@ my @inputs_that_should_parse = (
       'pre bcd post',
       'false (but defined) if/else followed by a variable insertion' ],
 
-    [ 'pre <TMPL_IF A>a<TMPL_ELSE>b</TMPL_IF>c<TMPL_VAR D> post',
-      { 'D' => 'd' },
+    [ 'pre <tmpl_if a>a<tmpl_else>b</tmpl_if>c<tmpl_var d> post',
+      { 'd' => 'd' },
       'pre bcd post',
       'false (undefined) if/else followed by a variable insertion' ],
+
+    [ 'pre <tmpl_include name="t/test-templates/2.tmpl">post',
+      { 'FOO' => 'bar' },
+      'pre<h1>bar</h1>post',
+      'include template' ],
 );
 
 my @inputs_that_should_not_parse = (

@@ -11,6 +11,7 @@ grammar HTML::Template::Substitution {
                     | <insertion>
                     | <if_statement>
                     | <for_statement>
+                    | <include>
                     };
 
     regex insertion {
@@ -28,6 +29,10 @@ grammar HTML::Template::Substitution {
         <.tag_start> 'FOR' <attributes> '>'
         <contents>
         '</TMPL_FOR>'
+    };
+
+    regex include {
+        <.tag_start> 'INCLUDE' <attributes> '>'
     };
 
     token tag_start  { '<TMPL_' };
