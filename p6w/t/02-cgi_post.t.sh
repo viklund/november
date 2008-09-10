@@ -11,10 +11,9 @@ TEST_RESULT='{"foo" => "bar", "boo" => "her"}' \
 TEST_NAME='Post foo=bar&boo=her' \
 ./t/cgi_post_test; 
 
-echo -n "foo=bar&foo=boo&gop=her" |  
+echo -n "test=foo&test=bar" |  
 REQUEST_METHOD='POST' \
-TEST_RESULT='{"foo" => ["bar", "boo"], "gop" => "her"}' \
-TEST_NAME='Post foo=bar&foo=boo&gop=her' \
+TEST_RESULT='{"test" => ["foo", "bar"] }' \
+TEST_NAME='Post test=foo&test=bar' \
 ./t/cgi_post_test; 
-
 
