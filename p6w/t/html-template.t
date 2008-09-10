@@ -95,7 +95,7 @@ for @inputs_that_should_parse -> $test {
       = HTML::Template.from_string($input).with_params(
           $parameters).output();
 
-    is( $expected_output, $actual_output, $description );
+    is( $actual_output, $expected_output, $description );
 }
 
 for @inputs_that_should_not_parse -> $test {
