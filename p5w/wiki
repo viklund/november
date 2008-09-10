@@ -308,7 +308,9 @@ sub view_page {
     my $template = HTML::Template->new(
         filename => $TEMPLATE_PATH.'view.tmpl');
 
-    $template->param(TITLE => $page);
+    $template->param(TITLE => $page,);
+    $template->param(VIEW_PAGE => 1) unless $revision;
+
     my $contents;
     if ( my ($path) = $page =~ m[ ^ $PUGS_PREFIX \b (.*) $ ]x ) {
         if ( -d (my $file = $PUGS_PATH.$path) ) {
@@ -487,7 +489,9 @@ sub log_in {
              eq $users{$user_name}->{password} ) {
 
             my $template = HTML::Template->new(
-                filename => $TEMPLATE_PATH.'login_succeeded.tmpl');
+                filename => $TEMPLATE_PATH.'login_succeeded.tmpl'
+            );
+            $template->param(LOGGED_IN => 1);
 
             my $session_id = md5_base64(time);
             my $session_cookie = $cgi->cookie(
