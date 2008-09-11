@@ -71,9 +71,9 @@ my @inputs_that_should_parse = (
       'pre bcd post',
       'false (undefined) if/else followed by a variable insertion' ],
 
-    [ 'pre <tmpl_include name="t/test-templates/2.tmpl">post',
+    [ 'pre<TMPL_INCLUDE NAME="t/test-templates/2.tmpl">post',
       { 'FOO' => 'bar' },
-      'pre<h1>bar</h1>post',
+      "pre<h1>bar</h1>\npost",
       'include template' ],
 );
 
