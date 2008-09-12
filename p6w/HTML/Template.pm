@@ -36,6 +36,10 @@ grammar HTML::Template::Substitution {
     };
 
     token tag_start  { '<TMPL_' };
+    # Я пока не разобрался можно ли сделать так, чтобы оно закаптуревало только часть. 
+    # Может тогда будет лучше обойтись без value
+    # I don`t find how I can capture only part of string in token name. 
+    # May be we can do without value. 
     token name       { \w+ | '"' <value> '"'  };
     token value        { <[ A..z 0..9 . _ \- \/ \\ ]>* };
     token escape     { 'NONE' | 'HTML' | 'URL' | 'JS' | 'JAVASCRIPT' };
