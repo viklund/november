@@ -36,7 +36,8 @@ grammar HTML::Template::Substitution {
     };
 
     token tag_start  { '<TMPL_' };
-    token name       { \w+ };
+    token name       { \w+ | '"' <value> '"'  };
+    token value        { <[ A..z 0..9 . _ \- \/ \\ ]>* };
     token escape     { 'NONE' | 'HTML' | 'URL' | 'JS' | 'JAVASCRIPT' };
     token attributes { \s+ 'NAME='? <name> [\s+ 'ESCAPE=' <escape> ]? };
 };
@@ -107,6 +108,15 @@ class HTML::Template {
                                );
                 }
             }
+            elsif $chunk<directive><include> {
+                my $file = $chunk<directive><include><attributes><name><value> ||  $chunk<directive><include><attributes><name>;
+                if file_exists( $file ) {
+                    $output ~= substitute(
+                                 parse( slurp($file) ),
+                                 $parameters
+                             );
+                }
+            }
 
             $output ~= $chunk<plaintext>;
         }
@@ -114,10 +124,23 @@ class HTML::Template {
     }
 
     method output() {
-        $.input ~~ HTML::Template::Substitution::TOP;
-
-        die("No match") unless $/;
-
-        return substitute( $/<contents>, $.parameters );
+        return substitute( parse($.input), $.parameters );
     }
+
+}
+
+sub parse( Str $in ) {
+    $in ~~ HTML::Template::Substitution::TOP;
+    die("No match") unless $/;
+    return $/<contents>;
+}
+
+sub file_exists( $file ) {
+    # RAKUDO: use ~~ :e
+    my $exists = False;
+    try {
+        my $fh = open( $file );
+        $exists = True;
+    }
+    return $exists;
 }
