@@ -1,10 +1,12 @@
 use Impatience;
 
 sub escape($str, $how) {
-    my $m = $how.lc;
-    return $str if $m eq 'none';
-    return escape_str($str, &escape_html_char) if $m eq 'html';
-    return escape_str($str, &escape_uri_char ) if $m eq 'url' | 'uri';
+    # RAKUDO: .lc not emplemented yet
+    #my $m = $how.lc;
+    my $m = $how;
+    return $str if $m eq 'none' | 'NONE';
+    return escape_str($str, &escape_html_char) if $m eq 'html' | 'HTML';
+    return escape_str($str, &escape_uri_char ) if $m eq 'url' | 'uri' | 'URL' | 'URI';
     die "Don't know how to escape format '$how' yet";
 }
 
