@@ -217,8 +217,11 @@ class Wiki does Session {
         my $template = HTML::Template.new(
             filename => $.template_path ~ 'view.tmpl');
 
+        my $converter = Wiki::Markup::Minimal.new;
+        $converter.wiki = self;
+
         $template.param('TITLE'     => $page);
-        $template.param('CONTENT'   => self.format_html(
+        $template.param('CONTENT'   => $converter.format(
                                            $.storage.read_page($page)
                                        ));
         $template.param('LOGGED_IN' => self.logged_in());
@@ -313,81 +316,6 @@ class Wiki does Session {
         return $text.chars;
     }
 
-    sub wrap($text, $length) {
-        my $clb = convenient_line_break($text, $length);
-
-        return $text if $clb >= $text.chars;
-
-        my $rest_of_string = $text.substr($clb).subst(/^ \s+/, '');
-
-        return $text.substr(0, $clb) ~ "\n" ~ wrap($rest_of_string, $length);
-    }
-
-    sub indent($text, $length) {
-        return join("\n", map { ' ' x $length ~ $_ }, split("\n", $text));
-    }
-
-    method format_html($text is rw) {
-        # RAKUDO: $text.split( /\n\n/ )
-        my @pars = grep { $_ ne "" },
-                   map { $_.subst( / ^ \n /, '' ) },
-                   $text.split("\r\n\r\n");
-
-        my @formatted;
-        for @pars -> $par {
-            if $par ~~ Wiki::Markup::Minimal::Syntax::paragraph {
-                # RAKDUO: Must match again. [perl #57858]
-                $par ~~ Wiki::Markup::Minimal::Syntax::paragraph;
-
-                my $result;
-
-                if $/<heading> {
-                    # RAKDUO: Must match again. [perl #57858]
-                    $par ~~ Wiki::Markup::Minimal::Syntax::paragraph;
-
-                    $result = '<h1>'
-                        ~ $/<heading>.values[0].subst( / ^ \s+ /, '' ).subst(
-                          / \s+ $ /, '')
-                        ~ '</h1>';
-                }
-                else {
-                    # RAKDUO: Must match again. [perl #57858]
-                    $par ~~ Wiki::Markup::Minimal::Syntax::paragraph;
-
-                    $result = '<p>';
-
-                    for $/<parchunk> -> $chunk {
-                        my $text = $chunk.values[0];
-                        given $chunk.keys[0] {
-                            when 'twext'     { $result ~= $text }
-                            when 'wikimark'  { my $page = substr($text, 2, -2);
-                                               $result ~= self.make_link($page) }
-                            when 'metachar'  { $result ~= self.quote($text) }
-                            when 'malformed' { $result ~= $text }
-                        }
-                    }
-                    $result ~= "</p>";
-
-                    push @formatted, indent( wrap($result, 60), 12 );
-                }
-            }
-            else {
-                push @formatted, indent( '<p>Could not parse paragraph.</p>',
-                                         12 );
-            }
-        }
-
-        return join "\n\n", @formatted;
-    }
-
-    method make_link($page) {
-        return sprintf('<a href="?action=%s&page=%s"%s>%s</a>',
-                       $.storage.wiki_page_exists($page)
-                         ?? ('view', $page, '')
-                         !! ('edit', $page, ' class="nonexistent"'),
-                       $page);
-    }
-
     method not_found() {
         my $template = HTML::Template.new(
             filename => $.template_path ~ 'not_found.tmpl');
@@ -479,6 +407,14 @@ class Wiki does Session {
         return;
     }
 
+    method make_link($page) {
+        return sprintf('<a href="?action=%s&page=%s"%s>%s</a>',
+                       $.storage.wiki_page_exists($page)
+                         ?? ('view', $page, '')
+                         !! ('edit', $page, ' class="nonexistent"'),
+                       $page);
+    }
+
     method list_recent_changes {
 
         # RAKUDO: Seemingly impossible to get the right number of list
@@ -488,9 +424,10 @@ class Wiki does Session {
         my @changes;
         for $recent_changes.values -> $modification_id {
             my $modification = $.storage.read_modification($modification_id);
-            push @changes, { 'page' => self.make_link( $modification[0] ),
-                             'time' => $modification_id,
-                             'author' => $modification[2] || 'somebody' };
+            push @changes, {
+                'page' => self.make_link($modification[0]),
+                'time' => $modification_id,
+                'author' => $modification[2] || 'somebody' };
         }
 
         my $template = HTML::Template.new(
