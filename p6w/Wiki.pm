@@ -328,23 +328,15 @@ class Wiki does Session {
         my @formatted;
         for @pars -> $par {
             if $par ~~ Wiki::Syntax::paragraph {
-                # RAKDUO: Must match again. [perl #57858]
-                $par ~~ Wiki::Syntax::paragraph;
-
                 my $result;
 
                 if $/<heading> {
-                    # RAKDUO: Must match again. [perl #57858]
-                    $par ~~ Wiki::Syntax::paragraph;
-
                     $result = '<h1>'
                         ~ $/<heading>.values[0].subst( / ^ \s+ /, '' ).subst(
                           / \s+ $ /, '')
                         ~ '</h1>';
                 }
                 else {
-                    # RAKDUO: Must match again. [perl #57858]
-                    $par ~~ Wiki::Syntax::paragraph;
 
                     $result = '<p>';
 
