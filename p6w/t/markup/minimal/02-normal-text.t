@@ -3,9 +3,9 @@ use v6;
 use Test;
 plan 1;
 
-use Wiki::Markup::Minimal;
+use Text::Markup::Wiki::Minimal;
 
-my $converter = Wiki::Markup::Minimal.new;
+my $converter = Text::Markup::Wiki::Minimal.new;
 
 my $input = 'normal text';
 my $expected_output = '<p>normal text</p>';

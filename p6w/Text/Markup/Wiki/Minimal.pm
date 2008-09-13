@@ -1,11 +1,11 @@
 use v6;
 
 # RAKUDO: Inheriting from classes in other modules does not quite work yet
-#use Wiki::Markup;
+#use Text::Markup::Wiki;
 
 # ...so instead we inline the method inside the class for now.
 
-grammar Wiki::Markup::Minimal::Syntax {
+grammar Text::Markup::Wiki::Minimal::Syntax {
 
     token paragraph { ^ <parchunk>+ $ };
 
@@ -25,7 +25,7 @@ grammar Wiki::Markup::Minimal::Syntax {
     token malformed { '[' || ']' }
 }
 
-class Wiki::Markup::Minimal { # is Wiki::Markup {
+class Text::Markup::Wiki::Minimal { # is Text::Markup::Wiki {
 
     has $.wiki is rw;
 
@@ -37,15 +37,15 @@ class Wiki::Markup::Minimal { # is Wiki::Markup {
 
         my @formatted;
         for @pars -> $par {
-            if $par ~~ Wiki::Markup::Minimal::Syntax::paragraph {
+            if $par ~~ Text::Markup::Wiki::Minimal::Syntax::paragraph {
                 # RAKDUO: Must match again. [perl #57858]
-                $par ~~ Wiki::Markup::Minimal::Syntax::paragraph;
+                $par ~~ Text::Markup::Wiki::Minimal::Syntax::paragraph;
 
                 my $result;
 
                 if $/<heading> {
                     # RAKDUO: Must match again. [perl #57858]
-                    $par ~~ Wiki::Markup::Minimal::Syntax::paragraph;
+                    $par ~~ Text::Markup::Wiki::Minimal::Syntax::paragraph;
 
                     $result = '<h1>'
                         ~ $/<heading>.values[0].subst( / ^ \s+ /, '' ).subst(
@@ -54,7 +54,7 @@ class Wiki::Markup::Minimal { # is Wiki::Markup {
                 }
                 else {
                     # RAKDUO: Must match again. [perl #57858]
-                    $par ~~ Wiki::Markup::Minimal::Syntax::paragraph;
+                    $par ~~ Text::Markup::Wiki::Minimal::Syntax::paragraph;
                     $result = '<p>';
 
                     for $/<parchunk> -> $chunk {
