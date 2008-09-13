@@ -327,6 +327,8 @@ class Wiki does Session {
 
         my @formatted;
         for @pars -> $par {
+            # RAKUDO: when #58676 will be resolved use: 
+            # if $par ~~ Wiki::Syntax::paragraph.new {
             if $par ~~ Wiki::Syntax::paragraph {
                 my $result;
 
