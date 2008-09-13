@@ -194,7 +194,7 @@ class Wiki does Session {
     method view_page() {
         my $page = $.cgi.param<page> // 'Main_Page';
 
-        if !$.storage.wiki_page_exists($page) {
+        unless $.storage.wiki_page_exists($page) {
             my $template = HTML::Template.new(
                 filename => $.template_path ~ 'not_found.tmpl');
 
