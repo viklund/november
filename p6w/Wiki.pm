@@ -179,7 +179,7 @@ class Wiki does Session {
         my $action = $cgi.param<action> // 'view';
 
         # Maybe we should consider turning this given into a lookup hash.
-        # RAKUDO: 'when' doesn't break out by default yet
+        # RAKUDO: 'when' doesn't break out by default yet, #57652
         given $action {
             when 'view'           { self.view_page();           return; }
             when 'edit'           { self.edit_page();           return; }
