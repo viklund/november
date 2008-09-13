@@ -1,10 +1,5 @@
 use v6;
 
-# RAKUDO: Inheriting from classes in other modules does not quite work yet
-#use Text::Markup::Wiki;
-
-# ...so instead we inline the method inside the class for now.
-
 grammar Text::Markup::Wiki::Minimal::Syntax {
 
     token paragraph { ^ <parchunk>+ $ };
@@ -25,7 +20,7 @@ grammar Text::Markup::Wiki::Minimal::Syntax {
     token malformed { '[' || ']' }
 }
 
-class Text::Markup::Wiki::Minimal { # is Text::Markup::Wiki {
+class Text::Markup::Wiki::Minimal {
 
     has $.wiki is rw;
 
