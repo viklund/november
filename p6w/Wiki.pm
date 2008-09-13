@@ -437,13 +437,12 @@ class Wiki does Session {
     }
 
     method log_out {
-        # TODO: Fix 500 error on server
-        if defined $.cgi.cookie('session_id') {
+        if defined $.cgi.cookie<session_id> {
 
-            my $session_id = $.cgi.cookie('session_id');
+            my $session_id = $.cgi.cookie<session_id>;
             self.remove_session( $session_id );
 
-            my $session_cookie = "session_id=''";
+            my $session_cookie = "session_id=";
 
             my $template = HTML::Template.new(
                 filename => $.template_path ~ 'logout_succeeded.tmpl');
