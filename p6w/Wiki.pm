@@ -297,15 +297,6 @@ class Wiki does Session {
         return eval( slurp( $.userfile_path ) );
     }
 
-    method quote($metachar) {
-        # RAKUDO: Chained trinary operators do not do what we mean yet.
-        return '&#039;' if $metachar eq '\'';
-        return '&lt;'   if $metachar eq '<';
-        return '&gt;'   if $metachar eq '>';
-        return '&amp;'  if $metachar eq '&';
-        return $metachar;
-    }
-
     sub convenient_line_break($text, $length) {
         return $text.chars if $text.chars < $length;
         # RAKUDO: This should of course be done with rindex, once that's

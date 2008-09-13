@@ -60,7 +60,7 @@ class Text::Markup::Wiki::Minimal {
                                 my $page = substr($text, 2, -2);
                                 $result ~= $.wiki.make_link($page)
                             }
-                            when 'metachar'  { $result ~= self.quote($text) }
+                            when 'metachar'  { $result ~= quote($text) }
                             when 'malformed' { $result ~= $text }
                         }
                     }
@@ -75,5 +75,14 @@ class Text::Markup::Wiki::Minimal {
         }
 
         return join "\n\n", @formatted;
+    }
+
+    sub quote($metachar) {
+        # RAKUDO: Chained trinary operators do not do what we mean yet.
+        return '&#039;' if $metachar eq '\'';
+        return '&lt;'   if $metachar eq '<';
+        return '&gt;'   if $metachar eq '>';
+        return '&amp;'  if $metachar eq '&';
+        return $metachar;
     }
 }
