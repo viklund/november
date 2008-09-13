@@ -226,7 +226,12 @@ class Wiki does Session {
         my $session_id = $.cgi.cookie<session_id>;
         # RAKUDO: 'defined' should maybe be 'exists', although here it doesn't
         # matter.
-        return defined $session_id && defined $sessions{$session_id};
+        # RAKUDO: && bug [perl #58830]
+        # defined $session_id && defined $sessions{$session_id}
+        if $session_id {
+            return defined $sessions{$session_id};
+        } 
+        return;
     }
 
     method edit_page() {
