@@ -1,5 +1,5 @@
 #!/bin/sh
-# Use shell script here, becouse
+# Use shell script here, because
 # RAKUDO: Can`t modify %*ENV;
 
 echo -n "foo=bar" |  
