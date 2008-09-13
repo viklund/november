@@ -38,12 +38,8 @@ grammar HTML::Template::Substitution {
     };
 
     token tag_start  { '<TMPL_' };
-    # Я пока не разобрался можно ли сделать так, чтобы оно закаптуревало только часть. 
-    # Может тогда будет лучше обойтись без value
-    # I don`t find how I can capture only part of string in token name. 
-    # May be we can do without value. 
-    token name       { \w+ | '"' <value> '"'  };
-    token value        { <[ 0..9 '/._' \- // ] +alpha>* };
+    token name       { $<val>=\w+ | <.qq> $<val>=[ <[ 0..9 '/._' \- // ] +alpha>* ] <.qq> };
+    regex qq         { '"' };
     token escape     { 'NONE' | 'HTML' | 'URL' | 'JS' | 'JAVASCRIPT' };
     token attributes { \s+ 'NAME='? <name> [\s+ 'ESCAPE=' <escape> ]? };
 };
@@ -106,7 +102,7 @@ class HTML::Template {
                 }
             }
             elsif $chunk<directive><for_statement> {
-                my $key = $chunk<directive><for_statement><attributes><name>;
+                my $key = $chunk<directive><for_statement><attributes><name><val>;
                 my $iterations = $parameters{$key};
                 # RAKUDO: This should exhibit the correct behaviour, but due
                 # to a bug having to do with for loops and recursion, it
@@ -119,7 +115,7 @@ class HTML::Template {
                 }
             }
             elsif $chunk<directive><include> {
-                my $file = $chunk<directive><include><attributes><name><value> ||  $chunk<directive><include><attributes><name>;
+                my $file = $chunk<directive><include><attributes><name><val>;
                 if file_exists( $file ) {
                     $output ~= substitute(
                                  parse( slurp($file) ),
