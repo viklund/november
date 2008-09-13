@@ -2,6 +2,7 @@ use v6;
 
 use CGI;
 use HTML::Template;
+use Text::Markup::Wiki::Simple;
 
 sub file_exists( $file ) {
     # RAKUDO: use ~~ :e
@@ -328,8 +329,8 @@ class Wiki does Session {
         my @formatted;
         for @pars -> $par {
             # RAKUDO: when #58676 will be resolved use: 
-            # if $par ~~ Wiki::Syntax::paragraph.new {
-            if $par ~~ Wiki::Syntax::paragraph {
+            # if $par ~~ Text::Markup::Wiki::Simple.new {
+            if $par ~~ Text::Markup::Wiki::Simple::TOP {
                 my $result;
 
                 if $/<heading> {
@@ -492,24 +493,3 @@ class Wiki does Session {
         return;
     }
 }
-
-grammar Wiki::Syntax {
-
-    token paragraph { ^ <parchunk>+ $ };
-
-    token parchunk { <twext> || <wikimark> || <metachar> || <malformed> };
-
-    # RAKUDO: a token may not be called 'text' [perl #57864]
-    token twext { [ <alnum> || <otherchar> || <sp> ]+ };
-
-    token otherchar { <[ !..% (../ : ; ? @ \\ ^..` {..~ ]> };
-
-    token sp { ' ' | \n };
-
-    token wikimark { '[[' <twext> ']]' };
-
-    token metachar { '<' || '>' || '&' || \' };
-
-    token malformed { '[' || ']' }
-}
-
