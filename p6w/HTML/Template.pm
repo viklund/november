@@ -43,7 +43,7 @@ grammar HTML::Template::Substitution {
     # I don`t find how I can capture only part of string in token name. 
     # May be we can do without value. 
     token name       { \w+ | '"' <value> '"'  };
-    token value        { <[ A..z 0..9 . _ \- \/ \\ ]>* };
+    token value        { <[ 0..9 '/._' \- // ] +alpha>* };
     token escape     { 'NONE' | 'HTML' | 'URL' | 'JS' | 'JAVASCRIPT' };
     token attributes { \s+ 'NAME='? <name> [\s+ 'ESCAPE=' <escape> ]? };
 };

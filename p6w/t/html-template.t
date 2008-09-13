@@ -38,6 +38,7 @@ my @inputs_that_should_parse = (
       'ac',
       'nested if directives, inner one false' ],
 
+    # 10
     [ '<TMPL_IF NAME=FOO>a<TMPL_IF NAME=BAR>b</TMPL_IF>c</TMPL_IF>',
       { 'FOO' => 1, BAR => 1 },
       'abc',
