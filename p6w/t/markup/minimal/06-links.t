@@ -13,7 +13,7 @@ my $converter = Text::Markup::Wiki::Minimal.new;
         = '<p>An example of a <a href="/?page=link">link</a></p>';
     my $actual_output = $converter.format($input);
 
-    is( $expected_output, $actual_output, 'link conversion works' );
+    is( $actual_output, $expected_output, 'link conversion works' );
 }
 
 {
@@ -21,7 +21,7 @@ my $converter = Text::Markup::Wiki::Minimal.new;
     my $expected_output = '<p>An example of a [[malformed link</p>';
     my $actual_output = $converter.format($input);
 
-    is( $expected_output, $actual_output, 'malformed link I' );
+    is( $actual_output, $expected_output, 'malformed link I' );
 }
 
 {
@@ -29,5 +29,5 @@ my $converter = Text::Markup::Wiki::Minimal.new;
     my $expected_output = '<p>An example of a malformed link]]</p>';
     my $actual_output = $converter.format($input);
 
-    is( $expected_output, $actual_output, 'malformed link II' );
+    is( $actual_output, $expected_output, 'malformed link II' );
 }

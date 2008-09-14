@@ -22,4 +22,4 @@ my $expected_output = join "\n\n",
    '<p>par 2</p>';
 my $actual_output = $converter.format($input);
 
-is( $expected_output, $actual_output, 'mixing paragraphs and headings works' );
+is( $actual_output, $expected_output, 'mixing paragraphs and headings works' );

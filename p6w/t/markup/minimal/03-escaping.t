@@ -18,5 +18,5 @@ for %h.kv -> $input, $abbr {
     my $expected_output = "<p>$expected_escape</p>";
     my $actual_output = $converter.format($input);
 
-    is( $expected_output, $actual_output, "$input -> $expected_escape" );
+    is( $actual_output, $expected_output, "$input -> $expected_escape" );
 }

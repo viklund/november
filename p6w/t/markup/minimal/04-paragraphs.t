@@ -18,5 +18,5 @@ my $actual_output   = $converter.format($input);
 say $expected_output;
 say $actual_output;
 
-is( $expected_output, $actual_output,
+is( $actual_output, $expected_output,
     'paragraphs are turned into separate <p> blocks' );
