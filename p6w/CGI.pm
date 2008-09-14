@@ -82,7 +82,7 @@ class CGI {
     }
 
     method add_param ( Hash %params is rw, Str $key, $value ) {
-        # RAKUDO: синтаксис Hash.:exists{key} еще не релизован 
+        # RAKUDO: синтаксис Hash.:exists{key} еще не реализован 
         #        (Hash.:exists{key} not implemented yet)
         # if %params.:exists{$key} {
 
