@@ -73,7 +73,6 @@ class CGI {
         }
         # RAKUDO: This could also be rewritten as a single .subst :g call.
         while $string ~~ /\%(..)/ {
-            $string ~~ /\%(..)/;
             my $match = $0;
             my $character = chr(:16($match));
             # RAKUDO: DOTTY

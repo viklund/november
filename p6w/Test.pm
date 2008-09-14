@@ -58,7 +58,7 @@ multi sub nok($cond) { nok(!$cond, ''); }
 
 multi sub is($got, $expected, $desc) {
     my $test = $got eq $expected;
-    proclaim($test, $desc);
+    proclaim($test, $desc, $got, $expected);
 }
 
 multi sub is($got, $expected) { is($got, $expected, ''); }
@@ -66,14 +66,14 @@ multi sub is($got, $expected) { is($got, $expected, ''); }
 
 multi sub isnt($got, $expected, $desc) {
     my $test = !($got eq $expected);
-    proclaim($test, $desc);
+    proclaim($test, $desc, $got, $expected);
 }
 
 multi sub isnt($got, $expected) { isnt($got, $expected, ''); }
 
 multi sub is_approx($got, $expected, $desc) {
     my $test = abs($got - $expected) <= 0.00001;
-    proclaim($test, $desc);
+    proclaim($test, $desc, $got, $expected);
 }
 
 multi sub is_approx($got, $expected) { is_approx($got, $expected, ''); }
@@ -153,12 +153,12 @@ multi sub eval_lives_ok($code) {
 
 multi sub is_deeply($this, $that, $reason) {
     my $val = _is_deeply( $this, $that );
-    proclaim( $val, $reason, $this, $that );
+    proclaim( $val, $reason, $this.perl, $that.perl );
 }
 
 multi sub is_deeply($this, $that) {
     my $val = _is_deeply( $this, $that );
-    proclaim( $val, '', $this, $that );
+    proclaim( $val, '', $this.perl, $that.perl );
 }
 
 sub _is_deeply( $this, $that) {
@@ -211,14 +211,12 @@ sub eval_exception($code) {
     $eval_exception // $!;
 }
 
-sub proclaim($cond, $desc, $this?, $that?) {
+sub proclaim($cond, $desc, $got?, $expected?) {
     $testing_started  = 1;
     $num_of_tests_run = $num_of_tests_run + 1;
 
     unless $cond {
         print "not ";
-        # Rakudo: exists not implimented yet
-        say "\ngot: " ~$this.perl~ "\nexpected: " ~ $that.perl if $this; # if $this.exists;
         $num_of_tests_failed = $num_of_tests_failed + 1
             unless  $num_of_tests_run <= $todo_upto_test_num;
     }
@@ -226,6 +224,9 @@ sub proclaim($cond, $desc, $this?, $that?) {
     if $todo_reason and $num_of_tests_run <= $todo_upto_test_num {
         print $todo_reason;
     }
+
+    # Rakudo: exists not implimented yet
+    print "\n# got: " ~ $got ~ "\n# expected: " ~ $expected if $expected and ! $cond; # if $got.exists;
     print "\n";
 }
 
