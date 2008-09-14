@@ -7,11 +7,11 @@ grammar Text::Markup::Wiki::Minimal::Syntax {
     token parchunk { <twext> || <wikimark> || <metachar> || <malformed> };
 
     # RAKUDO: a token may not be called 'text' [perl #57864]
-    token twext { [ <alnum> || <otherchar> || <sp> ]+ };
+    token twext { [ <.alnum> || <.otherchar> || <.whitespace> ]+ };
 
     token otherchar { <[ !..% (../ : ; ? @ \\ ^..` {..~ ]> };
 
-    token sp { ' ' | \n };
+    token whitespace { ' ' | \n };
 
     token wikimark { '[[' <twext> ']]' };
 
