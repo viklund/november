@@ -15,8 +15,5 @@ my $input           = join "\r\n\r\n", @pars;
 my $expected_output = join "\r\n\r\n", map { "<p>$_</p>" }, @pars;
 my $actual_output   = $converter.format($input);
 
-say $expected_output;
-say $actual_output;
-
 is( $actual_output, $expected_output,
     'paragraphs are turned into separate <p> blocks' );
