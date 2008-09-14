@@ -2,7 +2,9 @@ use v6;
 
 grammar Text::Markup::Wiki::Minimal::Syntax {
 
-    token paragraph { ^ <parchunk>+ $ };
+    token paragraph { ^ [<heading> || <parchunk>+] $ };
+
+    token heading { '==' <parchunk>+ '==' };
 
     token parchunk { <twext> || <wikimark> || <metachar> || <malformed> };
 
@@ -28,19 +30,20 @@ class Text::Markup::Wiki::Minimal {
         # RAKUDO: $text.split( /\n\n/ )
         my @pars = grep { $_ ne "" },
                    map { $_.subst( / ^ \n /, '' ) },
-                   $text.split("\r\n\r\n");
+                   $text.split("\n\n");
 
         my @formatted;
         for @pars -> $par {
+
+            my $result;
+
             if $par ~~ Text::Markup::Wiki::Minimal::Syntax::paragraph {
 
-                my $result;
-
                 if $/<heading> {
-                    $result = '<h1>'
-                        ~ $/<heading>.values[0].subst( / ^ \s+ /, '' ).subst(
-                          / \s+ $ /, '')
-                        ~ '</h1>';
+                    my $heading = $/<heading><parchunk>[0];
+                    $heading = $heading.subst( / ^ \s+ /, '' );
+                    $heading = $heading.subst( / \s+ $ /, '' );
+                    $result = "<h1>$heading</h1>";
                 }
                 else {
                     $result = '<p>';
@@ -58,13 +61,13 @@ class Text::Markup::Wiki::Minimal {
                         }
                     }
                     $result ~= "</p>";
-
-                    push @formatted, $result;
                 }
             }
             else {
-                push @formatted, '<p>Could not parse paragraph.</p>';
+                $result = '<p>Could not parse paragraph.</p>';
             }
+
+            push @formatted, $result;
         }
 
         return join "\n\n", @formatted;

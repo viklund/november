@@ -9,10 +9,10 @@ my $converter = Text::Markup::Wiki::Minimal.new;
 
 my @pars =
   "par 1",
-  "par 2\r\nwith\r\nnewlines in it",
+  "par 2\nwith\nnewlines in it",
   "par 3";
-my $input           = join "\r\n\r\n", @pars;
-my $expected_output = join "\r\n\r\n", map { "<p>$_</p>" }, @pars;
+my $input           = join "\n\n", @pars;
+my $expected_output = join "\n\n", map { "<p>$_</p>" }, @pars;
 my $actual_output   = $converter.format($input);
 
 is( $actual_output, $expected_output,
