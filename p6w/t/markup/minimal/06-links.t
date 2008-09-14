@@ -7,6 +7,12 @@ use Text::Markup::Wiki::Minimal;
 
 my $converter = Text::Markup::Wiki::Minimal.new;
 
+class MockedWiki {
+    method make_link($page) { return "<a href=\"/?page=$page\">$page</a>"; }
+}
+
+$converter.wiki = MockedWiki.new;
+
 {
     my $input = 'An example of a [[link]]';
     my $expected_output
