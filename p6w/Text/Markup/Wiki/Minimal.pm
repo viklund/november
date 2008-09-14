@@ -48,8 +48,6 @@ class Text::Markup::Wiki::Minimal { # is Text::Markup::Wiki {
                         ~ '</h1>';
                 }
                 else {
-                    # RAKDUO: Must match again. [perl #57858]
-                    $par ~~ Text::Markup::Wiki::Minimal::Syntax::paragraph;
                     $result = '<p>';
 
                     for $/<parchunk> -> $chunk {
