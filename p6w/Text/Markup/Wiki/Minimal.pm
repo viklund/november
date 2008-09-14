@@ -33,23 +33,16 @@ class Text::Markup::Wiki::Minimal {
         my @formatted;
         for @pars -> $par {
             if $par ~~ Text::Markup::Wiki::Minimal::Syntax::paragraph {
-                # RAKDUO: Must match again. [perl #57858]
-                $par ~~ Text::Markup::Wiki::Minimal::Syntax::paragraph;
 
                 my $result;
 
                 if $/<heading> {
-                    # RAKDUO: Must match again. [perl #57858]
-                    $par ~~ Text::Markup::Wiki::Minimal::Syntax::paragraph;
-
                     $result = '<h1>'
                         ~ $/<heading>.values[0].subst( / ^ \s+ /, '' ).subst(
                           / \s+ $ /, '')
                         ~ '</h1>';
                 }
                 else {
-                    # RAKDUO: Must match again. [perl #57858]
-                    $par ~~ Text::Markup::Wiki::Minimal::Syntax::paragraph;
                     $result = '<p>';
 
                     for $/<parchunk> -> $chunk {
