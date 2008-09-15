@@ -19,6 +19,13 @@ sub get_unique_id {
     return int(time%1000000/100) ~ time%100
 }
 
+# RAKUDO: :g not implemented yet :( 
+sub r_remove( $str is rw ) {
+    while $str ~~ /\\r/ {
+        $str = $str.subst( /\\r/, '' );
+    }
+}
+
 role Session {
     has $.sessionfile_path  is rw;
     has $.sessions          is rw;
@@ -147,9 +154,12 @@ class Storage::File is Storage {
     }
 
     method write_modification ( $modification_id, $modification ) {
+        my $data = $modification.perl;
+        r_remove($data);
+
         my $file =  $.modifications_path ~ $modification_id;
         my $fh = open( $file, :w );
-        $fh.say( $modification.perl );
+        $fh.say( $data );
         $fh.close();
     }
 }
