@@ -220,6 +220,7 @@ sub proclaim($cond, $desc, $got?, $expected?) {
             unless  $num_of_tests_run <= $todo_upto_test_num;
     }
     print "ok ", $num_of_tests_run, " - ", $desc;
+
     if $todo_reason and $num_of_tests_run <= $todo_upto_test_num {
         print $todo_reason;
     }
@@ -227,8 +228,9 @@ sub proclaim($cond, $desc, $got?, $expected?) {
     unless $cond {
         # Rakudo: exists not implimented yet
         print "\n# got: " ~ $got ~ "\n# expected: " ~ $expected if defined $expected; # if $got.exists;
-        print "\n";
     }
+    
+    say;
 }
 
 END {
