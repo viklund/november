@@ -196,3 +196,5 @@ class Digest::MD5 {
         return @words;
     }
 }
+
+# vim:ft=perl6

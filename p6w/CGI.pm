@@ -107,3 +107,4 @@ class CGI {
 # Johan Viklund
 # Ilya Belikin <forihrd@gmail.com>
 
+# vim:ft=perl6

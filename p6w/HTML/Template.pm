@@ -139,3 +139,4 @@ class HTML::Template {
         return $result;
     }
 }
+# vim:ft=perl6
