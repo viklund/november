@@ -1,48 +1,7 @@
 use v6;
 
 use Text::Escape;
-
-grammar HTML::Template::Substitution {
-    regex TOP { ^ <contents> $ };
-
-    regex contents  { <plaintext> <chunk>* };
-    regex chunk     { <directive> <plaintext> };
-    regex plaintext { [ <!before '<TMPL_' ><!before '</TMPL_' >. ]* };
-
-    token directive {
-                    | <insertion>
-                    | <if_statement>
-                    | <for_statement>
-                    | <include>
-                    };
-
-    regex insertion {
-        <.tag_start> 'VAR' <attributes> '>'
-    };
-
-    regex if_statement { 
-        <.tag_start> 'IF' <attributes> '>' 
-        <contents>
-        [ '<TMPL_ELSE>' <else=contents> ]?
-        '</TMPL_IF>' 
-    };
-
-    regex for_statement {
-        <.tag_start> 'FOR' <attributes> '>'
-        <contents>
-        '</TMPL_FOR>'
-    };
-
-    regex include {
-        <.tag_start> 'INCLUDE' <attributes> '>'
-    };
-
-    token tag_start  { '<TMPL_' };
-    token name       { $<val>=\w+ | <.qq> $<val>=[ <[ 0..9 '/._' \- // ] +alpha>* ] <.qq> };
-    regex qq         { '"' };
-    token escape     { 'NONE' | 'HTML' | 'URL' | 'JS' | 'JAVASCRIPT' };
-    token attributes { \s+ 'NAME='? <name> [\s+ 'ESCAPE=' <escape> ]? };
-};
+use HTML::Template::Grammar;
 
 class HTML::Template {
     has $.input;
@@ -132,13 +91,12 @@ class HTML::Template {
     method output() {
         return substitute( parse($.input), %!params );
     }
-
 }
 
 sub parse( Str $in ) {
     # RAKUDO: when #58676 will be resolved use: 
     # $in ~~ HTML::Template::Substitution::TOP.new;
-    $in ~~ HTML::Template::Substitution::TOP;
+    $in ~~ HTML::Template::Grammar::TOP;
     die("No match") unless $/;
     return $/<contents>;
 }
