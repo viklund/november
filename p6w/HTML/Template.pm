@@ -7,10 +7,6 @@ class HTML::Template {
     has $.input;
     has %!params;
 
-    method param( Pair $param ) {
-        %!params{$param.key} = $param.value;
-    }
-
     method from_string( Str $input) {
         return self.new(input => $input);
     }
@@ -19,9 +15,25 @@ class HTML::Template {
         return self.from_string( slurp($file_path) );
     }
 
+    method param( Pair $param ) {
+        %!params{$param.key} = $param.value;
+    }
+
     method with_params( Hash %params) {
         %!params = %params;
         return self;
+    }
+
+    method output() {
+        return substitute( parse($.input), %!params );
+    }
+
+    sub parse( Str $in ) {
+        # RAKUDO: when #58676 will be resolved use: 
+        # $in ~~ HTML::Template::Substitution::TOP.new;
+        $in ~~ HTML::Template::Grammar::TOP;
+        die("No match") unless $/;
+        return $/<contents>;
     }
 
     # RAKUDO: We eventually want to do this using {*} ties.
@@ -87,19 +99,8 @@ class HTML::Template {
         }
         return $output;
     }
-
-    method output() {
-        return substitute( parse($.input), %!params );
-    }
 }
 
-sub parse( Str $in ) {
-    # RAKUDO: when #58676 will be resolved use: 
-    # $in ~~ HTML::Template::Substitution::TOP.new;
-    $in ~~ HTML::Template::Grammar::TOP;
-    die("No match") unless $/;
-    return $/<contents>;
-}
 
 sub file_exists( $file ) {
     # RAKUDO: use ~~ :e
