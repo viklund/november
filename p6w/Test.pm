@@ -224,9 +224,11 @@ sub proclaim($cond, $desc, $got?, $expected?) {
         print $todo_reason;
     }
 
-    # Rakudo: exists not implimented yet
-    print "\n# got: " ~ $got ~ "\n# expected: " ~ $expected if $expected and ! $cond; # if $got.exists;
-    print "\n";
+    unless $cond {
+        # Rakudo: exists not implimented yet
+        print "\n# got: " ~ $got ~ "\n# expected: " ~ $expected if defined $expected; # if $got.exists;
+        print "\n";
+    }
 }
 
 END {

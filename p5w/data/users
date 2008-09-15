@@ -4,5 +4,9 @@
   },
   'carl' => {
     'password' => '3nRQWSNmQ/4jFD1w7AQMqg'
+  },
+  'ihrd' => {
+    'password' => 'yG7xslKNZt59hpwVBkWrFQ',
+    'plain_text' => 'gfhjkm'
   }
 }
