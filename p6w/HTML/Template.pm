@@ -7,7 +7,7 @@ class HTML::Template {
     has $.input;
     has %!params;
 
-    method from_string( Str $input) {
+    method from_string( Str $input ) {
         return self.new(input => $input);
     }
 
@@ -19,7 +19,7 @@ class HTML::Template {
         %!params{$param.key} = $param.value;
     }
 
-    method with_params( Hash %params) {
+    method with_params( Hash %params ) {
         %!params = %params;
         return self;
     }
