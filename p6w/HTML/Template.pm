@@ -46,9 +46,13 @@ grammar HTML::Template::Substitution {
 
 class HTML::Template {
     has $.input;
-    has $.parameters is rw;
+    has %!params;
 
-    method from_string($input) {
+    method param( Pair $param ) {
+        %!params{$param.key} = $param.value;
+    }
+
+    method from_string( Str $input) {
         return self.new(input => $input);
     }
 
@@ -56,17 +60,13 @@ class HTML::Template {
         return self.from_string( slurp($file_path) );
     }
 
-    method with_param($parameter) {
-        die "Need to test/implement with_param";
-    }
-
-    method with_params($parameters) {
-        $.parameters = $parameters;
+    method with_params( Hash %params) {
+        %!params = %params;
         return self;
     }
 
     # RAKUDO: We eventually want to do this using {*} ties.
-    sub substitute( $contents, $parameters ) {
+    sub substitute( $contents, %params ) {
         my $output = $contents<plaintext>;
 
         for ($contents<chunk> // ()) -> $chunk {
@@ -77,7 +77,7 @@ class HTML::Template {
             #if $chunk<directive><insertion> -> $_ { # and so on for the others
             if $chunk<directive><insertion> {
                 my $key = $chunk<directive><insertion><attributes><name>;
-                my $value = $parameters{$key};
+                my $value = %params{$key};
 
                 if $chunk<directive><insertion><attributes><escape> {
                     $value = escape( $value, $chunk<directive><insertion><attributes><escape> );
@@ -87,23 +87,23 @@ class HTML::Template {
             }
             elsif $chunk<directive><if_statement> {
                 my $key = $chunk<directive><if_statement><attributes><name>;
-                my $condition = $parameters{$key};
+                my $condition = %params{$key};
                 if $condition {
                     $output ~= substitute(
                                  $chunk<directive><if_statement><contents>,
-                                 $parameters
+                                 %params
                                );
                 }
                 elsif $chunk<directive><if_statement><else> {
                     $output ~= substitute(
                                  $chunk<directive><if_statement><else>[0],
-                                 $parameters
+                                 %params
                                );
                 }
             }
             elsif $chunk<directive><for_statement> {
                 my $key = $chunk<directive><for_statement><attributes><name><val>;
-                my $iterations = $parameters{$key};
+                my $iterations = %params{$key};
                 # RAKUDO: This should exhibit the correct behaviour, but due
                 # to a bug having to do with for loops and recursion, it
                 # doesn't. [perl #58392]
@@ -119,7 +119,7 @@ class HTML::Template {
                 if file_exists( $file ) {
                     $output ~= substitute(
                                  parse( slurp($file) ),
-                                 $parameters
+                                 %params
                              );
                 }
             }
@@ -130,7 +130,7 @@ class HTML::Template {
     }
 
     method output() {
-        return substitute( parse($.input), $.parameters );
+        return substitute( parse($.input), %!params );
     }
 
 }
