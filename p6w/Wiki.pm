@@ -1,9 +1,9 @@
-#!perl6
 use v6;
 
 use CGI;
 use HTML::Template;
 use Text::Escape;
+use Text::Markup::Wiki::Minimal;
 
 sub file_exists( $file ) {
     # RAKUDO: use ~~ :e
@@ -62,23 +62,16 @@ role Session {
 }
 
 class Storage {
-    sub yadda() {
-        die "This method should never be called directly in Storage, but "
-            ~ "should instead\nbe overridden by a deriving class."
-    }
+    method wiki_page_exists($page)                               { ... }
 
-    # These should be overridden in a deriving class
-    # RAKUDO: This is really a job for '...', which is not implemented yet.
-    method wiki_page_exists($page)                               {yadda}
+    method read_recent_changes()                                 { ... }
+    method write_recent_changes( $recent_changes )               { ... }
 
-    method read_recent_changes()                                 {yadda}
-    method write_recent_changes( $recent_changes )               {yadda}
+    method read_page_history($page)                              { ... }
+    method write_page_history( $page, $page_history )            { ... }
 
-    method read_page_history($page)                              {yadda}
-    method write_page_history( $page, $page_history )            {yadda}
-
-    method read_modification($modification_id)                   {yadda}
-    method write_modification( $modification_id, $modification ) {yadda}
+    method read_modification($modification_id)                   { ... }
+    method write_modification( $modification_id, $modification ) { ... }
 
     method save_page($page, $new_text, $author) {
         my $modification_id = get_unique_id();
@@ -188,7 +181,7 @@ class Wiki does Session {
         my $action = $cgi.param<action> // 'view';
 
         # Maybe we should consider turning this given into a lookup hash.
-        # RAKUDO: 'when' doesn't break out by default yet
+        # RAKUDO: 'when' doesn't break out by default yet, #57652
         given $action {
             when 'view'           { self.view_page();           return; }
             when 'edit'           { self.edit_page();           return; }
@@ -203,25 +196,32 @@ class Wiki does Session {
     method view_page() {
         my $page = $.cgi.param<page> // 'Main_Page';
 
-        if !$.storage.wiki_page_exists($page) {
+        unless $.storage.wiki_page_exists($page) {
+            my $template = HTML::Template.new(
+                filename => $.template_path ~ 'not_found.tmpl');
+
+            $template.param('PAGE' => $page);
+
             $.cgi.send_response(
-                HTML::Template.from_file(
-                    $.template_path ~ 'not_found.tmpl').with_params(
-                        { 'PAGE' => $page }
-                    ).output()
+                    $template.output()
             );
             return;
         }
 
+        my $template = HTML::Template.new(
+            filename => $.template_path ~ 'view.tmpl');
+
+        my $converter = Text::Markup::Wiki::Minimal.new;
+        $converter.wiki = self;
+
+        $template.param('TITLE'     => $page);
+        $template.param('CONTENT'   => $converter.format(
+                                           $.storage.read_page($page)
+                                       ));
+        $template.param('LOGGED_IN' => self.logged_in());
+
         $.cgi.send_response(
-            HTML::Template.from_file(
-                $.template_path ~ 'view.tmpl').with_params(
-                    { 'TITLE'     => $page,
-                      'CONTENT'   => self.format_html(
-                                         $.storage.read_page($page)
-                                     ),
-                      'LOGGED_IN' => self.logged_in() }
-                ).output()
+            $template.output(),
         );
     }
 
@@ -230,7 +230,12 @@ class Wiki does Session {
         my $session_id = $.cgi.cookie<session_id>;
         # RAKUDO: 'defined' should maybe be 'exists', although here it doesn't
         # matter.
-        return defined $session_id && defined $sessions{$session_id};
+        # RAKUDO: && bug [perl #58830]
+        # defined $session_id && defined $sessions{$session_id}
+        if $session_id {
+            return defined $sessions{$session_id};
+        } 
+        return;
     }
 
     method edit_page() {
@@ -295,61 +300,6 @@ class Wiki does Session {
         return $text.chars;
     }
 
-    sub wrap($text, $length) {
-        my $clb = convenient_line_break($text, $length);
-
-        return $text if $clb >= $text.chars;
-
-        my $rest_of_string = $text.substr($clb).subst(/^ \s+/, '');
-
-        return $text.substr(0, $clb) ~ "\n" ~ wrap($rest_of_string, $length);
-    }
-
-    sub indent($text, $length) {
-        return join("\n", map { ' ' x $length ~ $_ }, split("\n", $text));
-    }
-
-    method format_html($text is rw) {
-        if $text ~~ Wiki::Syntax::TOP {
-            # RAKDUO: Must match again. [perl #57858]
-            $text ~~ Wiki::Syntax::TOP;	
-
-            # RAKUDO: Perhaps use 'gather' instead, once rakudo has that.
-            my @pars;
-
-            for $/<paragraph> -> $p {
-
-                my $result = '<p>';
-                for $p<parchunk> {
-                    my $text = $_.values[0];
-                    given $_.keys[0] {
-                        when 'twext'     { $result ~= $text }
-                        when 'wikimark'  { my $page = substr($text, 2, -2);
-                                           $result ~= self.make_link($page) }
-                        when 'metachar'
-                                         { $result ~= escape($text, 'html') }
-                        when 'malformed' { $result ~= $text }
-                    }
-                }
-                $result ~= "</p>";
-
-                push @pars, indent( wrap($result, 60), 12 );
-            }
-
-            return join "\n\n", @pars;
-        } else {
-            return '<p>Could not parse markup.</p>';
-        }
-    }
-
-    method make_link($page) {
-        return sprintf('<a href="?action=%s&page=%s"%s>%s</a>',
-                       $.storage.wiki_page_exists($page)
-                         ?? ('view', $page, '')
-                         !! ('edit', $page, ' class="nonexistent"'),
-                       $page);
-    }
-
     method not_found() {
         $.cgi.send_response(
             HTML::Template.from_file(
@@ -407,12 +357,12 @@ class Wiki does Session {
     }
 
     method log_out {
-        if defined $.cgi.cookie('session_id') {
+        if defined $.cgi.cookie<session_id> {
 
-            my $session_id = $.cgi.cookie('session_id');
+            my $session_id = $.cgi.cookie<session_id>;
             self.remove_session( $session_id );
 
-            my $session_cookie = "session_id=''";
+            my $session_cookie = "session_id=";
 
             $.cgi.send_response(
                 HTML::Template.from_file(
@@ -433,6 +383,14 @@ class Wiki does Session {
         return;
     }
 
+    method make_link($page) {
+        return sprintf('<a href="?action=%s&page=%s"%s>%s</a>',
+                       $.storage.wiki_page_exists($page)
+                         ?? ('view', $page, '')
+                         !! ('edit', $page, ' class="nonexistent"'),
+                       $page);
+    }
+
     method list_recent_changes {
 
         # RAKUDO: Seemingly impossible to get the right number of list
@@ -442,9 +400,10 @@ class Wiki does Session {
         my @changes;
         for $recent_changes.values -> $modification_id {
             my $modification = $.storage.read_modification($modification_id);
-            push @changes, { 'page' => self.make_link( $modification[0] ),
-                             'time' => $modification_id,
-                             'author' => $modification[2] || 'somebody' };
+            push @changes, {
+                'page' => self.make_link($modification[0]),
+                'time' => $modification_id,
+                'author' => $modification[2] || 'somebody' };
         }
 
         $.cgi.send_response(
@@ -458,26 +417,3 @@ class Wiki does Session {
         return;
     }
 }
-
-grammar Wiki::Syntax {
-    token TOP { ^ [ <paragraph> | <newlines> ]* $ };
-
-    token paragraph { <parchunk>+ };
-    token newlines { \n ** {2..*} };
-
-    token parchunk { <twext> || <wikimark> || <metachar> || <malformed> };
-
-    # RAKUDO: a token may not be called 'text' [perl #57864]
-    token twext { [ <alnum> || <otherchar> || <sp> ]+ };
-
-    token otherchar { <[ !..% (../ : ; ? @ \\ ^..` {..~ ]> };
-
-    token sp { ' ' };
-
-    token wikimark { '[[' <twext> ']]' };
-
-    token metachar { '<' || '>' || '&' || \' };
-
-    token malformed { '[' || ']' || <!after \n> \n <!before \n> }
-}
-

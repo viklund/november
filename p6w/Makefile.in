@@ -1,6 +1,8 @@
-SOURCES=Impatience.pm HTML/Template.pm CGI.pm Wiki.pm Text/Escape.pm
+PARROT_DIR=<PARROT_DIR>
+
+SOURCES=Impatience.pm HTML/Template.pm CGI.pm Text/Markup/Wiki/Minimal.pm Wiki.pm Test.pm Text/Escape.pm
+
 PIRS=$(SOURCES:.pm=.pir)
-PARROT_DIR=/home/johan/Perl6/parrot-svn
 
 all: $(PIRS)
 

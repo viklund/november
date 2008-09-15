@@ -1,0 +1,4 @@
+#!/bin/sh
+
+PARROT_DIR=<PARROT_DIR>
+exec $PARROT_DIR/parrot $PARROT_DIR/languages/perl6/perl6.pbc wiki

@@ -1,4 +1,8 @@
 #!perl6
+#
+# Perl6 CGI.pm developed as a part of November (http://github.com/viklund/november/).
+# v 0.0.3
+#
 use v6;
 use Impatience;
 
@@ -8,7 +12,8 @@ class CGI {
 
     # RAKUDO: BUILD method not supported
     method init() {
-        my %params = parse_params( %*ENV<QUERY_STRING> );
+        my %params;
+        self.parse_params(%params, %*ENV<QUERY_STRING>);
 
         # It's prudent to handle CONTENT_LENGTH too, but right now that's not
         # a priority. It would make our tests scripts more complicated, with
@@ -17,15 +22,12 @@ class CGI {
         if %*ENV<REQUEST_METHOD> eq 'POST' {
             # Maybe check content_length here and only take that many bytes?
             my $input = $*IN.slurp();
-            my %post_params = parse_params( $input );
-            for %post_params.kv -> $k, $v {
-            # TODO: Check if key exists, if so make an array
-                %params{$k} = $v;
-            }
+            self.parse_params(%params, $input);
         }
         $.param = %params;
 
-        my %cookie = parse_params(%*ENV<HTTP_COOKIE>);
+        my %cookie; 
+        self.parse_params(%cookie, %*ENV<HTTP_COOKIE>);
         $.cookie = %cookie;
     }
 
@@ -48,16 +50,20 @@ class CGI {
         print $contents;
     }
 
-    sub parse_params($string is rw) {
+    method redirect($uri, %opts?) {
+        my $status = '302 Moved' || %opts<status>;
+        print "Status: $status\r\n";
+        print "Location: $uri";
+        print "\r\n\r\n";
+    }
+
+    method parse_params(Hash %params is rw, $string) {
         my @param_values = split('&' , $string);
-        my %param_temp;
         for @param_values -> $param_value {
             my @kvs = split('=', $param_value);
-            # TODO: Check if that key already exists; make an array if it does.
             # TODO: Is the case of 'page=' handled correctly?
-            %param_temp{@kvs[0]} = unescape(@kvs[1]);
+            self.add_param( %params, @kvs[0], unescape(@kvs[1]) );
         }
-        return %param_temp;
     }
 
     sub unescape($string is rw) {
@@ -66,7 +72,7 @@ class CGI {
             $string = $string.subst('+', ' ');
         }
         # RAKUDO: This could also be rewritten as a single .subst :g call.
-        while ( $string ~~ /\%(..)/ ) {
+        while $string ~~ /\%(..)/ {
             my $match = $0;
             my $character = chr(:16($match));
             # RAKUDO: DOTTY
@@ -74,5 +80,30 @@ class CGI {
         }
         return $string;
     }
+
+    method add_param ( Hash %params is rw, Str $key, $value ) {
+        # RAKUDO: синтаксис Hash.:exists{key} еще не реализован 
+        #        (Hash.:exists{key} not implemented yet)
+        # if %params.:exists{$key} {
+
+        if %params.exists($key) {
+            # RAKUDO: ~~ Scalar
+            if %params{$key} ~~ Str | Int {
+                %params{$key} = [ %params{$key}, $value ];
+            } 
+            elsif %params{$key} ~~ Array {
+                %params{$key}.push( $value );
+            } 
+        }
+        else {
+            %params{$key} = $value;
+        }
+    }
 }
+
+# Contributors
+#
+# Carl Mäsak
+# Johan Viklund
+# Ilya Belikin <forihrd@gmail.com>
 

@@ -38,14 +38,11 @@ REPOSITORY LAYOUT
 RUNNING NOVEMBER
 ----------------
 
-It's a bit slow running everything through the interpreter every time. To
-speed things up run make in the p6w directory. You need to update the
-PARROT_DIR macro in the Makefile to point to your parrot directory.
+ $ perl Makefile.PL
+ $ make # not required, only for speed
 
 * From the command line
   
-  Set the PARROT_DIR variable to the path of your parrot directory.
-
   This will generate the Main_Page on STDOUT:
 
     $ ./test_wiki.sh
@@ -69,21 +66,21 @@ PARROT_DIR macro in the Makefile to point to your parrot directory.
     wiki.sh
     wiki
     skin/
-    HTML
+    HTML/
     CGI.pm
     Impatience.pm
+    Wiki.pm
     data/
 
-  And make sure that the files and directories below data/ are readable and
-  writable by the webbserver. Also, if you want a styled wiki you need to copy
-  the following files into the root of your web server:
+  If you have compiled november you can copy the .pir files instead of the .pm
+  files. And make sure that the files and directories below data/ are readable
+  and writable by the webbserver. Also, if you want a styled wiki you need to
+  copy the following files into the root of your web server:
   
     skin/spartan.css
     skin/november-logo.png
 
   Seriously. (This will change, though.)
-
-  Edit the file wiki.sh and update the PARROT_DIR variable.
 
   After this, you can direct your browser to the wiki. The URL will
   look something like this:
@@ -93,9 +90,5 @@ PARROT_DIR macro in the Makefile to point to your parrot directory.
 CONTACT
 -------
 
-Carl Mäsak
-    irc: masak
-    e-mail: cmasak@gmail.com
-Johan Viklund
-    irc: viklund
-    e-mail: johan.viklund@gmail.com
+Google group: november-wiki@googlegroups.com
+IRC channel: #november-wiki over at irc.freenode.org

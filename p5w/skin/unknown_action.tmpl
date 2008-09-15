@@ -5,13 +5,7 @@
         <link rel="stylesheet" type="text/css" href="spartan.css" />
     </head>
     <body>
-        <ul id="toolbar">
-            <TMPL_IF NAME=LOGGED_IN>
-                <li><a href="?action=log_out">Log out</a></li>
-            <TMPL_ELSE>
-                <li><a href="?action=log_in">Log in</a></li>
-            </TMPL_IF>
-        </ul>
+        <TMPL_INCLUDE NAME="toolbar.tmpl">
         <div id="content">
             <h1>Unknown action</h1>
             Unknown action "<TMPL_VAR NAME=ACTION>".

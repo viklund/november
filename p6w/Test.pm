@@ -1,8 +1,14 @@
+# Based on:
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: Test.pm 28698 2008-06-25 22:33:15Z bernhard $
+# $Id: Test.pm 30592 2008-08-27 14:31:45Z moritz $
 
 ## This is a temporary Test.pm to get us started until we get pugs's Test.pm
 ## working. It's shamelessly stolen & adapted from MiniPerl6 in the pugs repo.
+
+# This version of Test.pm used in November (http://github.com/viklund/november/)
+# Changes:
+# - implementation of is_deeply (by viklund) 
+# - proclaim can say got and expected (by ihrd)
 
 # globals to keep track of our tests
 our $num_of_tests_run = 0;
@@ -31,6 +37,9 @@ sub plan($number_of_tests) {
     say '1..' ~ $number_of_tests;
 }
 
+multi sub pass($desc) {
+    proclaim(1, $desc);
+}
 
 multi sub ok($cond, $desc) {
     proclaim($cond, $desc);
@@ -215,9 +224,11 @@ sub proclaim($cond, $desc, $got?, $expected?) {
         print $todo_reason;
     }
 
-    # Rakudo: exists not implimented yet
-    print "\n# got: " ~ $got ~ "\n# expected: " ~ $expected if $expected and ! $cond; # if $got.exists;
-    print "\n";
+    unless $cond {
+        # Rakudo: exists not implimented yet
+        print "\n# got: " ~ $got ~ "\n# expected: " ~ $expected if defined $expected; # if $got.exists;
+        print "\n";
+    }
 }
 
 END {
