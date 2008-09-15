@@ -197,19 +197,11 @@ class Wiki does Session {
         my $page = $.cgi.param<page> // 'Main_Page';
 
         unless $.storage.wiki_page_exists($page) {
-            my $template = HTML::Template.new(
-                filename => $.template_path ~ 'not_found.tmpl');
-
-            $template.param('PAGE' => $page);
-
-            $.cgi.send_response(
-                    $template.output()
-            );
+            self.not_found();
             return;
         }
 
-        my $template = HTML::Template.new(
-            filename => $.template_path ~ 'view.tmpl');
+        my $template = HTML::Template.from_file($.template_path ~ 'view.tmpl');
 
         my $converter = Text::Markup::Wiki::Minimal.new;
         $converter.wiki = self;
@@ -221,7 +213,7 @@ class Wiki does Session {
         $template.param('LOGGED_IN' => self.logged_in());
 
         $.cgi.send_response(
-            $template.output(),
+            $template.output()
         );
     }
 
@@ -262,25 +254,29 @@ class Wiki does Session {
             return self.view_page();
         }
 
+        my $template = HTML::Template.from_file($.template_path ~ 'edit.tmpl');
+ 
+        $template.param('PAGE' => $page);
+        $template.param('TITLE' => $title);
+        $template.param('CONTENT' => $old_content);
+        $template.param('LOGGED_IN' => True);
+
         $.cgi.send_response(
-            HTML::Template.from_file(
-                $.template_path ~ 'edit.tmpl' ).with_params(
-                { 'PAGE'      => $page,
-                  'TITLE'     => $title,
-                  'CONTENT'   => $old_content,
-                  'LOGGED_IN' => True }
-            ).output()
+            $template.output()
         );
     }
 
     method not_authorized() {
-        $.cgi.send_response(
-            HTML::Template.from_file(
-                $.template_path ~ 'action_not_authorized.tmpl' ).with_params(
-                { 'DISALLOWED_ACTION' => 'edit pages' }
-            ).output()
-        );
+        my $template = HTML::Template.from_file(
+            $.template_path ~ 'action_not_authorized.tmpl');
 
+        # TODO: file bug, without "'" it is interpreted as named args and not
+        #       as Pair
+        $template.param('DISALLOWED_ACTION' => 'edit pages');
+   
+        $.cgi.send_response(
+            $template.output()
+        );
         return;
     }
 
@@ -301,13 +297,16 @@ class Wiki does Session {
     }
 
     method not_found() {
+        my $template = HTML::Template.from_file(
+            $.template_path ~ 'not_found.tmpl');
+
+        $template.param('PAGE'      => 'Action Not found');
+        $template.param( 'LOGGED_IN' => self.logged_in() );
+
         $.cgi.send_response(
-            HTML::Template.from_file(
-                $.template_path ~ 'not_found.tmpl' ).with_param(
-                    { 'PAGE'      => 'Action not found',
-                      'LOGGED_IN' => self.logged_in() }
-                ).output()
+            $template.output()
         );
+
         return;
     }
 
@@ -328,29 +327,33 @@ class Wiki does Session {
                 my $session_id = self.new_session($user_name);
                 my $session_cookie = "session_id=$session_id";
 
+                my $template = HTML::Template.from_file(
+                    $.template_path ~ 'login_succeeded.tmpl');
+
                 $.cgi.send_response(
-                    HTML::Template.from_file(
-                        $.template_path ~ 'login_succeeded.tmpl'
-                    ).output(),
-                    { cookie => $session_cookie }
+                    $template.output(),
+                    { :cookie($session_cookie) }
                 );
 
                 return;
             }
 
+            my $template = HTML::Template.from_file(
+                $.template_path ~ 'login_failed.tmpl');
+ 
             $.cgi.send_response(
-                HTML::Template.from_file(
-                    $.template_path ~ 'login_failed.tmpl'
-                ).output()
+                $template.output()
             );
 
             return;
         }
 
+
+        my $template = HTML::Template.from_file(
+            $.template_path ~ 'login.tmpl');
+
         $.cgi.send_response(
-            HTML::Template.from_file(
-                $.template_path ~ 'log_in.tmpl'
-            ).output()
+            $template.output()
         );
 
         return;
@@ -364,20 +367,22 @@ class Wiki does Session {
 
             my $session_cookie = "session_id=";
 
+            my $template = HTML::Template.from_file(
+                $.template_path ~ 'login_succeeded.tmpl');
+
             $.cgi.send_response(
-                HTML::Template.from_file(
-                    $.template_path ~ 'logout_succeeded.tmpl'
-                ).output(),
+                $template.output(),
                 { :cookie($session_cookie) }
             );
 
             return;
         }
 
+        my $template = HTML::Template.from_file(
+            $.template_path ~ 'logout_succeeded.tmpl');
+
         $.cgi.send_response(
-            HTML::Template.from_file(
-                $.template_path ~ 'logout_succeeded.tmpl'
-            )
+            $template.output()
         );
 
         return;
