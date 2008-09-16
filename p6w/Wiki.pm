@@ -217,12 +217,10 @@ class Wiki does Session {
         my $template = HTML::Template.new(
             filename => $.template_path ~ 'view.tmpl');
 
-        my $converter = Text::Markup::Wiki::Minimal.new;
-        $converter.wiki = self;
-
         $template.param('TITLE'     => $page);
-        $template.param('CONTENT'   => $converter.format(
-                                           $.storage.read_page($page)
+        $template.param('CONTENT'   => Text::Markup::Wiki::Minimal.new.format(
+                                           $.storage.read_page($page),
+                                           { self.make_link($^page) }
                                        ));
         $template.param('LOGGED_IN' => self.logged_in());
 
