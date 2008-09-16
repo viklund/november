@@ -2,7 +2,7 @@
 
 use Test;
 
-plan 16;
+plan 18;
 
 use CGI;
 ok(1);
@@ -59,3 +59,18 @@ for @add_params_test -> $each {
     is_deeply( %start, $result, "Add kv: :$key<$val>" );
 }
 
+my @parse_params_test = (
+    [ 'foo=bar',
+      { :foo<bar> } ],
+    [ 'foo=bar; bar=12.20',
+      { :foo<bar>, :bar<12.20> } ],
+    );
+
+# with semicolons
+for @parse_params_test -> $each {
+    my $param = $each[0];
+    my $result = $each[1];
+    my %res;
+    $cgi.parse_params(%res, $param, ';');
+    is_deeply(%res, $result, 'Parse param: ' ~ $param);
+}

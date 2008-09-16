@@ -27,7 +27,7 @@ class CGI {
         $.param = %params;
 
         my %cookie; 
-        self.parse_params(%cookie, %*ENV<HTTP_COOKIE>);
+        self.parse_params(%cookie, %*ENV<HTTP_COOKIE>, ';');
         $.cookie = %cookie;
     }
 
@@ -57,11 +57,14 @@ class CGI {
         print "\r\n\r\n";
     }
 
-    method parse_params(Hash %params is rw, $string) {
-        my @param_values = split('&' , $string);
+    method parse_params(Hash %params is rw, $string, $delimiter?) {
+        my $delim = $delimiter || '&';
+
+        my @param_values  = map { $_.subst( / ^ \s* /, '' ) }, 
+                                $string.split( $delim );
+
         for @param_values -> $param_value {
             my @kvs = split('=', $param_value);
-            # TODO: Is the case of 'page=' handled correctly?
             self.add_param( %params, @kvs[0], unescape(@kvs[1]) );
         }
     }
