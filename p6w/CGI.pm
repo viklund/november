@@ -9,6 +9,7 @@ use Impatience;
 class CGI {
     has %.param is rw;
     has %.cookie is rw;
+    has @.keywords is rw;
 
     # RAKUDO: BUILD method not supported
     method init() {
@@ -26,9 +27,7 @@ class CGI {
         }
         $.param = %params;
 
-        my %cookie; 
-        self.parse_params(%cookie, %*ENV<HTTP_COOKIE>, ';');
-        $.cookie = %cookie;
+        self.eat_cookie( %*ENV<HTTP_COOKIE> );
     }
 
     # For debugging
@@ -57,15 +56,37 @@ class CGI {
         print "\r\n\r\n";
     }
 
-    method parse_params(Hash %params is rw, $string, $delimiter?) {
-        my $delim = $delimiter || '&';
+    method parse_params(Hash %params is rw, $string) {
+        if $string ~~ / '&' | ';' | '=' / {
+            # RAKODO: we need rexexp in split 
+            # split(/ '&' | ';' /)
+            my @param_values = $string.split('&');
 
-        my @param_values  = map { $_.subst( / ^ \s* /, '' ) }, 
-                                $string.split( $delim );
+            for @param_values -> $param_value {
+                my @kvs = split('=', $param_value);
+                self.add_param( %params, @kvs[0], unescape(@kvs[1]) );
+            }
+        } 
+        else {
+            self.parse_keywords($string);
+        }
+    }
+
+    method parse_keywords (Str $string is copy) {
+        my $kws = unescape($string); 
+        # RAKODO: we need rexexp in split 
+        # split(/ \s+ /)
+        @.keywords = $kws.split(' ');
+    }
+
+    method eat_cookie(Str $http_cookie) {
+        # RAKODO: we need rexexp in split 
+        # split(/ ';' ' '? /)
+        my @param_values  = $http_cookie.split('; ');
 
         for @param_values -> $param_value {
             my @kvs = split('=', $param_value);
-            self.add_param( %params, @kvs[0], unescape(@kvs[1]) );
+            %.cookie{ @kvs[0] } = unescape( @kvs[1] );
         }
     }
 
@@ -102,6 +123,7 @@ class CGI {
             %params{$key} = $value;
         }
     }
+
 }
 
 # Contributors

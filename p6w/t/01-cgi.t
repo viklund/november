@@ -2,7 +2,7 @@
 
 use Test;
 
-plan 18;
+plan 21;
 
 use CGI;
 ok(1);
@@ -39,6 +39,26 @@ for @parse_params_test -> $each {
     is_deeply(%res, $result, 'Parse param: ' ~ $param);
 }
 
+my $param  = "foo+bar+her";
+my $result = ['foo','bar','her'];
+
+my @parse_params_test = (
+    [ 'foo',
+      ['foo'] ],
+    [ 'foo+bar+her',
+      ['foo','bar','her'] ],
+    [ 'foo +bar+ her',
+      ['foo','bar','her'] ],
+    );
+
+for @parse_params_test -> $each {
+    my $param = $each[0];
+    my $result = $each[1];
+    my %res;
+    $cgi.parse_params(%res, $param);
+    is_deeply($cgi.keywords, $result , 'Parse param (keywords): ' ~ $param);
+}
+
 my %start = {};
 my @add_params_test = (
     [ :key1<val> , { :key1<val> } ],
@@ -59,18 +79,18 @@ for @add_params_test -> $each {
     is_deeply( %start, $result, "Add kv: :$key<$val>" );
 }
 
-my @parse_params_test = (
+my @parse_cookie_test = (
     [ 'foo=bar',
       { :foo<bar> } ],
     [ 'foo=bar; bar=12.20',
       { :foo<bar>, :bar<12.20> } ],
     );
 
-# with semicolons
-for @parse_params_test -> $each {
+for @parse_cookie_test -> $each {
     my $param = $each[0];
     my $result = $each[1];
     my %res;
-    $cgi.parse_params(%res, $param, ';');
-    is_deeply(%res, $result, 'Parse param: ' ~ $param);
+    $cgi.eat_cookie($param);
+    is_deeply($cgi.cookie, $result, 'Parse cookies: ' ~ $param);
 }
+
