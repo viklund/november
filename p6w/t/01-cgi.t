@@ -2,7 +2,7 @@
 
 use Test;
 
-plan 21;
+plan 24;
 
 use CGI;
 ok(1);
@@ -29,6 +29,12 @@ my @parse_params_test = (
       { :test<5>, :params<3>, :words("first\nsecond") } ],
     [ 'test=foo&test=bar',
       { :test<foo bar> } ],
+    [ 'test=2;params=2',
+      { :test<2>, :params<2> },  ],
+    [ 'test=3;params=3;words=first+second',
+      { :test<3>, :params<3>, :words('first second') } ],
+    [ 'test=4;params=3&words=first+%41+second',
+      { :test<4>, :params<3>, :words('first A second') } ],
     );
 
 for @parse_params_test -> $each {
