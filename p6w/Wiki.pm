@@ -296,16 +296,6 @@ class Wiki does Session {
         return eval( slurp( $.userfile_path ) );
     }
 
-    sub convenient_line_break($text, $length) {
-        return $text.chars if $text.chars < $length;
-        # RAKUDO: This should of course be done with rindex, once that's
-        # in place.
-        for reverse(0 .. $length), $length .. $text.chars -> $pos {
-            return $pos if $text.substr( $pos, 1 ) eq ' ';
-        }
-        return $text.chars;
-    }
-
     method not_found() {
         my $template = HTML::Template.new(
             filename => $.template_path ~ 'not_found.tmpl');
