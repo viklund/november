@@ -60,7 +60,12 @@ class CGI {
         if $string ~~ / '&' | ';' | '=' / {
             # RAKODO: we need regexp in split [perl 57378] 
             # split(/ '&' | ';' /)
-            my @param_values = $string.split('&');
+            # now I use workaround:
+            my $str = $string;
+            while $str ~~ / ';' / {
+                $str .= subst(/ ';' /, '&');
+            }
+            my @param_values = $str.split('&');
 
             for @param_values -> $param_value {
                 my @kvs = split('=', $param_value);
@@ -93,14 +98,14 @@ class CGI {
     sub unescape($string is rw) {
         # RAKUDO: :g plz
         while $string ~~ /\+/ {
-            $string = $string.subst('+', ' ');
+            $string .= subst('+', ' ');
         }
         # RAKUDO: This could also be rewritten as a single .subst :g call.
         while $string ~~ /\%(..)/ {
             my $match = $0;
             my $character = chr(:16($match));
             # RAKUDO: DOTTY
-            $string = $string.subst('%' ~ $match, $character);
+            $string .= subst('%' ~ $match, $character);
         }
         return $string;
     }
