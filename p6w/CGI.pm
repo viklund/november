@@ -9,6 +9,7 @@ use Impatience;
 class CGI {
     has %.param is rw;
     has %.cookie is rw;
+    has @.keywords is rw;
 
     # RAKUDO: BUILD method not supported
     method init() {
@@ -26,9 +27,7 @@ class CGI {
         }
         $.param = %params;
 
-        my %cookie; 
-        self.parse_params(%cookie, %*ENV<HTTP_COOKIE>);
-        $.cookie = %cookie;
+        self.eat_cookie( %*ENV<HTTP_COOKIE> );
     }
 
     # For debugging
@@ -58,25 +57,55 @@ class CGI {
     }
 
     method parse_params(Hash %params is rw, $string) {
-        my @param_values = split('&' , $string);
+        if $string ~~ / '&' | ';' | '=' / {
+            # RAKODO: we need regexp in split [perl 57378] 
+            # split(/ '&' | ';' /)
+            # now I use workaround:
+            my $str = $string;
+            while $str ~~ / ';' / {
+                $str .= subst(/ ';' /, '&');
+            }
+            my @param_values = $str.split('&');
+
+            for @param_values -> $param_value {
+                my @kvs = split('=', $param_value);
+                self.add_param( %params, @kvs[0], unescape(@kvs[1]) );
+            }
+        } 
+        else {
+            self.parse_keywords($string);
+        }
+    }
+
+    method parse_keywords (Str $string is copy) {
+        my $kws = unescape($string); 
+        # RAKODO: we need rexexp in split 
+        # split(/ \s+ /)
+        @.keywords = $kws.split(' ');
+    }
+
+    method eat_cookie(Str $http_cookie) {
+        # RAKODO: we need rexexp in split 
+        # split(/ ';' ' '? /)
+        my @param_values  = $http_cookie.split('; ');
+
         for @param_values -> $param_value {
             my @kvs = split('=', $param_value);
-            # TODO: Is the case of 'page=' handled correctly?
-            self.add_param( %params, @kvs[0], unescape(@kvs[1]) );
+            %.cookie{ @kvs[0] } = unescape( @kvs[1] );
         }
     }
 
     sub unescape($string is rw) {
         # RAKUDO: :g plz
         while $string ~~ /\+/ {
-            $string = $string.subst('+', ' ');
+            $string .= subst('+', ' ');
         }
         # RAKUDO: This could also be rewritten as a single .subst :g call.
         while $string ~~ /\%(..)/ {
             my $match = $0;
             my $character = chr(:16($match));
             # RAKUDO: DOTTY
-            $string = $string.subst('%' ~ $match, $character);
+            $string .= subst('%' ~ $match, $character);
         }
         return $string;
     }
@@ -99,6 +128,7 @@ class CGI {
             %params{$key} = $value;
         }
     }
+
 }
 
 # Contributors

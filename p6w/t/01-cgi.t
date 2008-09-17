@@ -2,7 +2,7 @@
 
 use Test;
 
-plan 16;
+plan 23;
 
 use CGI;
 ok(1);
@@ -29,6 +29,12 @@ my @parse_params_test = (
       { :test<5>, :params<3>, :words("first\nsecond") } ],
     [ 'test=foo&test=bar',
       { :test<foo bar> } ],
+    [ 'test=2;params=2',
+      { :test<2>, :params<2> },  ],
+    [ 'test=3;params=3;words=first+second',
+      { :test<3>, :params<3>, :words('first second') } ],
+    [ 'test=4;params=3&words=first+%41+second',
+      { :test<4>, :params<3>, :words('first A second') } ],
     );
 
 for @parse_params_test -> $each {
@@ -37,6 +43,24 @@ for @parse_params_test -> $each {
     my %res;
     $cgi.parse_params(%res, $param);
     is_deeply(%res, $result, 'Parse param: ' ~ $param);
+}
+
+my $param  = "foo+bar+her";
+my $result = ['foo','bar','her'];
+
+my @parse_params_test = (
+    [ 'foo',
+      ['foo'] ],
+    [ 'foo+bar+her',
+      ['foo','bar','her'] ],
+    );
+
+for @parse_params_test -> $each {
+    my $param = $each[0];
+    my $result = $each[1];
+    my %res;
+    $cgi.parse_params(%res, $param);
+    is_deeply($cgi.keywords, $result , 'Parse param (keywords): ' ~ $param);
 }
 
 my %start = {};
@@ -57,5 +81,20 @@ for @add_params_test -> $each {
     my $result = $each[1];
     $cgi.add_param( %start, $key, $val);
     is_deeply( %start, $result, "Add kv: :$key<$val>" );
+}
+
+my @parse_cookie_test = (
+    [ 'foo=bar',
+      { :foo<bar> } ],
+    [ 'foo=bar; bar=12.20',
+      { :foo<bar>, :bar<12.20> } ],
+    );
+
+for @parse_cookie_test -> $each {
+    my $param = $each[0];
+    my $result = $each[1];
+    my %res;
+    $cgi.eat_cookie($param);
+    is_deeply($cgi.cookie, $result, 'Parse cookies: ' ~ $param);
 }
 
