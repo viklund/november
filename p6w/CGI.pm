@@ -58,7 +58,7 @@ class CGI {
 
     method parse_params(Hash %params is rw, $string) {
         if $string ~~ / '&' | ';' | '=' / {
-            # RAKODO: we need rexexp in split 
+            # RAKODO: we need regexp in split [perl 57378] 
             # split(/ '&' | ';' /)
             my @param_values = $string.split('&');
 
