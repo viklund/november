@@ -40,7 +40,7 @@ sub tags_parse ($tags) {
 
 
 sub tag_count_normalize ($count) {
-    # TODO: log need here, now just feake
+    # TODO: log need here, faking it for now
     if $count < 10 {
         return $count; 
     }
