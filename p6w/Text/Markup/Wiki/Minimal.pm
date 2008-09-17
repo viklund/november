@@ -85,3 +85,5 @@ class Text::Markup::Wiki::Minimal {
         return $metachar;
     }
 }
+
+# vim:ft=perl6

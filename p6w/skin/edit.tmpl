@@ -16,9 +16,9 @@
         <div id="content">
             <h1><TMPL_VAR NAME=TITLE></h1>
             <form method="POST">
-                <textarea name="articletext" rows="10" cols="50"><TMPL_VAR NAME=CONTENT></textarea>
+                <textarea name="articletext" rows="20" cols="100"><TMPL_VAR NAME=CONTENT></textarea>
                 <p/>
-                <input type="submit" value="Save" />
+                <input type="submit" value="Save" /> or <a href="?page=<TMPL_VAR NAME=PAGE>">cancel</a>
             </form>
         </div>
     </body>

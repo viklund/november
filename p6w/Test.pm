@@ -220,13 +220,17 @@ sub proclaim($cond, $desc, $got?, $expected?) {
             unless  $num_of_tests_run <= $todo_upto_test_num;
     }
     print "ok ", $num_of_tests_run, " - ", $desc;
+
     if $todo_reason and $num_of_tests_run <= $todo_upto_test_num {
         print $todo_reason;
     }
 
-    # Rakudo: exists not implimented yet
-    print "\n# got: " ~ $got ~ "\n# expected: " ~ $expected if $expected and ! $cond; # if $got.exists;
-    print "\n";
+    unless $cond {
+        # Rakudo: exists not implimented yet
+        print "\n# got: " ~ $got ~ "\n# expected: " ~ $expected if defined $expected; # if $got.exists;
+    }
+    
+    say;
 }
 
 END {
@@ -244,3 +248,5 @@ END {
         diag("Looks like you failed $num_of_tests_failed tests of $num_of_tests_run");
     }
 }
+
+# vim:ft=perl6

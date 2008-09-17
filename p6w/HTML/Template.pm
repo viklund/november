@@ -25,9 +25,6 @@ class HTML::Template {
         my @loops;
 
         while ( $text ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' / ) {
-            # RAKUDO: Need to match again inside while loop. [perl #58352]
-            $text ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' /;
-
             my $directive = $0;
             my $name = $1;
 
@@ -142,3 +139,4 @@ class HTML::Template {
         return $result;
     }
 }
+# vim:ft=perl6

@@ -61,23 +61,16 @@ role Session {
 }
 
 class Storage {
-    sub yadda() {
-        die "This method should never be called directly in Storage, but "
-            ~ "should instead\nbe overridden by a deriving class."
-    }
+    method wiki_page_exists($page)                               { ... }
 
-    # These should be overridden in a deriving class
-    # RAKUDO: This is really a job for '...', which is not implemented yet.
-    method wiki_page_exists($page)                               {yadda}
+    method read_recent_changes()                                 { ... }
+    method write_recent_changes( $recent_changes )               { ... }
 
-    method read_recent_changes()                                 {yadda}
-    method write_recent_changes( $recent_changes )               {yadda}
+    method read_page_history($page)                              { ... }
+    method write_page_history( $page, $page_history )            { ... }
 
-    method read_page_history($page)                              {yadda}
-    method write_page_history( $page, $page_history )            {yadda}
-
-    method read_modification($modification_id)                   {yadda}
-    method write_modification( $modification_id, $modification ) {yadda}
+    method read_modification($modification_id)                   { ... }
+    method write_modification( $modification_id, $modification ) { ... }
 
     method save_page($page, $new_text, $author) {
         my $modification_id = get_unique_id();
@@ -187,7 +180,7 @@ class Wiki does Session {
         my $action = $cgi.param<action> // 'view';
 
         # Maybe we should consider turning this given into a lookup hash.
-        # RAKUDO: 'when' doesn't break out by default yet
+        # RAKUDO: 'when' doesn't break out by default yet, #57652
         given $action {
             when 'view'           { self.view_page();           return; }
             when 'edit'           { self.edit_page();           return; }
@@ -202,15 +195,8 @@ class Wiki does Session {
     method view_page() {
         my $page = $.cgi.param<page> // 'Main_Page';
 
-        if !$.storage.wiki_page_exists($page) {
-            my $template = HTML::Template.new(
-                filename => $.template_path ~ 'not_found.tmpl');
-
-            $template.param('PAGE' => $page);
-
-            $.cgi.send_response(
-                $template.output(),
-            );
+        unless $.storage.wiki_page_exists($page) {
+            self.not_found;
             return;
         }
 
@@ -234,7 +220,12 @@ class Wiki does Session {
         my $session_id = $.cgi.cookie<session_id>;
         # RAKUDO: 'defined' should maybe be 'exists', although here it doesn't
         # matter.
-        return defined $session_id && defined $sessions{$session_id};
+        # RAKUDO: && bug [perl #58830]
+        # defined $session_id && defined $sessions{$session_id}
+        if $session_id {
+            return defined $sessions{$session_id};
+        } 
+        return;
     }
 
     method edit_page() {
@@ -367,13 +358,12 @@ class Wiki does Session {
     }
 
     method log_out {
-        # TODO: Fix 500 error on server
-        if defined $.cgi.cookie('session_id') {
+        if defined $.cgi.cookie<session_id> {
 
-            my $session_id = $.cgi.cookie('session_id');
+            my $session_id = $.cgi.cookie<session_id>;
             self.remove_session( $session_id );
 
-            my $session_cookie = "session_id=''";
+            my $session_cookie = "session_id=";
 
             my $template = HTML::Template.new(
                 filename => $.template_path ~ 'logout_succeeded.tmpl');
@@ -432,3 +422,4 @@ class Wiki does Session {
         return;
     }
 }
+# vim:ft=perl6
