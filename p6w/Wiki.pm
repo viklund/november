@@ -376,12 +376,10 @@ class Wiki does Session {
         my $template = HTML::Template.new(
             filename => $.template_path ~ 'view.tmpl');
 
-        my $converter = Text::Markup::Wiki::Minimal.new;
-        $converter.wiki = self;
-
         $template.param('TITLE'     => $page);
-        $template.param('CONTENT'   => $converter.format(
-                                           $.storage.read_page($page)
+        $template.param('CONTENT'   => Text::Markup::Wiki::Minimal.new.format(
+                                           $.storage.read_page($page),
+                                           { self.make_link($^page) }
                                        ));
 
         my $page_tags = $.storage.read_page_tags($page);
@@ -486,16 +484,6 @@ class Wiki does Session {
         # RAKUDO: use :e
         return {} unless file_exists( $.userfile_path );
         return eval( slurp( $.userfile_path ) );
-    }
-
-    sub convenient_line_break($text, $length) {
-        return $text.chars if $text.chars < $length;
-        # RAKUDO: This should of course be done with rindex, once that's
-        # in place.
-        for reverse(0 .. $length), $length .. $text.chars -> $pos {
-            return $pos if $text.substr( $pos, 1 ) eq ' ';
-        }
-        return $text.chars;
     }
 
     method not_found() {
