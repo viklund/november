@@ -2,7 +2,7 @@
 
 use Test;
 
-plan 24;
+plan 23;
 
 use CGI;
 ok(1);
@@ -52,8 +52,6 @@ my @parse_params_test = (
     [ 'foo',
       ['foo'] ],
     [ 'foo+bar+her',
-      ['foo','bar','her'] ],
-    [ 'foo +bar+ her',
       ['foo','bar','her'] ],
     );
 
