@@ -1,6 +1,6 @@
 PARROT_DIR=<PARROT_DIR>
 
-SOURCES=Impatience.pm HTML/Template.pm CGI.pm Text/Markup/Wiki/Minimal.pm Wiki.pm Test.pm
+SOURCES=Impatience.pm HTML/Template.pm CGI.pm Text/Markup/Wiki/Minimal.pm Wiki.pm Test.pm Storage.pm Storage/File.pm
 
 PIRS=$(SOURCES:.pm=.pir)
 
