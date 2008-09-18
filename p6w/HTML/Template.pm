@@ -30,7 +30,7 @@ class HTML::Template {
 
     sub parse( Str $in ) {
         # RAKUDO: when #58676 will be resolved use: 
-        # $in ~~ HTML::Template::Substitution::TOP.new;
+        # $in ~~ HTML::Template::Grammar.new;
         $in ~~ HTML::Template::Grammar::TOP;
         die("No match") unless $/;
         return $/<contents>;
