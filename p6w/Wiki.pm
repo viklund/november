@@ -323,7 +323,13 @@ class Storage::File is Storage {
 
     method get_tag_count ($tag)  {
         my $counts = self.read_tags_count;
+        unless $counts {
+            # TODO: I think we must say warn there, but look like it`s do not 
+            # implemented in Rakudo now. Or may be it`s not {warn "foo"} today. 
+            return 1;
+        }
         return $counts{$tag};
+            
     }
 }
 
