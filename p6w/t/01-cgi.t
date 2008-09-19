@@ -2,7 +2,7 @@
 
 use Test;
 
-plan 23;
+plan 24;
 
 use CGI;
 ok(1);
@@ -45,14 +45,15 @@ for @parse_params_test -> $each {
     is_deeply(%res, $result, 'Parse param: ' ~ $param);
 }
 
-my $param  = "foo+bar+her";
-my $result = ['foo','bar','her'];
-
 my @parse_params_test = (
     [ 'foo',
       ['foo'] ],
     [ 'foo+bar+her',
       ['foo','bar','her'] ],
+
+    # does it right?
+    [ 'foo+bar+her ',
+      ['foo','bar','her '] ],
     );
 
 for @parse_params_test -> $each {
@@ -70,6 +71,7 @@ my @add_params_test = (
     [ :key1<val2>, { :key1<val val2>, :key2<val> } ],
     [ :key3<4>   , { :key1<val val2>, :key2<val>, :key3<4> } ],
     [ :key4<4.1> , { :key1<val val2>, :key2<val>, :key3<4>, :key4<4.1> } ],
+
     # Do not consistency :( but we don`t have adverbial syntax to set pairs with undef value
     # see http://www.nntp.perl.org/group/perl.perl6.language/2008/09/msg29610.html
     [ key2 => undef , { :key1<val val2>, key2 => ["val", undef], :key3<4>, :key4<4.1> } ],

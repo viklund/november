@@ -58,14 +58,7 @@ class CGI {
 
     method parse_params(Hash %params is rw, $string) {
         if $string ~~ / '&' | ';' | '=' / {
-            # RAKODO: we need regexp in split [perl 57378] 
-            # split(/ '&' | ';' /)
-            # now I use workaround:
-            my $str = $string;
-            while $str ~~ / ';' / {
-                $str .= subst(/ ';' /, '&');
-            }
-            my @param_values = $str.split('&');
+            my @param_values = $string.split(/ '&' | ';' /);
 
             for @param_values -> $param_value {
                 my @kvs = split('=', $param_value);
@@ -79,14 +72,12 @@ class CGI {
 
     method parse_keywords (Str $string is copy) {
         my $kws = unescape($string); 
-        # RAKODO: we need rexexp in split 
-        # split(/ \s+ /)
-        @.keywords = $kws.split(' ');
+        @.keywords = $kws.split(/ \s+ /);
     }
 
     method eat_cookie(Str $http_cookie) {
-        # RAKODO: we need rexexp in split 
-        # split(/ ';' ' '? /)
+        # RAKODO: split(/ ; ' '? /) produce [""] on "" 
+        # and ["foo;", ""] on 'foo;'
         my @param_values  = $http_cookie.split('; ');
 
         for @param_values -> $param_value {
