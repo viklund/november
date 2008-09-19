@@ -4,6 +4,7 @@ use CGI;
 use HTML::Template;
 use Text::Escape;
 use Text::Markup::Wiki::Minimal;
+use Storage::File;
 
 sub file_exists( $file ) {
     # RAKUDO: use ~~ :e
@@ -18,6 +19,36 @@ sub file_exists( $file ) {
 sub get_unique_id {
     # hopefully pretty unique ID
     return int(time%1000000/100) ~ time%100
+}
+
+sub r_remove( $str is rw ) {
+    # RAKUDO: :g not implemented yet :( 
+    while $str ~~ /\\r/ {
+        $str = $str.subst( /\\r/, '' );
+    }
+}
+
+sub tags_parse ($tags) {
+    # RAKODO: we need regexp in split [perl 57378]
+    # my @tags = $tags.split(/ \s* , \s* /)
+    # workaround:
+    my @tags = $tags.split(',');
+    @tags = map { .subst(/ ^ \s+ /, '') }, @tags;
+    @tags = map { .subst(/  \s+ $ /, '') }, @tags;
+
+    @tags = map { .subst(/ \n /, '') }, @tags;
+    return @tags;
+}
+
+
+sub tag_count_normalize ($count) {
+    # TODO: log need here, faking it for now
+    if $count < 10 {
+        return $count; 
+    }
+    else {
+        return 10; 
+    }
 }
 
 role Session {
@@ -58,100 +89,6 @@ role Session {
         my $session_id = get_unique_id();
         self.add_session( $session_id, { user_name => $user_name } );
         return $session_id;
-    }
-}
-
-class Storage {
-    method wiki_page_exists($page)                               { ... }
-
-    method read_recent_changes()                                 { ... }
-    method write_recent_changes( $recent_changes )               { ... }
-
-    method read_page_history($page)                              { ... }
-    method write_page_history( $page, $page_history )            { ... }
-
-    method read_modification($modification_id)                   { ... }
-    method write_modification( $modification_id, $modification ) { ... }
-
-    method save_page($page, $new_text, $author) {
-        my $modification_id = get_unique_id();
-
-        my $page_history = self.read_page_history($page);
-        $page_history.unshift( $modification_id );
-        self.write_page_history( $page, $page_history );
-
-        self.write_modification( $modification_id, 
-                                 [ $page, $new_text, $author] );
-
-        self.add_recent_change( $modification_id );
-    }
-
-    method add_recent_change( $modification_id ) {
-        my $recent_changes = self.read_recent_changes();
-        $recent_changes.unshift($modification_id);
-        self.write_recent_changes( $recent_changes );
-    }
-
-    method read_page($page) {
-        my $page_history = self.read_page_history($page);
-        return "" unless $page_history;
-        my $latest_change = self.read_modification( $page_history.shift );
-        return $latest_change[1];
-    }
-}
-
-class Storage::File is Storage {
-    my $.content_path        is rw;
-    my $.modifications_path  is rw;
-    my $.recent_changes_path is rw;
-
-    method init {
-        $.content_path = 'data/articles/';
-        $.modifications_path = 'data/modifications/';
-        $.recent_changes_path = 'data/recent-changes';
-    }
-
-    method wiki_page_exists($page) {
-        return file_exists( $.content_path ~ $page );
-    }
-
-    method read_recent_changes {
-        return [] unless file_exists( $.recent_changes_path );
-        return eval( slurp( $.recent_changes_path ) );
-    }
-
-    method write_recent_changes ( $recent_changes ) {
-        my $fh = open($.recent_changes_path, :w);
-        $fh.say($recent_changes.perl);
-        $fh.close;
-    }
-
-    method read_page_history($page) {
-        my $file = $.content_path ~ $page;
-        return [] unless file_exists( $file );
-        my $page_history = eval( slurp($file) );
-        return $page_history;
-    }
-
-    method write_page_history( $page, $page_history ) {
-        my $file = $.content_path ~ $page;
-        my $fh = open($file, :w);
-        $fh.say( $page_history.perl );
-        $fh.close;
-    }
-
-    method read_modification($modification_id) {
-        my $file = $.modifications_path ~ $modification_id;
-        # RAKUDO: use :e
-        return [] unless file_exists( $file );
-        return eval( slurp($file) );
-    }
-
-    method write_modification ( $modification_id, $modification ) {
-        my $file =  $.modifications_path ~ $modification_id;
-        my $fh = open( $file, :w );
-        $fh.say( $modification.perl );
-        $fh.close();
     }
 }
 
@@ -197,19 +134,46 @@ class Wiki does Session {
         my $page = $.cgi.param<page> // 'Main_Page';
 
         unless $.storage.wiki_page_exists($page) {
-            self.not_found();
+            self.not_found;
             return;
         }
 
         my $template = HTML::Template.from_file($.template_path ~ 'view.tmpl');
 
-        my $converter = Text::Markup::Wiki::Minimal.new;
-        $converter.wiki = self;
-
         $template.param('TITLE'     => $page);
-        $template.param('CONTENT'   => $converter.format(
-                                           $.storage.read_page($page)
+        $template.param('CONTENT'   => Text::Markup::Wiki::Minimal.new.format(
+                                           $.storage.read_page($page),
+                                           { self.make_link($^page) }
                                        ));
+
+        my $page_tags = $.storage.read_page_tags($page);
+        my @page_tags = tags_parse($page_tags); 
+
+        # does exist clearest way to check @tags... mb @t ~~ [] ?
+        if @page_tags[0] {
+            @page_tags = map { '<a class="t' ~ $.storage.get_tag_count($_) 
+                ~ '" href="?action=toc?tag=' ~ $_ ~'">' ~ $_ ~ '</a>'}, @page_tags;
+
+            $page_tags = @page_tags.join(', ');
+        }
+    
+        $template.param('PAGETAGS' => $page_tags);
+
+        my $tags = $.storage.read_tags_count;
+
+        my $tags_str;
+        if $tags {
+            for $tags.keys -> $tag {
+                if $tags{$tag} > 0 {
+                    $tags_str = $tags_str ~ '<a class="t' 
+                        ~ tag_count_normalize( $tags{$tag} ) 
+                        ~ '" href="?action=toc?tag=' ~ $tag ~ '">' 
+                        ~ $tag ~ '</a> ';
+                }
+            }
+        }
+        $template.param('TAGS' => $tags_str);
+
         $template.param('LOGGED_IN' => self.logged_in());
 
         $.cgi.send_response(
@@ -222,12 +186,7 @@ class Wiki does Session {
         my $session_id = $.cgi.cookie<session_id>;
         # RAKUDO: 'defined' should maybe be 'exists', although here it doesn't
         # matter.
-        # RAKUDO: && bug [perl #58830]
-        # defined $session_id && defined $sessions{$session_id}
-        if $session_id {
-            return defined $sessions{$session_id};
-        } 
-        return;
+        defined $session_id && defined $sessions{$session_id}
     }
 
     method edit_page() {
@@ -246,19 +205,22 @@ class Wiki does Session {
         # The 'edit' action handles both showing the form and accepting the
         # POST data. The difference is the presence of the 'articletext'
         # parameter -- if there is one, the action is considered a save.
-        if $.cgi.param<articletext> {
+        if $.cgi.param<articletext> || $.cgi.param<tags> {
             my $new_text = $.cgi.param<articletext>;
+            my $tags = $.cgi.param<tags>;
             my $session_id = $.cgi.cookie<session_id>;
             my $author = $sessions{$session_id}<user_name>;
-            $.storage.save_page($page, $new_text, $author);
+            $.storage.save_page($page, $new_text, $author, $tags);
             return self.view_page();
         }
 
         my $template = HTML::Template.from_file($.template_path ~ 'edit.tmpl');
  
-        $template.param('PAGE' => $page);
-        $template.param('TITLE' => $title);
-        $template.param('CONTENT' => $old_content);
+        $template.param('PAGE'      => $page);
+        $template.param('TITLE'     => $title);
+        $template.param('CONTENT'   => $old_content);
+
+        $template.param('TAGS'      => $.storage.read_page_tags($page));
         $template.param('LOGGED_IN' => True);
 
         $.cgi.send_response(
@@ -284,16 +246,6 @@ class Wiki does Session {
         # RAKUDO: use :e
         return {} unless file_exists( $.userfile_path );
         return eval( slurp( $.userfile_path ) );
-    }
-
-    sub convenient_line_break($text, $length) {
-        return $text.chars if $text.chars < $length;
-        # RAKUDO: This should of course be done with rindex, once that's
-        # in place.
-        for reverse(0 .. $length), $length .. $text.chars -> $pos {
-            return $pos if $text.substr( $pos, 1 ) eq ' ';
-        }
-        return $text.chars;
     }
 
     method not_found() {
@@ -422,3 +374,4 @@ class Wiki does Session {
         return;
     }
 }
+# vim:ft=perl6

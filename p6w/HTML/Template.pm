@@ -111,3 +111,4 @@ sub file_exists( $file ) {
     }
     return $exists;
 }
+# vim:ft=perl6

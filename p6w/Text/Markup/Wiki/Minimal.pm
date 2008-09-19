@@ -24,9 +24,7 @@ grammar Text::Markup::Wiki::Minimal::Syntax {
 
 class Text::Markup::Wiki::Minimal {
 
-    has $.wiki is rw;
-
-    method format($text is rw) {
+    method format($text, :$link_maker) {
         # RAKUDO: $text.split( /\n\n/ )
         my @pars = grep { $_ ne "" },
                    map { $_.subst( / ^ \n /, '' ) },
@@ -37,6 +35,8 @@ class Text::Markup::Wiki::Minimal {
 
             my $result;
 
+            # RAKUDO: when #58676 will be resolved use: 
+            # $par ~~ Text::Markup::Wiki::Minimal::Syntax.new;
             if $par ~~ Text::Markup::Wiki::Minimal::Syntax::paragraph {
 
                 if $/<heading> {
@@ -53,8 +53,13 @@ class Text::Markup::Wiki::Minimal {
                         given $chunk.keys[0] {
                             when 'twext'     { $result ~= $text }
                             when 'wikimark' {
-                                my $page = substr($text, 2, -2);
-                                $result ~= $.wiki.make_link($page)
+                                if $link_maker.defined {
+                                    my $page = substr($text, 2, -2);
+                                    $result ~= $link_maker($page);
+                                }
+                                else {
+                                    $result ~= $text;
+                                }
                             }
                             when 'metachar'  { $result ~= quote($text) }
                             when 'malformed' { $result ~= $text }
@@ -82,3 +87,5 @@ class Text::Markup::Wiki::Minimal {
         return $metachar;
     }
 }
+
+# vim:ft=perl6

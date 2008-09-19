@@ -248,3 +248,5 @@ END {
         diag("Looks like you failed $num_of_tests_failed tests of $num_of_tests_run");
     }
 }
+
+# vim:ft=perl6
