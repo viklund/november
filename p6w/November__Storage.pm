@@ -1,6 +1,6 @@
 use v6;
 
-class Storage {
+class November__Storage {
     method wiki_page_exists($page)                               { ... }
 
     method read_recent_changes()                                 { ... }

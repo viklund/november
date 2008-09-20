@@ -91,7 +91,7 @@ class November does Session {
     my $.template_path       is rw;
     my $.userfile_path       is rw;
 
-    has Storage $.storage    is rw;
+    has November__Storage $.storage    is rw;
     has CGI     $.cgi        is rw;
 
     method init {
