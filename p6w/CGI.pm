@@ -4,7 +4,7 @@
 # v 0.0.3
 #
 use v6;
-use Impatience;
+use November__Impatience;
 
 class CGI {
     has %.param is rw;
