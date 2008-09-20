@@ -3,7 +3,7 @@ use v6;
 use CGI;
 use HTML::Template;
 use Text::Markup::Wiki::Minimal;
-use Storage::File;
+use November__Storage__File;   # RAKUDO: :: in module names doesn't fully work
 
 sub file_exists( $file ) {
     # RAKUDO: use ~~ :e
@@ -82,12 +82,13 @@ role Session {
     }
 }
 
-class Wiki does Session {
+class November does Session {
 
     my $.template_path       is rw;
     my $.userfile_path       is rw;
 
-    has Storage $.storage    is rw;
+    # RAKUDO: :: in module names doesn't fully work
+    has November__Storage $.storage    is rw;
     has CGI     $.cgi        is rw;
 
     method init {
@@ -96,7 +97,8 @@ class Wiki does Session {
         $.userfile_path = 'data/users';
 
         # Multiple dispatch doesn't work
-        $.storage = Storage::File.new();
+        # RAKUDO: :: in module names doesn't fully work
+        $.storage = November__Storage__File.new();
         $.storage.init();
         #Storage::File::init(self);
         Session::init(self);

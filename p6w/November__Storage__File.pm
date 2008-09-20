@@ -1,7 +1,8 @@
 use v6;
-use Storage;
+use November__Storage;  # RAKUDO: :: in module names doesn't fully work
 
-class Storage::File is Storage {
+# RAKUDO: :: in class names doesn't fully work
+class November__Storage__File is November__Storage {
     my $.content_path        is rw;
     my $.modifications_path  is rw;
     my $.recent_changes_path is rw;
