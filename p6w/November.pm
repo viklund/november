@@ -3,7 +3,7 @@ use v6;
 use CGI;
 use HTML::Template;
 use Text::Markup::Wiki::Minimal;
-use Storage::File;
+use November__Storage__File;
 
 sub file_exists( $file ) {
     # RAKUDO: use ~~ :e
@@ -100,7 +100,7 @@ class November does Session {
         $.userfile_path = 'data/users';
 
         # Multiple dispatch doesn't work
-        $.storage = Storage::File.new();
+        $.storage = November__Storage__File.new();
         $.storage.init();
         #Storage::File::init(self);
         Session::init(self);

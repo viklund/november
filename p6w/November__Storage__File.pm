@@ -1,7 +1,7 @@
 use v6;
 use November__Storage;
 
-class Storage::File is November__Storage {
+class November__Storage__File is November__Storage {
     my $.content_path        is rw;
     my $.modifications_path  is rw;
     my $.recent_changes_path is rw;
