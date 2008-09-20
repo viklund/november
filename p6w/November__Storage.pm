@@ -1,5 +1,6 @@
 use v6;
 
+# RAKDUO: :: in class names doesn't fully work
 class November__Storage {
     method wiki_page_exists($page)                               { ... }
 

@@ -4,7 +4,7 @@
 # v 0.0.3
 #
 use v6;
-use November__Impatience;
+use November__Impatience;  # RAKUDO: :: in module names doesn't fully work
 
 class CGI {
     has %.param is rw;
