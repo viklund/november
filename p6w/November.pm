@@ -86,7 +86,7 @@ role Session {
     }
 }
 
-class Wiki does Session {
+class November does Session {
 
     my $.template_path       is rw;
     my $.userfile_path       is rw;
