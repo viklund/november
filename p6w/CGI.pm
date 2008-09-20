@@ -1,8 +1,3 @@
-#!perl6
-#
-# Perl6 CGI.pm developed as a part of November (http://github.com/viklund/november/).
-# v 0.0.3
-#
 use v6;
 use November__Impatience;  # RAKUDO: :: in module names doesn't fully work
 
@@ -121,11 +116,5 @@ class CGI {
     }
 
 }
-
-# Contributors
-#
-# Carl Mäsak
-# Johan Viklund
-# Ilya Belikin <forihrd@gmail.com>
 
 # vim:ft=perl6

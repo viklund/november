@@ -177,3 +177,5 @@ class November__Storage__File is November__Storage {
             
     }
 }
+
+# vim:ft=perl6

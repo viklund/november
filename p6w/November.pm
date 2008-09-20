@@ -376,4 +376,5 @@ class November does Session {
         return;
     }
 }
+
 # vim:ft=perl6
