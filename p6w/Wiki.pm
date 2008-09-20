@@ -28,13 +28,9 @@ sub r_remove( $str is rw ) {
 }
 
 sub tags_parse ($tags) {
-    # RAKODO: we need regexp in split [perl 57378]
-    # my @tags = $tags.split(/ \s* , \s* /)
-    # workaround:
-    my @tags = $tags.split(',');
-    @tags = map { .subst(/ ^ \s+ /, '') }, @tags;
-    @tags = map { .subst(/  \s+ $ /, '') }, @tags;
-
+    # p6 split do not trim and I do not understand how to do that simple
+    my @tags = $tags.split(/ \s* ',' \s* /);
+    @tags = grep { "" !~~ $_ }, @tags;
     @tags = map { .subst(/ \n /, '') }, @tags;
     return @tags;
 }
