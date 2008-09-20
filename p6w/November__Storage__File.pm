@@ -3,21 +3,12 @@ use November__Storage;  # RAKUDO: :: in module names doesn't fully work
 
 # RAKUDO: :: in class names doesn't fully work
 class November__Storage__File is November__Storage {
-    my $.content_path        is rw;
-    my $.modifications_path  is rw;
-    my $.recent_changes_path is rw;
-    my $.page_tags_path      is rw;
-    my $.tags_count_path     is rw;
-    my $.tags_index_path     is rw;
-
-    method init {
-        $.content_path = 'data/articles/';
-        $.modifications_path = 'data/modifications/';
-        $.recent_changes_path = 'data/recent-changes';
-        $.page_tags_path = 'data/page_tags/';
-        $.tags_count_path = 'data/tags_count';
-        $.tags_index_path = 'data/tags_index';
-    }
+    my $.content_path        = 'data/articles/';
+    my $.modifications_path  = 'data/modifications/';
+    my $.recent_changes_path = 'data/recent-changes';
+    my $.page_tags_path      = 'data/page_tags/';
+    my $.tags_count_path     = 'data/tags_count';
+    my $.tags_index_path     = 'data/tags_index';
 
     method wiki_page_exists($page) {
         return file_exists( $.content_path ~ $page );
