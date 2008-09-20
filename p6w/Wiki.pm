@@ -40,14 +40,9 @@ sub tags_parse ($tags) {
 }
 
 
-sub tag_count_normalize ($count) {
-    # TODO: log need here, faking it for now
-    if $count < 10 {
-        return $count; 
-    }
-    else {
-        return 10; 
-    }
+sub tag_count_normalize ($count, $min, $max) {
+    my $step = ($count - $min) / (($max - $min) || 1);
+    ceiling( ( log($step + 1 ) * 10 ) / log 2 ); 
 }
 
 role Session {
@@ -148,25 +143,32 @@ class Wiki does Session {
 
         my $page_tags = $.storage.read_page_tags($page);
         my @page_tags = tags_parse($page_tags); 
+        my $tags = $.storage.read_tags_count;
+        
+        my $tags_min = $tags.values.min; 
+        my $tags_max = $tags.values.max;
 
         # does exist clearest way to check @tags... mb @t ~~ [] ?
         if @page_tags[0] {
-            @page_tags = map { '<a class="t' ~ $.storage.get_tag_count($_) 
-                ~ '" href="?action=toc?tag=' ~ $_ ~'">' ~ $_ ~ '</a>'}, @page_tags;
+            @page_tags = map { '<a class="t' 
+                ~ tag_count_normalize($.storage.get_tag_count($_), 
+                                      $tags_min, 
+                                      $tags_max ) 
+                ~ '" href="?action=toc?tag=' ~ $_ ~'">' 
+                ~ $_ ~ '</a>'}, @page_tags;
 
             $page_tags = @page_tags.join(', ');
         }
     
         $template.param('PAGETAGS' => $page_tags);
 
-        my $tags = $.storage.read_tags_count;
 
         my $tags_str;
         if $tags {
             for $tags.keys -> $tag {
                 if $tags{$tag} > 0 {
                     $tags_str = $tags_str ~ '<a class="t' 
-                        ~ tag_count_normalize( $tags{$tag} ) 
+                        ~ tag_count_normalize( $tags{$tag}, $tags_min, $tags_max ) 
                         ~ '" href="?action=toc?tag=' ~ $tag ~ '">' 
                         ~ $tag ~ '</a> ';
                 }

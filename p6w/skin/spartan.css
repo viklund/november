@@ -81,6 +81,7 @@ a.nonexistent {
     clear:both;
     line-height:1.9em;
     width: 200px;
+    padding:20px;
 }
 
 .pagetags {
@@ -92,6 +93,7 @@ a.nonexistent {
 	background-repeat: no-repeat;
 }
 
+.t0 { font-size:0.7em;}
 .t1 { font-size:0.8em;}
 .t2 { font-size:0.9em;}
 .t2 { font-size:1.0em;}
