@@ -2,9 +2,9 @@
 
 use Test;
 
-plan 6;
+plan 8;
 
-use Wiki;
+use November;
 
 my @to_parse = (    
     [ 'foo',
@@ -19,7 +19,10 @@ my @to_parse = (
       ['foo'] ],
     [ 'foo , bar    , her',
       ['foo', 'bar', 'her'] ],
-
+    [ 'Foo',
+      ['foo'] ],
+    [ 'foo, BAR',
+      ['foo', 'bar'] ],
 );
 
 for @to_parse -> $each {

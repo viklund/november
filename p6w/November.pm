@@ -28,10 +28,10 @@ sub r_remove( $str is rw ) {
 }
 
 sub tags_parse ($tags) {
-    # p6 split do not trim and I do not understand how to do that simple
-    my @tags = $tags.split(/ \s* ',' \s* /);
-    @tags = grep { "" !~~ $_ }, @tags;
-    @tags = map { .subst(/ \n /, '') }, @tags;
+    my @tags = $tags.lc.split(/ \s* ',' \s* /);
+    # split in p6 don`t trim
+    @tags = map { $_.subst(/\n*/, '') }, @tags;
+    @tags = grep { $_ ne "" }, @tags;
     return @tags;
 }
 

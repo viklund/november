@@ -3,7 +3,7 @@ use v6;
 use Test;
 plan 2;
 
-use Wiki;
+use November;
 
 my @counts_to_test = (
     [ { one => 2, foo => 5, bar => 6, her => 14 }, 
