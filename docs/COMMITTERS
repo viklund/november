@@ -14,11 +14,10 @@ constitute our roadmap right now.
 p6w. This is because bugs easily distract from the goal in p6w. The Perl 5
 version is a sort of live spec for the Perl 6 version.
 
-4. We're currently doing quite a bit of our work in branches. Currently, there
-are two branches: new-html-template aims to replace the HTML::Template with a
-new grammar-using module, and tests is a playground for new test files for
-other modules. (Things like branches change quickly. github is the ultimate
-reference.)
+4. We're currently doing quite a bit of our work in branches, so it might be
+a very good idea to take a look at what development goes on in different
+branches. Branching and merging is typically a good thing to announce on the
+mailing list november-wiki@googlegroups.com.
 
 5. Patches are very welcome, nowadays through the mailing list
 november-wiki@googlegroups.com, or the IRC channel #november over at
