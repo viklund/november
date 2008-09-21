@@ -43,7 +43,6 @@ sub tag_count_normalize ($count, $min, $max) {
 
 role Session {
     has $.sessionfile_path  is rw;
-    has $.sessions          is rw;
 
     method init {
         # RAKUDO: set the attributes when declaring them
@@ -84,28 +83,25 @@ role Session {
 
 class November does Session {
 
-    my $.template_path       is rw;
-    my $.userfile_path       is rw;
+    has $.template_path;
+    has $.userfile_path;
 
     # RAKUDO: :: in module names doesn't fully work
-    has November__Storage $.storage    is rw;
-    has CGI     $.cgi        is rw;
+    has November__Storage $.storage;
+    has CGI     $.cgi;
 
     method init {
         # RAKUDO: set the attributes when declaring them
-        $.template_path = 'skin/';
-        $.userfile_path = 'data/users';
+        $!template_path = 'skin/';
+        $!userfile_path = 'data/users';
 
-        # Multiple dispatch doesn't work
         # RAKUDO: :: in module names doesn't fully work
-        $.storage = November__Storage__File.new();
-        $.storage.init();
-        #Storage::File::init(self);
+        $!storage = November__Storage__File.new();
         Session::init(self);
     }
 
     method handle_request(CGI $cgi) {
-        $.cgi = $cgi;
+        $!cgi = $cgi;
 
         my $action = $cgi.param<action> // 'view';
 
@@ -376,4 +372,5 @@ class November does Session {
         return;
     }
 }
+
 # vim:ft=perl6
