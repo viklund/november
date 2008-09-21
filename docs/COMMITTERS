@@ -1,0 +1,42 @@
+Hello, committer. Glad you're here. In case you haven't seen
+http://use.perl.org/~masak/journal/37340 yet, here's the informative part
+reproduced:
+
+== 5 things you might be helped by if you plan to hack on November ==
+
+1. First, feel free to ignore these rules if they inconvenience you. They are
+there to help you, not to restrict you.
+
+2. The three files FEATURES, JANITORS and LOOKINTO together constitute our
+roadmap right now. Note that these files are found in p5w/, the Perl 5
+implementation of the wiki.
+
+3. As a rule, we implement feature-size things in p5w before we try them out on
+p6w. This is because bugs easily distract from the goal in p6w. The Perl 5
+version is a sort of live spec for the Perl 6 version.
+
+4. We're currently doing quite a bit of our work in branches. Currently, there
+are two branches: new-html-template aims to replace the HTML::Template with a
+new grammar-using module, and tests is a playground for new test files for
+other modules. (Things like branches change quickly. github is the ultimate
+reference.)
+
+5. Patches are very welcome, nowadays through the mailing list
+november-wiki@googlegroups.com, or the IRC channel #november over at
+irc.freenode.org.
+
+There's also an emerging coding standard, starting with the message
+http://groups.google.com/group/november-wiki/msg/1f168acfb2049830 on
+the november-wiki mailing list:
+
+* All module files start with the line "use v6" and end with an empty
+line followed by "# vim:ft=perl6".
+
+* No "#!perl6" shebang line is needed in the module files.
+
+* No copyright statements, no authorship statements, no version
+numbers. We keep the copyright statement in Test.pm out of courtesy -- and
+likely for legal reasons, too.
+
+* People are encouraged to add themselves to the AUTHORS file, even
+before committing anything else. 
