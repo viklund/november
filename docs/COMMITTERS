@@ -7,9 +7,8 @@ reproduced:
 1. First, feel free to ignore these rules if they inconvenience you. They are
 there to help you, not to restrict you.
 
-2. The three files FEATURES, JANITORS and LOOKINTO together constitute our
-roadmap right now. Note that these files are found in p5w/, the Perl 5
-implementation of the wiki.
+2. The three files FEATURES, JANITORS and LOOKINTO in the docs/ directory
+constitute our roadmap right now.
 
 3. As a rule, we implement feature-size things in p5w before we try them out on
 p6w. This is because bugs easily distract from the goal in p6w. The Perl 5
