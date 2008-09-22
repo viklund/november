@@ -30,6 +30,10 @@ my $MODIFICATIONS_PATH = 'data/modifications/';
 my $USERFILE_PATH = 'data/users';
 my $PUGS_PATH = '/Users/masak/svn-work/hobbies/pugs';
 
+my $PAGE_TAGS_PATH  = 'data/page_tags/';
+my $TAGS_COUNT_PATH = 'data/tags_count';
+my $TAGS_INDEX_PATH = 'data/tags_index';
+
 my $PUGS_PREFIX = 'pugs';
 
 my %sessions;
@@ -263,6 +267,34 @@ sub write_modification {
     write_file( $MODIFICATIONS_PATH . $modification_id,
                 Dumper( $modification_ref ) );
 }
+
+sub read_page_tags {
+    my $page = shift; 
+    my $file = $PAGE_TAGS_PATH . $page;
+    return '' unless -e $file;
+    return eval( read_file($file) );
+}
+
+sub write_page_tags {
+    my ($page, $tags) = @_;
+    my $file = $PAGE_TAGS_PATH . $page;
+    write_file( $file, $tags );
+}
+
+sub read_tags_count {
+    my $file = $TAGS_COUNT_PATH;
+    return {} unless -e $file;
+    return eval( read_file($file) );
+}
+
+sub write_tags_count {
+    my $counts = shift; 
+    my $file = $TAGS_COUNT_PATH;
+    $Data::Dumper::Terse = 1;
+    $Data::Dumper::Indent = 1;
+    write_file( $file, Dumper($counts) );
+}
+
 
 sub add_recent_change {
     my ($modification_id, $page, $contents, $author) = @_;
