@@ -1,7 +1,7 @@
 use Test::More tests => 8;
-use Wiki;
+use November;
 
-my $tf = \&Wiki::tags_parse;
+my $tf = \&November::tags_parse;
 
 my @to_parse = (    
     [ 'foo',

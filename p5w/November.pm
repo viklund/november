@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
 
-package Wiki;
+package November;
 
 use HTTP::Server::Simple::CGI;
 use HTML::EscapeEvil;
@@ -587,4 +587,10 @@ sub list_recent_changes {
 
 sub tags_parse { [ split /\s*[,\n]\s*/, lc(shift) ] }
 
+sub tag_count_normalize {
+    my ($count, $min, $max) = @_;
+    my $step = ($count - $min) / (($max - $min) || 1);
+    use POSIX;
+    ceil( ( log($step + 1 ) * 10 ) / log 2 ); 
+}
 1;
