@@ -227,7 +227,7 @@ sub read_old_page {
 }
 
 sub modify_page {
-    my ($page, $article_text, $author) = @_;
+    my ($page, $article_text, $tags, $author) = @_;
 
     my $modification_id = DateTime->now()->epoch();
 
@@ -237,6 +237,12 @@ sub modify_page {
 
     write_modification( $modification_id, [$page, $article_text, $author] );
     add_recent_change( $modification_id, $page, $article_text, $author );
+
+    my $old_tags = read_page_tags($page); 
+    remove_tags($page, $old_tags);
+    add_tags($page, $tags);
+
+    write_page_tags($page, $tags);
 }
 
 sub read_recent_changes {
@@ -268,11 +274,56 @@ sub write_modification {
                 Dumper( $modification_ref ) );
 }
 
+sub add_tags {
+    my ($page, $tags) = @_;
+
+    return if $tags =~ m/^\s*$/;
+
+    my $count = read_tags_count();
+    $tags = tags_parse($tags);
+
+    for my $t (@$tags) {
+        if ( $count->{$t} ) {
+            $count->{$t}++;
+        } 
+        else {
+            $count->{$t} = 1;
+        }
+    }
+
+    write_tags_count($count);
+
+    # code for add to index here
+}
+
+sub remove_tags {
+    my ($page, $tags) = @_;
+
+    return if $tags =~ m/^\s*$/;
+
+    my $count = read_tags_count();
+    $tags = tags_parse($tags);
+
+    for my $t (@$tags) {
+        if ( $count->{$t} && $count->{$t} > 0 ) {
+            $count->{$t}--;
+        } 
+        else {
+            $count->{$t} = 0;
+        }
+    }
+
+    write_tags_count($count);
+    
+    # code for remove from index here
+}
+
 sub read_page_tags {
     my $page = shift; 
     my $file = $PAGE_TAGS_PATH . $page;
+
     return '' unless -e $file;
-    return eval( read_file($file) );
+    return read_file($file);
 }
 
 sub write_page_tags {
@@ -293,6 +344,16 @@ sub write_tags_count {
     $Data::Dumper::Terse = 1;
     $Data::Dumper::Indent = 1;
     write_file( $file, Dumper($counts) );
+}
+
+sub get_tag_count {
+    my $tag = shift; 
+    my $counts = read_tags_count();
+    unless ($counts) {
+        warn "Can`t read tags count";
+        return 1;
+    }
+    return $counts->{$tag};
 }
 
 
@@ -364,6 +425,31 @@ sub view_page {
         $contents = format_html(escape($raw_contents));
     }
     $template->param(CONTENT => $contents);
+
+
+    my @page_tags = @{ tags_parse( read_page_tags($page) ) };
+    my %tags = %{ read_tags_count() };
+    
+    use List::Util qw| max min |;
+
+    my $min = min( values %tags );
+    my $max = max( values %tags );
+    my $page_tags;
+    if (@page_tags) {
+        @page_tags = map { '<a class="t' 
+            . tag_count_normalize( get_tag_count($_), 
+                                  $min, 
+                                  $max ) 
+            . '" href="?action=toc?tag=' . $_ .'">' 
+            . $_ . '</a>' } @page_tags;
+
+        $page_tags = join(', ', @page_tags);
+    }
+
+    $template->param('PAGETAGS' => $page_tags);
+
+    # code for all tags view here
+    
     $template->param(LOGGED_IN => logged_in($cgi));
 
     print status_ok(),
@@ -402,7 +488,8 @@ sub edit_page {
     if ( my $article_text = $cgi->param('articletext') ) {
         my $session_id = $cgi->cookie('session_id');
         my $author = $sessions{$session_id}{user_name};
-        modify_page( $page, $article_text, $author );
+        my $tags = $cgi->param('tags');
+        modify_page( $page, $article_text, $tags, $author );
 
         return view_page($cgi);
     }
@@ -413,6 +500,7 @@ sub edit_page {
     $template->param(PAGE => $page);
     my $title = $action . ' ' . $page;
     $template->param(TITLE => $title);
+    $template->param(PAGETAGS => read_page_tags($page));
     $template->param(CONTENT => $old_content);
     $template->param(LOGGED_IN => logged_in($cgi));
 

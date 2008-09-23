@@ -138,15 +138,15 @@ class November does Session {
         my @page_tags = tags_parse($page_tags); 
         my $tags = $.storage.read_tags_count;
         
-        my $tags_min = $tags.values.min; 
-        my $tags_max = $tags.values.max;
+        my $min = $tags.values.min; 
+        my $max = $tags.values.max;
 
         # does exist clearest way to check @tags... mb @t ~~ [] ?
         if @page_tags[0] {
             @page_tags = map { '<a class="t' 
                 ~ tag_count_normalize($.storage.get_tag_count($_), 
-                                      $tags_min, 
-                                      $tags_max ) 
+                                      $min, 
+                                      $max ) 
                 ~ '" href="?action=toc?tag=' ~ $_ ~'">' 
                 ~ $_ ~ '</a>'}, @page_tags;
 
@@ -161,7 +161,7 @@ class November does Session {
             for $tags.keys -> $tag {
                 if $tags{$tag} > 0 {
                     $tags_str = $tags_str ~ '<a class="t' 
-                        ~ tag_count_normalize( $tags{$tag}, $tags_min, $tags_max ) 
+                        ~ tag_count_normalize( $tags{$tag}, $min, $max ) 
                         ~ '" href="?action=toc?tag=' ~ $tag ~ '">' 
                         ~ $tag ~ '</a> ';
                 }
@@ -216,7 +216,7 @@ class November does Session {
         $template.param('TITLE'     => $title);
         $template.param('CONTENT'   => $old_content);
 
-        $template.param('TAGS'      => $.storage.read_page_tags($page));
+        $template.param('PAGETAGS'      => $.storage.read_page_tags($page));
         $template.param('LOGGED_IN' => True);
 
         $.cgi.send_response(
