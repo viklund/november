@@ -4,7 +4,13 @@ SOURCES=HTML/Template.pm CGI.pm Text/Markup/Wiki/Minimal.pm November.pm Test.pm 
 
 PIRS=$(SOURCES:.pm=.pir)
 
-all: $(PIRS)
+all:
+	@echo "======================================================================="
+	@echo "Uuuups!" 
+	@echo "Right now Rakudo do not work properly with modules on pir [perl 59105]."
+	@echo "======================================================================="
+	perl -e "exit(1)"
+	$(PIRS)
 
 %.pir: %.pm
 	$(PARROT_DIR)/parrot $(PARROT_DIR)/languages/perl6/perl6.pbc --target=pir $<  > $@
