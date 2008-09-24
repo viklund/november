@@ -5,11 +5,13 @@ SOURCES=HTML/Template.pm CGI.pm Text/Markup/Wiki/Minimal.pm November.pm Test.pm 
 PIRS=$(SOURCES:.pm=.pir)
 
 all:
-	@echo "======================================================================="
-	@echo "Uuuups!" 
-	@echo "Right now Rakudo do not work properly with modules on pir [perl 59105]."
-	@echo "======================================================================="
-	perl -e "exit(1)"
+	@echo "================================================================================"
+	@echo "Dear builder:" 
+	@echo "Right now Rakudo doesn't work properly with modules in PIR format [perl #59104]."
+	@echo "Until that is fixed, you likely don't want to run make.  If you do, however,"
+	@echo "you can remove the 'exit 1' line after this message in the Makefile."
+	@echo "================================================================================"
+	@exit 1
 	$(PIRS)
 
 %.pir: %.pm
