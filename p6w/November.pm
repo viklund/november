@@ -1,30 +1,14 @@
 use v6;
 
 use CGI;
+use Impatience;
 use HTML::Template;
 use Text::Markup::Wiki::Minimal;
 use November__Storage__File;   # RAKUDO: :: in module names doesn't fully work
 
-sub file_exists( $file ) {
-    # RAKUDO: use ~~ :e
-    my $exists = False;
-    try {
-        my $fh = open( $file );
-        $exists = True;
-    }
-    return $exists;
-}
-
 sub get_unique_id {
     # hopefully pretty unique ID
     return int(time%1000000/100) ~ time%100
-}
-
-sub r_remove( $str is rw ) {
-    # RAKUDO: :g not implemented yet :( 
-    while $str ~~ /\\r/ {
-        $str = $str.subst( /\\r/, '' );
-    }
 }
 
 sub tags_parse ($tags) {
