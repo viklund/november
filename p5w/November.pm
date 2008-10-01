@@ -293,7 +293,18 @@ sub add_tags {
 
     write_tags_count($count);
 
-    # code for add to index here
+    my $index = read_tags_index();
+
+    for my $t (@$tags) {
+            unless ( $index->{$t} ) {
+                $index->{$t} = {};
+            }
+            unless ( $index->{$t}{$page} ) {
+                $index->{$t}{$page} = 1;
+            }
+    }
+    
+    write_tags_index($index);
 }
 
 sub remove_tags {
@@ -315,7 +326,15 @@ sub remove_tags {
 
     write_tags_count($count);
     
-    # code for remove from index here
+    my $index = read_tags_index();
+
+    for my $t (@$tags) {
+        if ( $index->{$t} && $index->{$t}{$page} ) {
+            $index->{$t}{$page} = 0;
+        } 
+    }
+    
+    write_tags_index($index);
 }
 
 sub read_page_tags {
@@ -344,6 +363,20 @@ sub write_tags_count {
     $Data::Dumper::Terse = 1;
     $Data::Dumper::Indent = 1;
     write_file( $file, Dumper($counts) );
+}
+
+sub read_tags_index {
+    my $file = $TAGS_INDEX_PATH;
+    return {} unless -e $file;
+    return eval( read_file($file) );
+}
+
+sub write_tags_index {
+    my $index = shift;
+    my $file = $TAGS_INDEX_PATH;
+    $Data::Dumper::Terse = 1;
+    $Data::Dumper::Indent = 1;
+    write_file( $file, Dumper($index) );
 }
 
 sub get_tag_count {
