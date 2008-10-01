@@ -2,7 +2,7 @@ use v6;
 
 use CGI;
 use HTML::Template;
-use Text::Markup::Wiki::Minimal;
+use Text::Markup::Wiki::MediaWiki;
 use November__Storage__File;   # RAKUDO: :: in module names doesn't fully work
 
 sub file_exists( $file ) {
@@ -129,10 +129,11 @@ class November does Session {
             filename => $.template_path ~ 'view.tmpl');
 
         $template.param('TITLE'     => $page);
-        $template.param('CONTENT'   => Text::Markup::Wiki::Minimal.new.format(
-                                           $.storage.read_page($page),
-                                           { self.make_link($^page) }
-                                       ));
+        $template.param('CONTENT'   =>
+            Text::Markup::Wiki::MediaWiki.new.format(
+                $.storage.read_page($page),
+                { self.make_link($^page) }
+            ));
 
         my $page_tags = $.storage.read_page_tags($page);
         my @page_tags = tags_parse($page_tags); 
