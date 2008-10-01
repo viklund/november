@@ -15,8 +15,20 @@
             </TMPL_IF>
         </ul>
         <div id="content">
+
             <h1><TMPL_VAR NAME=TITLE></h1>
-<TMPL_VAR NAME=CONTENT>
+            <TMPL_IF NAME=PAGETAGS>
+            <div class="pagetags"><TMPL_VAR NAME=PAGETAGS></div>
+            </TMPL_IF>
+
+            <TMPL_IF NAME=TAGS>
+            <div class="cloud">
+                <h3>All tags</h3>
+                <TMPL_VAR NAME=TAGS>
+            </div>
+            </TMPL_IF>
+            
+            <TMPL_VAR NAME=CONTENT>
         </div>
     </body>
 </html>

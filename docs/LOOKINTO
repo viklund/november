@@ -1,4 +1,7 @@
+Things to investigate further with p6w:
+
 * Using Parrot NCI to wrap SQLite.
+  (<http://svn.perl.org/parrot/trunk/examples/nci/mysqltest.p6>)
 
 * Using svk as a storage backend.
 

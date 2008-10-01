@@ -35,6 +35,8 @@ class Text::Markup::Wiki::Minimal {
 
             my $result;
 
+            # RAKUDO: when #58676 will be resolved use: 
+            # $par ~~ Text::Markup::Wiki::Minimal::Syntax.new;
             if $par ~~ Text::Markup::Wiki::Minimal::Syntax::paragraph {
 
                 if $/<heading> {

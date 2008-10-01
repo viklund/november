@@ -63,3 +63,45 @@ h1 {
 a.nonexistent {
     color: #F00;
 }
+
+
+.pagetags a, .cloud a {
+    color: #333;
+}
+
+.pagetags a:hover, .cloud a:hover {
+    color: #00c;
+}
+
+.cloud a {
+    margin-right:12px;
+}
+.cloud {
+    float:right;
+    clear:both;
+    line-height:1.9em;
+    width: 200px;
+    padding:20px;
+}
+
+.pagetags {
+    font-size:0.8em;
+    margin-top:-12px;
+    padding-left:22px;
+	background-image: url('/imgs/tag.png');
+	background-position: left bottom;
+	background-repeat: no-repeat;
+}
+
+.t0 { font-size:0.7em;}
+.t1 { font-size:0.8em;}
+.t2 { font-size:0.9em;}
+.t2 { font-size:1.0em;}
+.t3 { font-size:1.1em;}
+.t4 { font-size:1.2em;}
+.t5 { font-size:1.3em;}
+.t6 { font-size:1.4em;}
+.t7 { font-size:1.5em;}
+.t8 { font-size:1.6em;}
+.t9 { font-size:1.7em;}
+.t10 { font-size:1.8em;}
