@@ -14,7 +14,7 @@ class November__Storage {
     method write_modification( $modification_id, $modification ) { ... }
 
 
-    method save_page($page, $new_text, $author, $tags) {
+    method save_page($page, $new_text, $author) {
         my $modification_id = get_unique_id();
 
         my $page_history = self.read_page_history($page);

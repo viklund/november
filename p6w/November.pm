@@ -106,6 +106,7 @@ class November does Session {
                                            { self.make_link($^page) }
                                        ));
 
+        # TODO: we need plugin system (see topics in mail-list)
         my $t = Tags.new();
         my $page_tags = $t.page_tags( $page );
         $template.param('PAGETAGS' => $page_tags);
@@ -148,7 +149,8 @@ class November does Session {
             my $tags = $.cgi.param<tags>;
             my $session_id = $.cgi.cookie<session_id>;
             my $author = $sessions{$session_id}<user_name>;
-            $.storage.save_page($page, $new_text, $author, $tags);
+            $.storage.save_page($page, $new_text, $author);
+
             return self.view_page();
         }
 
