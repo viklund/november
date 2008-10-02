@@ -27,7 +27,7 @@ class Tags {
         return 1 if $tags ~~ m/^ \s* $/;
         my $count = self.read_tags_count;
 
-        my @tags = tags_parse($tags);
+        my @tags = self.tags_parse($tags);
         for @tags -> $t {
             # RAKUDO: Increment not implemented in class 'Undef'
             if $count{$t} {
@@ -64,7 +64,7 @@ class Tags {
 
         my $count = self.read_tags_count;
 
-        my @tags = tags_parse($tags);
+        my @tags = self.tags_parse($tags);
         for @tags -> $t {
             # RAKUDO: Decrement not implemented in class 'Undef'
             if $count{$t} && $count{$t} > 0 {
@@ -190,6 +190,15 @@ class Tags {
             }
         }
         return $tags_str;
+    }
+
+    method update_tags ($page, $tags) {
+
+        my $old_tags = self.read_page_tags($page);
+
+        self.remove_tags($page, $old_tags);
+        self.add_tags($page, $tags);
+        self.write_page_tags($page, $tags);
     }
 }
 
