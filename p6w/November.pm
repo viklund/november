@@ -1,43 +1,15 @@
 use v6;
 
 use CGI;
+use Tags;
+use Impatience;
 use HTML::Template;
 use Text::Markup::Wiki::MediaWiki;
 use November__Storage__File;   # RAKUDO: :: in module names doesn't fully work
 
-sub file_exists( $file ) {
-    # RAKUDO: use ~~ :e
-    my $exists = False;
-    try {
-        my $fh = open( $file );
-        $exists = True;
-    }
-    return $exists;
-}
-
 sub get_unique_id {
     # hopefully pretty unique ID
     return int(time%1000000/100) ~ time%100
-}
-
-sub r_remove( $str is rw ) {
-    # RAKUDO: :g not implemented yet :( 
-    while $str ~~ /\\r/ {
-        $str = $str.subst( /\\r/, '' );
-    }
-}
-
-sub tags_parse ($tags) {
-    my @tags = $tags.lc.split(/ \s* ( ',' | \n ) \s* /);
-    # split in p6 don`t trim
-    @tags = grep { $_ ne "" }, @tags;
-    return @tags;
-}
-
-
-sub tag_count_normalize ($count, $min, $max) {
-    my $step = ($count - $min) / (($max - $min) || 1);
-    ceiling( ( log($step + 1 ) * 10 ) / log 2 ); 
 }
 
 role Session {
@@ -135,41 +107,12 @@ class November does Session {
                 { self.make_link($^page) }
             ));
 
-        my $page_tags = $.storage.read_page_tags($page);
-        my @page_tags = tags_parse($page_tags); 
-        my $tags = $.storage.read_tags_count;
-        
-        my $min = $tags.values.min; 
-        my $max = $tags.values.max;
-
-        # does exist clearest way to check @tags... mb @t ~~ [] ?
-        if @page_tags[0] {
-            @page_tags = map { '<a class="t' 
-                ~ tag_count_normalize($.storage.get_tag_count($_), 
-                                      $min, 
-                                      $max ) 
-                ~ '" href="?action=toc?tag=' ~ $_ ~'">' 
-                ~ $_ ~ '</a>'}, @page_tags;
-
-            $page_tags = @page_tags.join(', ');
-        }
-    
+        my $t = Tags.new();
+        my $page_tags = $t.page_tags( $page );
         $template.param('PAGETAGS' => $page_tags);
-
-
-        my $tags_str;
-        if $tags {
-            for $tags.keys -> $tag {
-                if $tags{$tag} > 0 {
-                    $tags_str = $tags_str ~ '<a class="t' 
-                        ~ tag_count_normalize( $tags{$tag}, $min, $max ) 
-                        ~ '" href="?action=toc?tag=' ~ $tag ~ '">' 
-                        ~ $tag ~ '</a> ';
-                }
-            }
-        }
-        $template.param('TAGS' => $tags_str);
-
+        my $cloud_tags = $t.cloud_tags();
+        $template.param('TAGS' => $cloud_tags);
+        
         $template.param('LOGGED_IN' => self.logged_in());
 
         $.cgi.send_response(
