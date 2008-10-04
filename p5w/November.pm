@@ -774,10 +774,27 @@ sub toc {
     }
 
     $template->param('TAGS' => $cloud_tags);
-    
-    my %tags_index = %{ read_tags_index() };
 
-    my $toc = "Not Emplemented Yet";
+    my $tag = $cgi->param('tag');
+    my @articles;
+
+    if ($tag) {
+        my %tags_index = %{ read_tags_index() };
+        @articles = keys %{ $tags_index{$tag} };      
+        $template->param(TITLE => "Articles with tag \"$tag\"");
+    } else {
+        opendir(TOC, $CONTENT_PATH) || die "can`t open $CONTENT_PATH -- $!";
+        @articles = grep { $_ ne '.' && $_ ne '..' } readdir(TOC);
+        closedir(TOC);
+        $template->param(TITLE => "Table of Content");
+    }
+ 
+    my $toc = '<ul>';
+    for (@articles) {
+        $toc .= '<li><a href="?action=view&page=' . $_ . '">' . $_ . '</a></li>'; 
+    }
+    $toc .= '</ul>';
+    $toc .= '<a href="?action=toc">See full TOC</a>' if $tag ;
 
     $template->param(CONTENT => $toc);
 
