@@ -4,7 +4,7 @@ use Test;
 
 plan 8;
 
-use November;
+use Tags;
 
 my @to_parse = (    
     [ 'foo',
@@ -28,5 +28,6 @@ my @to_parse = (
 for @to_parse -> $each {
     my $in = $each[0];
     my $result = $each[1];
-    is_deeply( tags_parse($in), $result, 'Parse tags: ' ~ $in.perl);
+    
+    is_deeply( Tags.new.tags_parse($in), $result, 'Parse tags: ' ~ $in.perl);
 }

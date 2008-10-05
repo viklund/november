@@ -21,6 +21,7 @@ my %dispatch = (
     'log_in'         => \&log_in,
     'log_out'        => \&log_out,
     'recent_changes' => \&list_recent_changes,
+    'toc'            => \&toc,
 );
 
 my $TEMPLATE_PATH = 'skin/';
@@ -389,7 +390,6 @@ sub get_tag_count {
     return $counts->{$tag};
 }
 
-
 sub add_recent_change {
     my ($modification_id, $page, $contents, $author) = @_;
 
@@ -464,16 +464,14 @@ sub view_page {
     my %tags = %{ read_tags_count() };
     
     use List::Util qw| max min |;
-
     my $min = min( values %tags );
     my $max = max( values %tags );
+
     my $page_tags;
     if (@page_tags) {
         @page_tags = map { '<a class="t' 
-            . tag_count_normalize( get_tag_count($_), 
-                                  $min, 
-                                  $max ) 
-            . '" href="?action=toc?tag=' . $_ .'">' 
+            . tag_count_normalize( get_tag_count($_), $min, $max ) 
+            . '" href="?action=toc&tag=' . $_ .'">' 
             . $_ . '</a>' } @page_tags;
 
         $page_tags = join(', ', @page_tags);
@@ -481,7 +479,19 @@ sub view_page {
 
     $template->param('PAGETAGS' => $page_tags);
 
-    # code for all tags view here
+    my $cloud_tags;
+    my @all_tags = keys %tags;
+
+    if (@all_tags) {
+        for (@all_tags) {
+            $cloud_tags .= '<a class="t' 
+                . tag_count_normalize( get_tag_count($_), $min, $max ) 
+                . '" href="?action=toc&tag=' . $_ .'">' 
+                . $_ . '</a>'
+        }
+    }
+
+    $template->param('TAGS' => $cloud_tags);
     
     $template->param(LOGGED_IN => logged_in($cgi));
 
@@ -732,6 +742,62 @@ sub list_recent_changes {
             filename => $TEMPLATE_PATH.'recent_changes.tmpl');
 
     $template->param(CHANGES => \@changes);
+    $template->param(LOGGED_IN => logged_in($cgi));
+
+    print status_ok(),
+          $template->output();
+}
+
+sub toc {
+    my ($cgi) = @_;
+    return if !ref $cgi;
+
+    my $template = HTML::Template->new(
+            filename => $TEMPLATE_PATH.'view.tmpl');
+
+    my %tags = %{ read_tags_count() };
+    
+    use List::Util qw| max min |;
+    my $min = min( values %tags );
+    my $max = max( values %tags );
+
+    my $cloud_tags;
+    my @all_tags = keys %tags;
+
+    if (@all_tags) {
+        for (@all_tags) {
+            $cloud_tags .= '<a class="t' 
+                . tag_count_normalize( get_tag_count($_), $min, $max ) 
+                . '" href="?action=toc&tag=' . $_ .'">' 
+                . $_ . '</a>'
+        }
+    }
+
+    $template->param('TAGS' => $cloud_tags);
+
+    my $tag = $cgi->param('tag');
+    my @articles;
+
+    if ($tag) {
+        my %tags_index = %{ read_tags_index() };
+        @articles = keys %{ $tags_index{$tag} };      
+        $template->param(TITLE => "Articles with tag \"$tag\"");
+    } else {
+        opendir(TOC, $CONTENT_PATH) || die "can`t open $CONTENT_PATH -- $!";
+        @articles = grep { $_ ne '.' && $_ ne '..' } readdir(TOC);
+        closedir(TOC);
+        $template->param(TITLE => "Table of Content");
+    }
+ 
+    my $toc = '<ul>';
+    for (@articles) {
+        $toc .= '<li><a href="?action=view&page=' . $_ . '">' . $_ . '</a></li>'; 
+    }
+    $toc .= '</ul>';
+    $toc .= '<a href="?action=toc">See full TOC</a>' if $tag ;
+
+    $template->param(CONTENT => $toc);
+
     $template->param(LOGGED_IN => logged_in($cgi));
 
     print status_ok(),

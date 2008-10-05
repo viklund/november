@@ -27,7 +27,7 @@ class Tags {
         return 1 if $tags ~~ m/^ \s* $/;
         my $count = self.read_tags_count;
 
-        my @tags = tags_parse($tags);
+        my @tags = self.tags_parse($tags);
         for @tags -> $t {
             # RAKUDO: Increment not implemented in class 'Undef'
             if $count{$t} {
@@ -64,7 +64,7 @@ class Tags {
 
         my $count = self.read_tags_count;
 
-        my @tags = tags_parse($tags);
+        my @tags = self.tags_parse($tags);
         for @tags -> $t {
             # RAKUDO: Decrement not implemented in class 'Undef'
             if $count{$t} && $count{$t} > 0 {
@@ -160,11 +160,12 @@ class Tags {
 
         # does exist clearest way to check @tags... mb @t ~~ [] ?
         if @page_tags[0] {
+            # ugly, we must use template instead
             @page_tags = map { '<a class="t' 
                 ~ self.tag_count_normalize(self.get_tag_count($_), 
                                       $min, 
                                       $max ) 
-                ~ '" href="?action=toc?tag=' ~ $_ ~'">' 
+                ~ '" href="?action=toc&tag=' ~ $_ ~'">' 
                 ~ $_ ~ '</a>'}, @page_tags;
 
             $page_tags = @page_tags.join(', ');
@@ -181,15 +182,25 @@ class Tags {
 
         if $tags {
             for $tags.keys -> $tag {
+                # ugly, we must use template instead
                 if $tags{$tag} > 0 {
-                    $tags_str = $tags_str ~ '<a class="t' 
+                    $tags_str ~= '<a class="t' 
                         ~ self.tag_count_normalize( $tags{$tag}, $min, $max ) 
-                        ~ '" href="?action=toc?tag=' ~ $tag ~ '">' 
+                        ~ '" href="?action=toc&tag=' ~ $tag ~ '">' 
                         ~ $tag ~ '</a> ';
                 }
             }
         }
         return $tags_str;
+    }
+
+    method update_tags ($page, $tags) {
+
+        my $old_tags = self.read_page_tags($page);
+
+        self.remove_tags($page, $old_tags);
+        self.add_tags($page, $tags);
+        self.write_page_tags($page, $tags);
     }
 }
 

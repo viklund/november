@@ -3,7 +3,7 @@ use v6;
 use Test;
 plan 2;
 
-use November;
+use Tags;
 
 my @counts_to_test = (
     [ { one => 2, foo => 5, bar => 6, her => 14 }, 
@@ -18,7 +18,7 @@ for @counts_to_test -> $each {
 
     my %out;
     for $tags.kv -> $tag, $count {
-        %out{$tag} = tag_count_normalize($count, $tags.values.min, $tags.values.max);
+        %out{$tag} = Tags.new.tag_count_normalize($count, $tags.values.min, $tags.values.max);
     } 
 
     is_deeply( %out , $expected, 'Normalize: ' ~ $tags.perl );
