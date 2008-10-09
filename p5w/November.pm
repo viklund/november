@@ -21,7 +21,7 @@ my %dispatch = (
     'log_in'         => \&log_in,
     'log_out'        => \&log_out,
     'recent_changes' => \&list_recent_changes,
-    'toc'            => \&toc,
+    'all_pages'      => \&list_all_pages,
 );
 
 my $TEMPLATE_PATH = 'skin/';
@@ -471,7 +471,7 @@ sub view_page {
     if (@page_tags) {
         @page_tags = map { '<a class="t' 
             . tag_count_normalize( get_tag_count($_), $min, $max ) 
-            . '" href="?action=toc&tag=' . $_ .'">' 
+            . '" href="?action=all_pages&tag=' . $_ .'">' 
             . $_ . '</a>' } @page_tags;
 
         $page_tags = join(', ', @page_tags);
@@ -486,7 +486,7 @@ sub view_page {
         for (@all_tags) {
             $cloud_tags .= '<a class="t' 
                 . tag_count_normalize( get_tag_count($_), $min, $max ) 
-                . '" href="?action=toc&tag=' . $_ .'">' 
+                . '" href="?action=all_pages&tag=' . $_ .'">' 
                 . $_ . '</a>'
         }
     }
@@ -748,7 +748,7 @@ sub list_recent_changes {
           $template->output();
 }
 
-sub toc {
+sub list_all_pages {
     my ($cgi) = @_;
     return if !ref $cgi;
 
@@ -768,7 +768,7 @@ sub toc {
         for (@all_tags) {
             $cloud_tags .= '<a class="t' 
                 . tag_count_normalize( get_tag_count($_), $min, $max ) 
-                . '" href="?action=toc&tag=' . $_ .'">' 
+                . '" href="?action=all_pages&tag=' . $_ .'">' 
                 . $_ . '</a>'
         }
     }
@@ -781,24 +781,25 @@ sub toc {
     if ($tag) {
         my %tags_index = %{ read_tags_index() };
         @articles = keys %{ $tags_index{$tag} };      
-        $template->param(TITLE => "Articles with tag \"$tag\"");
+        $template->param(TITLE => qq[Articles with tag "$tag"]);
     } else {
         opendir(my $content_dir, $CONTENT_PATH)
             or die "can`t open $CONTENT_PATH -- $!";
         @articles = grep { $_ ne '.' && $_ ne '..' } readdir($content_dir);
         closedir($content_dir);
-        $template->param(TITLE => "Table of Contents");
+        $template->param(TITLE => "All pages");
     }
  
-    my $toc = '<ul>';
-    for (@articles) {
-        $toc .= '<li><a href="?action=view&page=' . $_ . '">' . $_ . '</a></li>'; 
+    my $list = '<ul>';
+    for my $article (@articles) {
+        $list .= "<li><a href='?action=view&page=$article'>$article</a></li>"; 
     }
-    $toc .= '</ul>';
-    $toc .= '<a href="?action=toc">See full TOC</a>' if $tag ;
+    $list .= '</ul>';
+    if ($tag) {
+        $list .= '<a href="?action=all_pages">List all articles</a>';
+    }
 
-    $template->param(CONTENT => $toc);
-
+    $template->param(CONTENT => $list);
     $template->param(LOGGED_IN => logged_in($cgi));
 
     print status_ok(),
