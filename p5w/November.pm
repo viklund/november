@@ -783,10 +783,11 @@ sub toc {
         @articles = keys %{ $tags_index{$tag} };      
         $template->param(TITLE => "Articles with tag \"$tag\"");
     } else {
-        opendir(TOC, $CONTENT_PATH) || die "can`t open $CONTENT_PATH -- $!";
-        @articles = grep { $_ ne '.' && $_ ne '..' } readdir(TOC);
-        closedir(TOC);
-        $template->param(TITLE => "Table of Content");
+        opendir(my $content_dir, $CONTENT_PATH)
+            or die "can`t open $CONTENT_PATH -- $!";
+        @articles = grep { $_ ne '.' && $_ ne '..' } readdir($content_dir);
+        closedir($content_dir);
+        $template->param(TITLE => "Table of Contents");
     }
  
     my $toc = '<ul>';
