@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 4;
+plan 5;
 
 use Text::Markup::Wiki::MediaWiki;
 
@@ -40,4 +40,12 @@ my $link_maker = { "<a href=\"/?page=$^page\">$^page</a>" }
     my $actual_output = $converter.format($input, $link_maker);
 
     is( $actual_output, $expected_output, 'malformed link II' );
+}
+
+{
+    my $input = '[[A Link\nSpanning Two Lines]]';
+    my $expected_output = '<p>[[A Link Spanning Two Lines]]</p>';
+    my $actual_output = $converter.format($input, $link_maker);
+
+    is( $actual_output, $expected_output, 'malformed link III' );
 }
