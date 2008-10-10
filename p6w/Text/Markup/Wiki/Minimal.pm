@@ -2,7 +2,7 @@ use v6;
 
 grammar Text::Markup::Wiki::Minimal::Syntax {
 
-    token paragraph { ^ [<heading> || <parchunk>+] $ };
+    token TOP { ^ [<heading> || <parchunk>+] $ };
 
     token heading { '==' <parchunk>+ '==' };
 
@@ -37,7 +37,7 @@ class Text::Markup::Wiki::Minimal {
 
             # RAKUDO: when #58676 will be resolved use: 
             # $par ~~ Text::Markup::Wiki::Minimal::Syntax.new;
-            if $par ~~ Text::Markup::Wiki::Minimal::Syntax::paragraph {
+            if $par ~~ Text::Markup::Wiki::Minimal::Syntax::TOP {
 
                 if $/<heading> {
                     my $heading = $/<heading><parchunk>[0];
