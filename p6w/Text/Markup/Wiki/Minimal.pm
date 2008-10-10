@@ -25,10 +25,9 @@ grammar Text::Markup::Wiki::Minimal::Syntax {
 class Text::Markup::Wiki::Minimal {
 
     method format($text, :$link_maker) {
-        # RAKUDO: $text.split( /\n\n/ )
         my @pars = grep { $_ ne "" },
                    map { $_.subst( / ^ \n /, '' ) },
-                   $text.split("\n\n");
+                   $text.split( /\n\n/ );
 
         my @formatted;
         for @pars -> $par {
