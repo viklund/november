@@ -47,12 +47,10 @@ class HTML::Template {
                 }
                 my $loop_inside = $0;
 
-                # RAKUDO: Dotty methods don't work.
-                $text = $text.subst( / '<TMPL_LOOP NAME=' \w+ '>' .*?
-                                       '</TMPL_LOOP>' /,
-                                     self.serialize_loop(
-                                         $loop_inside,
-                                         $value ));
+                $text .= subst( / '<TMPL_LOOP NAME=' \w+ '>' .*?
+                                  '</TMPL_LOOP>' /,
+                                  self.serialize_loop($loop_inside, $value)
+                              );
             }
             elsif $directive eq 'IF' {
 
@@ -72,14 +70,11 @@ class HTML::Template {
                 }
                 # TODO: In a perfect world, the contents should also be
                 # parsed and substituted.
-                $text = $text.subst( / '<TMPL_IF NAME=' \w+ '>' .*?
-                                       '</TMPL_IF>' /,
-                                       $value ?? $if_inside !! $else_inside );
+                $text .= subst( / '<TMPL_IF NAME=' \w+ '>' .*?  '</TMPL_IF>' /,
+                                $value ?? $if_inside !! $else_inside );
             }
             else { # it's TMPL_VAR
-                # RAKUDO: Dotty methods don't work.
-                $text = $text.subst( / '<TMPL_VAR NAME=' \w+ '>' /,
-                                     $value );
+                $text .= subst( / '<TMPL_VAR NAME=' \w+ '>' /, $value );
             }
         }
 
@@ -122,9 +117,7 @@ class HTML::Template {
               // die "$name is defined in the template but undefined in source";
 
             if $directive eq 'VAR' {
-                # RAKUDO: Dotty methods don't work.
-                $result = $result.subst( / '<TMPL_VAR NAME=' \w+ '>' /,
-                                         $value );
+                $result .= subst( / '<TMPL_VAR NAME=' \w+ '>' /, $value );
             }
             else {
                 die("I haven't implemented TMPL_$directive in loops yet.");
