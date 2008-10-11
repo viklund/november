@@ -42,7 +42,7 @@ if (   ! $parrot_dir
     $parrot_dir = '~/parrot';
 }
 
-print " Parrot checkout location: [$parrot_dir] ";
+print "Parrot checkout location: [$parrot_dir] ";
 my $answer = <>;
 chomp $answer;
 if ($answer ne '') {
