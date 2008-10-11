@@ -40,8 +40,8 @@ class Text::Markup::Wiki::Minimal {
 
                 if $/<heading> {
                     my $heading = $/<heading><parchunk>[0];
-                    $heading = $heading.subst( / ^ \s+ /, '' );
-                    $heading = $heading.subst( / \s+ $ /, '' );
+                    $heading .= subst( / ^ \s+ /, '' );
+                    $heading .= subst( / \s+ $ /, '' );
                     $result = "<h1>$heading</h1>";
                 }
                 else {

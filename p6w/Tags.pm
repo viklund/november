@@ -174,7 +174,7 @@ class Tags {
     }
 
     method cloud_tags () {
-        my $tags_str;
+        my $tags_str = '';
         my $tags = self.read_tags_count;
         
         my $min = $tags.values.min; 
