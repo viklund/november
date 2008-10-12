@@ -46,7 +46,7 @@ print "Parrot checkout location: [$parrot_dir] ";
 my $answer = <>;
 chomp $answer;
 if ($answer ne '') {
-    $parrot_dir = $answer;
+    $parrot_dir = glob $answer;
 }
 
 if ( ! $parrot_dir ) {
