@@ -4,7 +4,7 @@ use CGI;
 use Tags;
 use Impatience;
 use HTML__Template;            # RAKUDO: :: in module names doesn't fully work
-use Text::Markup::Wiki::Minimal;
+use Text__Markup__Wiki__Minimal;
 use November__Storage__File;   # RAKUDO: :: in module names doesn't fully work
 
 sub get_unique_id {
@@ -101,7 +101,7 @@ class November does Session {
             filename => $.template_path ~ 'view.tmpl');
 
         $template.param('TITLE'     => $page);
-        $template.param('CONTENT'   => Text::Markup::Wiki::Minimal.new.format(
+        $template.param('CONTENT'   => Text__Markup__Wiki__Minimal.new.format(
                                            $.storage.read_page($page),
                                            { self.make_link($^page) }
                                        ));
