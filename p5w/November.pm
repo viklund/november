@@ -80,8 +80,9 @@ sub unknown_action {
 sub escape {
     my ($string) = @_;
 
+    return '' if !defined $string;
     my $escapeevil = HTML::EscapeEvil->new(allow_entity_reference => 0);
-    $escapeevil->parse($string . ' ');
+    $escapeevil->parse($string);
     return $escapeevil->filtered_html;
 }
 
