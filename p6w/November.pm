@@ -3,7 +3,7 @@ use v6;
 use CGI;
 use Tags;
 use Impatience;
-use HTML__Template;
+use HTML__Template;            # RAKUDO: :: in module names doesn't fully work
 use Text::Markup::Wiki::MediaWiki;
 use November__Storage__File;   # RAKUDO: :: in module names doesn't fully work
 

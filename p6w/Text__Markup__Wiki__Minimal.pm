@@ -1,6 +1,6 @@
 use v6;
 
-grammar Text::Markup::Wiki::Minimal::Syntax {
+grammar Text__Markup__Wiki__Minimal__Syntax {
 
     token TOP { ^ [<heading> || <parchunk>+] $ };
 
@@ -22,7 +22,7 @@ grammar Text::Markup::Wiki::Minimal::Syntax {
     token malformed { '[' || ']' }
 }
 
-class Text::Markup::Wiki::Minimal {
+class Text__Markup__Wiki__Minimal {
 
     method format($text, :$link_maker) {
         my @pars = grep { $_ ne "" },
@@ -35,8 +35,8 @@ class Text::Markup::Wiki::Minimal {
             my $result;
 
             # RAKUDO: when #58676 will be resolved use: 
-            # $par ~~ Text::Markup::Wiki::Minimal::Syntax.new;
-            if $par ~~ Text::Markup::Wiki::Minimal::Syntax::TOP {
+            # $par ~~ Text__Markup__Wiki__Minimal__Syntax.new;
+            if $par ~~ Text__Markup__Wiki__Minimal__Syntax::TOP {
 
                 if $/<heading> {
                     my $heading = $/<heading><parchunk>[0];
