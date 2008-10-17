@@ -15,8 +15,6 @@ free to remove it.
 * Add 'return_to' links for the login and logout actions. And maybe redirects,
   or at least manual links.
 
-* Cosmetically remove the underscores in link titles.
-
 * Implement 'created new page' flag in recent-changes.
 
 * Implement 'minor edits'.

@@ -57,7 +57,6 @@ sub handle_request {
 
     if (ref($handler) eq "CODE") {
         $handler->($cgi);
-
     }
     else {
         print unknown_action($cgi);
@@ -95,10 +94,20 @@ sub exists_wiki_page {
     return $page && -e $CONTENT_PATH.$page;
 }
 
+# Pretty-printing of page names. A more self-explanatory (but still succinct)
+# name for this subrouting would be a good thing -- suggestions welcome.
+sub pp {
+    my ($name) = @_;
+
+    $name =~ s/_/ /g;
+
+    return $name;
+}
+
 sub make_link {
     my ($page, $title) = @_;
 
-    $title ||= $page;
+    $title ||= pp($page);
     return exists_wiki_page( $page )
            ? qq|<a href="/?page=$page">$title</a>|
            : qq|<a href="/?page=$page&action=edit" class="nonexistent">$title</a>|;
@@ -185,7 +194,7 @@ sub format_html {
 
     $text =~ s{ \&amp;mdash; }{&mdash;}msxg;
 
-    # Add paragraphs
+    # Add paragraph tags
     $text =~ s{\n\s*\n}{\n<p>}xg;
 
     return $text;
@@ -435,7 +444,8 @@ sub view_page {
     my $template = HTML::Template->new(
         filename => $TEMPLATE_PATH.'view.tmpl');
 
-    $template->param(TITLE => $page,);
+    $template->param(PAGE      => $page);
+    $template->param(TITLE     => pp($page));
     $template->param(VIEW_PAGE => 1) unless $revision;
 
     my $contents;
@@ -542,8 +552,8 @@ sub edit_page {
             filename => $TEMPLATE_PATH.'edit.tmpl');
 
     $template->param(PAGE => $page);
-    my $title = $action . ' ' . $page;
-    $template->param(TITLE => $title);
+    $template->param(ACTION => $action);
+    $template->param(TITLE => pp($page));
     $template->param(PAGETAGS => read_page_tags($page));
     $template->param(CONTENT => $old_content);
     $template->param(LOGGED_IN => logged_in($cgi));
@@ -590,8 +600,9 @@ sub view_history {
     my $template = HTML::Template->new(
             filename => $TEMPLATE_PATH.'page_history.tmpl');
 
-    $template->param(PAGE    => $page);
-    $template->param(CHANGES => \@changes);
+    $template->param(PAGE      => $page);
+    $template->param(TITLE     => pp($page));
+    $template->param(CHANGES   => \@changes);
     $template->param(LOGGED_IN => logged_in($cgi));
 
     print status_ok(),
@@ -625,8 +636,9 @@ sub view_diff {
     my $template = HTML::Template->new(
         filename => $TEMPLATE_PATH.'view_diff.tmpl');
 
-    $template->param(PAGE => $page);
-    $template->param(HUNKS => \@changes);
+    $template->param(PAGE      => $page);
+    $template->param(TITLE     => pp($page));
+    $template->param(HUNKS     => \@changes);
     $template->param(LOGGED_IN => logged_in($cgi));
 
     print status_ok(),
@@ -815,4 +827,5 @@ sub tag_count_normalize {
     use POSIX;
     ceil( ( log($step + 1 ) * 10 ) / log 2 ); 
 }
+
 1;
