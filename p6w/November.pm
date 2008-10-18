@@ -2,7 +2,6 @@ use v6;
 
 use CGI;
 use Tags;
-use Impatience;
 use HTML__Template;            # RAKUDO: :: in module names doesn't fully work
 use Text__Markup__Wiki__Minimal;
 use November__Storage__File;   # RAKUDO: :: in module names doesn't fully work
@@ -33,7 +32,7 @@ role Session {
     }
 
     method read_sessions {
-        return {} unless file_exists( $.sessionfile_path );
+        return {} unless $.sessionfile_path ~~ :e;
         my $string = slurp( $.sessionfile_path );
         my $stuff = eval( $string );
         return $stuff;
@@ -193,7 +192,7 @@ class November does Session {
 
     method read_users {
         # RAKUDO: use :e
-        return {} unless file_exists( $.userfile_path );
+        return {} unless $.userfile_path ~~ :e;
         return eval( slurp( $.userfile_path ) );
     }
 

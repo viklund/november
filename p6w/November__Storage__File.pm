@@ -8,11 +8,11 @@ class November__Storage__File is November__Storage {
     my $.recent_changes_path = 'data/recent-changes';
 
     method wiki_page_exists($page) {
-        return file_exists( $.content_path ~ $page );
+        return ($.content_path ~ $page) ~~ :e;
     }
 
     method read_recent_changes {
-        return [] unless file_exists( $.recent_changes_path );
+        return [] unless $.recent_changes_path ~~ :e;
         return eval( slurp( $.recent_changes_path ) );
     }
 
@@ -24,7 +24,7 @@ class November__Storage__File is November__Storage {
 
     method read_page_history($page) {
         my $file = $.content_path ~ $page;
-        return [] unless file_exists( $file );
+        return [] unless $file ~~ :e;
         my $page_history = eval( slurp($file) );
         return $page_history;
     }
@@ -38,8 +38,7 @@ class November__Storage__File is November__Storage {
 
     method read_modification($modification_id) {
         my $file = $.modifications_path ~ $modification_id;
-        # RAKUDO: use :e
-        return [] unless file_exists( $file );
+        return [] unless $file ~~ :e;
         return eval( slurp($file) );
     }
 
