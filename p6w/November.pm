@@ -101,18 +101,10 @@ class November does Session {
             filename => $.template_path ~ 'view.tmpl');
 
         $template.param('TITLE'     => $page);
-<<<<<<< HEAD:p6w/November.pm
         $template.param('CONTENT'   => Text__Markup__Wiki__Minimal.new.format(
                                            $.storage.read_page($page),
                                            { self.make_link($^page) }
                                        ));
-=======
-        $template.param('CONTENT'   =>
-            Text::Markup::Wiki::MediaWiki.new.format(
-                $.storage.read_page($page),
-                { self.make_link($^page) }
-            ));
->>>>>>> 0fe9dd96f8ee1b7aec9c2b2f9ddc3e29e5af07cf:p6w/November.pm
 
         # TODO: we need plugin system (see topics in mail-list)
         my $t = Tags.new();
