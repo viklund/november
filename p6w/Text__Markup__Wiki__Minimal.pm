@@ -15,7 +15,10 @@ grammar Text__Markup__Wiki__Minimal__Syntax {
 
     token whitespace { ' ' | \n };
 
-    token wikimark { '[[' <twext> ']]' };
+    token wikimark { '[[' <link> [\s+ <link_title>]? ']]' };
+    
+    regex link { <[:/.]+alpha>+ };
+    regex link_title { <[\ ]+alpha>+ };
 
     token metachar { '<' || '>' || '&' || \' };
 
@@ -23,8 +26,9 @@ grammar Text__Markup__Wiki__Minimal__Syntax {
 }
 
 class Text__Markup__Wiki__Minimal {
+    has $.link_maker is rw;
 
-    method format($text, :$link_maker) {
+    method format($text ) {
         my @pars = grep { $_ ne "" },
                    map { $_.subst( / ^ \n /, '' ) },
                    $text.split( /\n\n/ );
@@ -47,21 +51,31 @@ class Text__Markup__Wiki__Minimal {
                 else {
                     $result = '<p>';
 
-                    for $/<parchunk> -> $chunk {
-                        my $text = $chunk.values[0];
-                        given $chunk.keys[0] {
-                            when 'twext'     { $result ~= $text }
-                            when 'wikimark' {
-                                if $link_maker.defined {
-                                    my $page = substr($text, 2, -2);
-                                    $result ~= $link_maker($page);
-                                }
-                                else {
-                                    $result ~= $text;
-                                }
+                    for $/<parchunk> {
+                        if $_<twext> { 
+                            $result ~= $_<twext>;
+                        }
+                        elsif $_<wikimark> {
+                            if $.link_maker {
+                                # RAKUDO: second arg transform to '1' by some dark magic 
+                                # $result ~= $.link_maker( $_<wikimark><link>, $_<wikimark><link_title> );
+                                # workaround:
+                                my $title = $_<wikimark><link_title>;
+  
+                                # First time I just put that in call, but when I do that I have Match 
+                                # in the make_link, and ~~ ':' do not work on it.
+                                my $page = $_<wikimark><link>;
+                                $result ~= $.link_maker( $page, $title );
                             }
-                            when 'metachar'  { $result ~= quote($text) }
-                            when 'malformed' { $result ~= $text }
+                            else {
+                                $result ~= $_<wikimark>;
+                            }
+                        }
+                        elsif $_<metachar>  { 
+                            $result ~= quote($_<metachar>) 
+                        }
+                        elsif $_<malformed> { 
+                            $result ~= $_<malformed> 
                         }
                     }
                     $result ~= "</p>";
@@ -85,6 +99,7 @@ class Text__Markup__Wiki__Minimal {
         return '&amp;'  if $metachar eq '&';
         return $metachar;
     }
+
 }
 
 # vim:ft=perl6

@@ -287,12 +287,20 @@ class November does Session {
         return;
     }
 
-    method make_link($page) {
-        return sprintf('<a href="?action=%s&page=%s"%s>%s</a>',
-                       $.storage.wiki_page_exists($page)
-                         ?? ('view', $page, '')
-                         !! ('edit', $page, ' class="nonexistent"'),
-                       $page);
+    method make_link($page, $title?) {
+        if $title {
+            if $page ~~ m/':'/ {
+                return "<a href=\"$page\">$title</a>";
+            } else {
+                return "<a href=\"?action=view&page=$page\">$title</a>";
+            }
+        } else {
+            return sprintf('<a href="?action=%s&page=%s"%s>%s</a>',
+                           $.storage.wiki_page_exists($page)
+                             ?? ('view', $page, '')
+                             !! ('edit', $page, ' class="nonexistent"'),
+                           $page);
+        }
     }
 
     method list_recent_changes {
