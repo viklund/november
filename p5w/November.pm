@@ -21,7 +21,7 @@ my %dispatch = (
     'log_in'         => \&log_in,
     'log_out'        => \&log_out,
     'recent_changes' => \&list_recent_changes,
-    'toc'            => \&toc,
+    'all_pages'      => \&list_all_pages,
 );
 
 my $TEMPLATE_PATH = 'skin/';
@@ -57,7 +57,6 @@ sub handle_request {
 
     if (ref($handler) eq "CODE") {
         $handler->($cgi);
-
     }
     else {
         print unknown_action($cgi);
@@ -80,8 +79,9 @@ sub unknown_action {
 sub escape {
     my ($string) = @_;
 
+    return '' if !defined $string;
     my $escapeevil = HTML::EscapeEvil->new(allow_entity_reference => 0);
-    $escapeevil->parse($string . ' ');
+    $escapeevil->parse($string);
     return $escapeevil->filtered_html;
 }
 
@@ -94,10 +94,20 @@ sub exists_wiki_page {
     return $page && -e $CONTENT_PATH.$page;
 }
 
+# Pretty-printing of page names. A more self-explanatory (but still succinct)
+# name for this subrouting would be a good thing -- suggestions welcome.
+sub pp {
+    my ($name) = @_;
+
+    $name =~ s/_/ /g;
+
+    return $name;
+}
+
 sub make_link {
     my ($page, $title) = @_;
 
-    $title ||= $page;
+    $title ||= pp($page);
     return exists_wiki_page( $page )
            ? qq|<a href="/?page=$page">$title</a>|
            : qq|<a href="/?page=$page&action=edit" class="nonexistent">$title</a>|;
@@ -184,7 +194,7 @@ sub format_html {
 
     $text =~ s{ \&amp;mdash; }{&mdash;}msxg;
 
-    # Add paragraphs
+    # Add paragraph tags
     $text =~ s{\n\s*\n}{\n<p>}xg;
 
     return $text;
@@ -434,7 +444,8 @@ sub view_page {
     my $template = HTML::Template->new(
         filename => $TEMPLATE_PATH.'view.tmpl');
 
-    $template->param(TITLE => $page,);
+    $template->param(PAGE      => $page);
+    $template->param(TITLE     => pp($page));
     $template->param(VIEW_PAGE => 1) unless $revision;
 
     my $contents;
@@ -471,7 +482,7 @@ sub view_page {
     if (@page_tags) {
         @page_tags = map { '<a class="t' 
             . tag_count_normalize( get_tag_count($_), $min, $max ) 
-            . '" href="?action=toc&tag=' . $_ .'">' 
+            . '" href="?action=all_pages&tag=' . $_ .'">' 
             . $_ . '</a>' } @page_tags;
 
         $page_tags = join(', ', @page_tags);
@@ -486,7 +497,7 @@ sub view_page {
         for (@all_tags) {
             $cloud_tags .= '<a class="t' 
                 . tag_count_normalize( get_tag_count($_), $min, $max ) 
-                . '" href="?action=toc&tag=' . $_ .'">' 
+                . '" href="?action=all_pages&tag=' . $_ .'">' 
                 . $_ . '</a>'
         }
     }
@@ -541,8 +552,8 @@ sub edit_page {
             filename => $TEMPLATE_PATH.'edit.tmpl');
 
     $template->param(PAGE => $page);
-    my $title = $action . ' ' . $page;
-    $template->param(TITLE => $title);
+    $template->param(ACTION => $action);
+    $template->param(TITLE => pp($page));
     $template->param(PAGETAGS => read_page_tags($page));
     $template->param(CONTENT => $old_content);
     $template->param(LOGGED_IN => logged_in($cgi));
@@ -589,8 +600,9 @@ sub view_history {
     my $template = HTML::Template->new(
             filename => $TEMPLATE_PATH.'page_history.tmpl');
 
-    $template->param(PAGE    => $page);
-    $template->param(CHANGES => \@changes);
+    $template->param(PAGE      => $page);
+    $template->param(TITLE     => pp($page));
+    $template->param(CHANGES   => \@changes);
     $template->param(LOGGED_IN => logged_in($cgi));
 
     print status_ok(),
@@ -624,8 +636,9 @@ sub view_diff {
     my $template = HTML::Template->new(
         filename => $TEMPLATE_PATH.'view_diff.tmpl');
 
-    $template->param(PAGE => $page);
-    $template->param(HUNKS => \@changes);
+    $template->param(PAGE      => $page);
+    $template->param(TITLE     => pp($page));
+    $template->param(HUNKS     => \@changes);
     $template->param(LOGGED_IN => logged_in($cgi));
 
     print status_ok(),
@@ -748,7 +761,7 @@ sub list_recent_changes {
           $template->output();
 }
 
-sub toc {
+sub list_all_pages {
     my ($cgi) = @_;
     return if !ref $cgi;
 
@@ -768,7 +781,7 @@ sub toc {
         for (@all_tags) {
             $cloud_tags .= '<a class="t' 
                 . tag_count_normalize( get_tag_count($_), $min, $max ) 
-                . '" href="?action=toc&tag=' . $_ .'">' 
+                . '" href="?action=all_pages&tag=' . $_ .'">' 
                 . $_ . '</a>'
         }
     }
@@ -781,24 +794,25 @@ sub toc {
     if ($tag) {
         my %tags_index = %{ read_tags_index() };
         @articles = keys %{ $tags_index{$tag} };      
-        $template->param(TITLE => "Articles with tag \"$tag\"");
+        $template->param(TITLE => qq[Articles with tag "$tag"]);
     } else {
         opendir(my $content_dir, $CONTENT_PATH)
             or die "can`t open $CONTENT_PATH -- $!";
         @articles = grep { $_ ne '.' && $_ ne '..' } readdir($content_dir);
         closedir($content_dir);
-        $template->param(TITLE => "Table of Contents");
+        $template->param(TITLE => "All pages");
     }
  
-    my $toc = '<ul>';
-    for (@articles) {
-        $toc .= '<li><a href="?action=view&page=' . $_ . '">' . $_ . '</a></li>'; 
+    my $list = '<ul>';
+    for my $article (@articles) {
+        $list .= "<li><a href='?action=view&page=$article'>$article</a></li>"; 
     }
-    $toc .= '</ul>';
-    $toc .= '<a href="?action=toc">See full TOC</a>' if $tag ;
+    $list .= '</ul>';
+    if ($tag) {
+        $list .= '<a href="?action=all_pages">List all articles</a>';
+    }
 
-    $template->param(CONTENT => $toc);
-
+    $template->param(CONTENT => $list);
     $template->param(LOGGED_IN => logged_in($cgi));
 
     print status_ok(),
@@ -813,4 +827,5 @@ sub tag_count_normalize {
     use POSIX;
     ceil( ( log($step + 1 ) * 10 ) / log 2 ); 
 }
+
 1;

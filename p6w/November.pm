@@ -3,9 +3,9 @@ use v6;
 use CGI;
 use Tags;
 use Impatience;
-use HTML::Template;
-use Text::Markup::Wiki::MediaWiki;
-use November__Storage__File;   # RAKUDO: :: in module names doesn't fully work
+use HTML__Template;            # RAKUDO: :: in module names doesn't fully work
+use Text__Markup__Wiki__Minimal;
+use November__Storage__File;  
 
 sub get_unique_id {
     # hopefully pretty unique ID
@@ -97,15 +97,14 @@ class November does Session {
             return;
         }
 
-        my $template = HTML::Template.new(
+        my $template = HTML__Template.new(
             filename => $.template_path ~ 'view.tmpl');
 
         $template.param('TITLE'     => $page);
-        $template.param('CONTENT'   =>
-            Text::Markup::Wiki::MediaWiki.new.format(
-                $.storage.read_page($page),
-                { self.make_link($^page) }
-            ));
+        $template.param('CONTENT'   => Text__Markup__Wiki__Minimal.new.format(
+                                           $.storage.read_page($page),
+                                           { self.make_link($^page) }
+                                       ));
 
         # TODO: we need plugin system (see topics in mail-list)
         my $t = Tags.new();
@@ -159,7 +158,7 @@ class November does Session {
             return self.view_page();
         }
 
-        my $template = HTML::Template.new(
+        my $template = HTML__Template.new(
             filename => $.template_path ~ 'edit.tmpl');
 
         $template.param('PAGE'      => $page);
@@ -178,7 +177,7 @@ class November does Session {
     }
 
     method not_authorized() {
-        my $template = HTML::Template.new(
+        my $template = HTML__Template.new(
             filename => $.template_path ~ 'action_not_authorized.tmpl');
 
         # TODO: file bug, without "'" it is interpreted as named args and not
@@ -199,7 +198,7 @@ class November does Session {
     }
 
     method not_found() {
-        my $template = HTML::Template.new(
+        my $template = HTML__Template.new(
             filename => $.template_path ~ 'not_found.tmpl');
 
         $template.param('PAGE'      => 'Action Not found');
@@ -228,7 +227,7 @@ class November does Session {
                 my $session_id = self.new_session($user_name);
                 my $session_cookie = "session_id=$session_id";
 
-                my $template = HTML::Template.new(
+                my $template = HTML__Template.new(
                     filename => $.template_path ~ 'login_succeeded.tmpl');
 
                 $.cgi.send_response(
@@ -239,7 +238,7 @@ class November does Session {
                 return;
             }
 
-            my $template = HTML::Template.new(
+            my $template = HTML__Template.new(
                 filename => $.template_path ~ 'login_failed.tmpl');
 
             $.cgi.send_response(
@@ -249,7 +248,7 @@ class November does Session {
             return;
         }
 
-        my $template = HTML::Template.new(
+        my $template = HTML__Template.new(
             filename => $.template_path ~ 'log_in.tmpl');
 
         $.cgi.send_response(
@@ -267,7 +266,7 @@ class November does Session {
 
             my $session_cookie = "session_id=";
 
-            my $template = HTML::Template.new(
+            my $template = HTML__Template.new(
                 filename => $.template_path ~ 'logout_succeeded.tmpl');
 
             $.cgi.send_response(
@@ -278,7 +277,7 @@ class November does Session {
             return;
         }
 
-        my $template = HTML::Template.new(
+        my $template = HTML__Template.new(
             filename => $.template_path ~ 'logout_succeeded.tmpl');
 
         $.cgi.send_response(
@@ -311,7 +310,7 @@ class November does Session {
                 'author' => $modification[2] || 'somebody' };
         }
 
-        my $template = HTML::Template.new(
+        my $template = HTML__Template.new(
                 filename => $.template_path ~ 'recent_changes.tmpl');
 
         $template.param('CHANGES'   => @changes);

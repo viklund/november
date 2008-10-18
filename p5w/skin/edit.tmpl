@@ -7,7 +7,7 @@
     <body>
         <TMPL_INCLUDE NAME="toolbar.tmpl">
         <div id="content">
-            <h1><TMPL_VAR NAME=TITLE></h1>
+            <h1><TMPL_VAR NAME=ACTION> <TMPL_VAR NAME=TITLE></h1>
             <form method="POST">
                 <input type="hidden" name="page" value="<TMPL_VAR NAME=PAGE>" />
                 <input type="hidden" name="action" value="edit" />

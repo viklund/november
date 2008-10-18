@@ -15,8 +15,6 @@ free to remove it.
 * Add 'return_to' links for the login and logout actions. And maybe redirects,
   or at least manual links.
 
-* Cosmetically remove the underscores in link titles.
-
 * Implement 'created new page' flag in recent-changes.
 
 * Implement 'minor edits'.
@@ -48,12 +46,6 @@ free to remove it.
 * Don't save an edit unless anything is changed.
 
 * Add a 'Cancel' button to the edit form.
-
-* Consider allowing logged-out edits by putting the logged-out user, and all
-  eir edits, in a honeypot. As long as the user is (semi-)logged in, the edits
-  look like they have already been applied. (Disable the "Log out" action in
-  this situation, since the user is not really logged in.) Edits and account
-  requests are quarantined and queued up for admin review.
 
 * Consider following this advice:
   <http://developers.slashdot.org/comments.pl?sid=622185&cid=24295989>
