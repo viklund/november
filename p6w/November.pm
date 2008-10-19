@@ -4,7 +4,7 @@ use CGI;
 use Tags;
 use Impatience;
 use HTML__Template;            # RAKUDO: :: in module names doesn't fully work
-use Text__Markup__Wiki__Minimal;
+use Text__Markup__Wiki__MediaWiki;
 use November__Storage__File;  
 
 sub get_unique_id {
@@ -102,8 +102,12 @@ class November does Session {
 
         $template.param('TITLE' => $page);
 
-        my $minimal = Text__Markup__Wiki__Minimal.new( link_maker => { self.make_link($^p, $^t) } );
-        $template.param('CONTENT' => $minimal.format($.storage.read_page($page)) );
+        $template.param('CONTENT' =>
+            Text__Markup__Wiki__MediaWiki.new.format(
+                $.storage.read_page($page),
+                { self.make_link($^page) }
+            )
+        );
 
         # TODO: we need plugin system (see topics in mail-list)
         my $t = Tags.new();
