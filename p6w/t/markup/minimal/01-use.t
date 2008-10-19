@@ -5,8 +5,8 @@ plan 1;
 
 my $used_successfully = False;
 try {
-  use Text::Markup::Wiki::Minimal;
+  use Text__Markup__Wiki__Minimal;
   $used_successfully = True;
 }
 
-ok( $used_successfully, "use Text::Markup::Wiki::Minimal" );
+ok( $used_successfully, "use Text__Markup__Wiki__Minimal" );

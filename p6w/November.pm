@@ -4,7 +4,7 @@ use CGI;
 use Tags;
 use HTML__Template;            # RAKUDO: :: in module names doesn't fully work
 use Text__Markup__Wiki__Minimal;
-use November__Storage__File;   # RAKUDO: :: in module names doesn't fully work
+use November__Storage__File;  
 
 sub get_unique_id {
     # hopefully pretty unique ID
@@ -99,11 +99,10 @@ class November does Session {
         my $template = HTML__Template.new(
             filename => $.template_path ~ 'view.tmpl');
 
-        $template.param('TITLE'     => $page);
-        $template.param('CONTENT'   => Text__Markup__Wiki__Minimal.new.format(
-                                           $.storage.read_page($page),
-                                           { self.make_link($^page) }
-                                       ));
+        $template.param('TITLE' => $page);
+
+        my $minimal = Text__Markup__Wiki__Minimal.new( link_maker => { self.make_link($^p, $^t) } );
+        $template.param('CONTENT' => $minimal.format($.storage.read_page($page)) );
 
         # TODO: we need plugin system (see topics in mail-list)
         my $t = Tags.new();
@@ -285,12 +284,20 @@ class November does Session {
         return;
     }
 
-    method make_link($page) {
-        return sprintf('<a href="?action=%s&page=%s"%s>%s</a>',
-                       $.storage.wiki_page_exists($page)
-                         ?? ('view', $page, '')
-                         !! ('edit', $page, ' class="nonexistent"'),
-                       $page);
+    method make_link($page, $title?) {
+        if $title {
+            if $page ~~ m/':'/ {
+                return "<a href=\"$page\">$title</a>";
+            } else {
+                return "<a href=\"?action=view&page=$page\">$title</a>";
+            }
+        } else {
+            return sprintf('<a href="?action=%s&page=%s"%s>%s</a>',
+                           $.storage.wiki_page_exists($page)
+                             ?? ('view', $page, '')
+                             !! ('edit', $page, ' class="nonexistent"'),
+                           $page);
+        }
     }
 
     method list_recent_changes {
