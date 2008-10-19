@@ -17,7 +17,7 @@ grammar Text__Markup__Wiki__Minimal__Syntax {
 
     token wikimark { '[[' <link> [\s+ <link_title>]? ']]' };
     
-    regex link { <[:/._@]+alpha>+ };
+    regex link { <[:/._@]+alpha+digit>+ };
     regex link_title { <[\ ]+alpha>+ };
 
     token metachar { '<' || '>' || '&' || \' };

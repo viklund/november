@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 8;
+plan 10;
 
 use Text__Markup__Wiki__Minimal;
 
@@ -71,12 +71,30 @@ my $converter = Text__Markup__Wiki__Minimal.new( link_maker => &make_link);
 }
 
 {
+    my $input = 'An example of a [[http://link.org/S12.pod pod]]';
+    my $expected_output
+        = '<p>An example of a <a href="http://link.org/S12.pod">pod</a></p>';
+    my $actual_output = $converter.format($input);
+
+    is( $actual_output, $expected_output, 'named external link with digets and dot' );
+}
+
+{
     my $input = 'An example of a [[http://link.org boo bar baz]]';
     my $expected_output
         = '<p>An example of a <a href="http://link.org">boo bar baz</a></p>';
     my $actual_output = $converter.format($input);
 
     is( $actual_output, $expected_output, 'named (long name) external link' );
+}
+
+{
+    my $input = 'An example of a [[mailto:forihrd@gmail.com ihrd]]';
+    my $expected_output
+        = '<p>An example of a <a href="mailto:forihrd@gmail.com">ihrd</a></p>';
+    my $actual_output = $converter.format($input);
+
+    is( $actual_output, $expected_output, 'mailto' );
 }
 
 sub  make_link($page, $title?) {

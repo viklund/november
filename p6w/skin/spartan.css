@@ -82,6 +82,7 @@ a.nonexistent {
     line-height:1.9em;
     width: 200px;
     padding:20px;
+    background:#ccc;
 }
 
 .pagetags {
