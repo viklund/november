@@ -191,7 +191,6 @@ class November does Session {
     }
 
     method read_users {
-        # RAKUDO: use :e
         return {} unless $.userfile_path ~~ :e;
         return eval( slurp( $.userfile_path ) );
     }
