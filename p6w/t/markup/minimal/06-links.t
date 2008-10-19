@@ -71,9 +71,9 @@ my $converter = Text__Markup__Wiki__Minimal.new( link_maker => &make_link);
 }
 
 {
-    my $input = 'An example of a [[http://link.org/foo-12.pod foo-pod]]';
+    my $input = 'An example of a [[http://link.org/foo-12_0.pod foo-pod 12]]';
     my $expected_output
-        = '<p>An example of a <a href="http://link.org/foo-12.pod">foo-pod</a></p>';
+        = '<p>An example of a <a href="http://link.org/foo-12_0.pod">foo-pod 12</a></p>';
     my $actual_output = $converter.format($input);
 
     is( $actual_output, $expected_output, 'named external link with digets and dot' );
