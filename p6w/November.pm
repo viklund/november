@@ -100,11 +100,10 @@ class November does Session {
         my $template = HTML__Template.new(
             filename => $.template_path ~ 'view.tmpl');
 
-        $template.param('TITLE'     => $page);
-        $template.param('CONTENT'   => Text__Markup__Wiki__Minimal.new.format(
-                                           $.storage.read_page($page),
-                                           { self.make_link($^page) }
-                                       ));
+        $template.param('TITLE' => $page);
+
+        my $minimal = Text__Markup__Wiki__Minimal.new( link_maker => { self.make_link($^p, $^t) } );
+        $template.param('CONTENT' => $minimal.format($.storage.read_page($page)) );
 
         # TODO: we need plugin system (see topics in mail-list)
         my $t = Tags.new();
@@ -288,6 +287,7 @@ class November does Session {
     }
 
     method make_link($page, $title?) {
+        say "Yay";
         if $title {
             if $page ~~ m/':'/ {
                 return "<a href=\"$page\">$title</a>";

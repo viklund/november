@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 7;
+plan 8;
 
 use Text__Markup__Wiki__Minimal;
 
@@ -44,6 +44,14 @@ my $converter = Text__Markup__Wiki__Minimal.new( link_maker => &make_link);
     is( $actual_output, $expected_output, 'malformed link II' );
 }
 
+{
+    my $input = 'An example of a [[My_Page]]';
+    my $expected_output
+        = '<p>An example of a <a href="?action=view&page=My_Page">My_Page</a></p>';
+    my $actual_output = $converter.format($input);
+
+    is( $actual_output, $expected_output, 'My_Page' );
+}
 {
     my $input = 'An example of a [[link boo]]';
     my $expected_output
@@ -89,7 +97,7 @@ sub  make_link($page, $title?) {
 }
 
 sub wiki_page_exists ($page) {
-    if $page ~~ 'link' | 'foo' {
+    if $page ~~ 'link'|'foo'|'My_Page' {
         return True;
     } 
 
