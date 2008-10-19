@@ -287,7 +287,6 @@ class November does Session {
     }
 
     method make_link($page, $title?) {
-        say "Yay";
         if $title {
             if $page ~~ m/':'/ {
                 return "<a href=\"$page\">$title</a>";
