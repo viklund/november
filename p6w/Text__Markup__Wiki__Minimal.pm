@@ -58,14 +58,11 @@ class Text__Markup__Wiki__Minimal {
                         elsif $_<wikimark> {
                             if $.link_maker {
                                 # RAKUDO: second arg transform to '1' by some dark magic 
-                                # $result ~= $.link_maker( $_<wikimark><link>, $_<wikimark><link_title> );
+                                # $result ~= $.link_maker( ~$_<wikimark><link>, ~$_<wikimark><link_title> );
                                 # workaround:
                                 my $title = $_<wikimark><link_title>;
   
-                                # First time I just put that in call, but when I do that I have Match 
-                                # in the make_link, and ~~ ':' do not work on it.
-                                my $page = $_<wikimark><link>;
-                                $result ~= $.link_maker( $page, $title );
+                                $result ~= $.link_maker( ~$_<wikimark><link>, $title );
                             }
                             else {
                                 $result ~= $_<wikimark>;
