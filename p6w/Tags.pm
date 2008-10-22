@@ -89,7 +89,6 @@ class Tags {
 
     method read_page_tags($page) {
         my $file = $.page_tags_path ~ $page;
-        # RAKUDO: use :e
         return '' unless $file ~~ :e;
         return slurp($file);
     }
@@ -103,7 +102,6 @@ class Tags {
    
     method read_tags_count {
         my $file = $.tags_count_path;
-        # RAKUDO: use :e
         return {} unless $file ~~ :e;
         return eval( slurp($file) );
     }
@@ -117,7 +115,6 @@ class Tags {
 
     method read_tags_index {  
         my $file = $.tags_index_path;
-        # RAKUDO: use :e
         return {} unless $file ~~ :e;
         return eval( slurp($file) );
     }
