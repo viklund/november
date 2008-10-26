@@ -6,6 +6,7 @@ class November__Storage__File is November__Storage {
     my $.content_path        = 'data/articles/';
     my $.modifications_path  = 'data/modifications/';
     my $.recent_changes_path = 'data/recent-changes';
+    my $.index_path          = 'data/index';
 
     method wiki_page_exists($page) {
         return ($.content_path ~ $page) ~~ :e;
@@ -50,6 +51,18 @@ class November__Storage__File is November__Storage {
         my $fh = open( $file, :w );
         $fh.say( $data );
         $fh.close();
+    }
+
+    method add_to_index ($page) {
+        my $index = self.read_index;
+        $index.push($page);
+        my $fh = open($.index_path, :w);
+        $fh.say($index.perl);
+        $fh.close;
+    }
+
+    method read_index {
+        return eval( slurp($.index_path) );
     }
 }
 
