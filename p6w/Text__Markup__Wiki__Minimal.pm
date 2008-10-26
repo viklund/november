@@ -15,7 +15,7 @@ grammar Text__Markup__Wiki__Minimal__Syntax {
 
     token whitespace { ' ' | \n };
 
-    token wikimark { '[[' <link> [\s+ <link_title>]? ']]' };
+    token wikimark { '[[' \s?  <link> [\s+ <link_title>]? \s? ']]' };
     
     regex link { <[:/._@\-0..9]+alpha>+ };
     regex link_title { <-[\]]>+ };
