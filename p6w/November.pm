@@ -143,10 +143,10 @@ class November does Session {
         # POST data. The difference is the presence of the 'articletext'
         # parameter -- if there is one, the action is considered a save.
         if $.cgi.param<articletext> || $.cgi.param<tags> {
-            my $new_text = $.cgi.param<articletext>;
-            my $tags = $.cgi.param<tags>;
+            my $new_text   = $.cgi.param<articletext>;
+            my $tags       = $.cgi.param<tags>;
             my $session_id = $.cgi.cookie<session_id>;
-            my $author = $sessions{$session_id}<user_name>;
+            my $author     = $sessions{$session_id}<user_name>;
             $.storage.save_page($page, $new_text, $author);
 
             # TODO: we need plugin system (see topics in mail-list)
