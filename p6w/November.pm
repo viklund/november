@@ -83,6 +83,7 @@ class November does Session {
             when 'log_in'         { self.log_in();              return; }
             when 'log_out'        { self.log_out();             return; }
             when 'recent_changes' { self.list_recent_changes(); return; }
+            when 'all_pages'      { self.list_all_pages;        return; }
         }
 
         self.not_found();
@@ -326,6 +327,49 @@ class November does Session {
         );
 
         return;
+    }
+
+    method list_all_pages {
+        my $template = HTML__Template.new(
+                filename => $.template_path ~ 'list_all_pages.tmpl');
+
+        my $t = Tags.new();
+        $template.param('TAGS' => $t.cloud_tags() );
+
+        my $index;
+
+        my $tag = $.cgi.param<tag>;
+        if $tag {
+            # TODO: we need plugin system (see topics in mail-list)
+            my $tags_index = $t.read_tags_index;
+            my $h = $tags_index{$tag};
+            $index = $h.keys;
+
+            $template.param('TAG' => $.cgi.param<tag> );
+        } 
+        else {
+            $index = $.storage.read_index;
+        }
+
+
+        # HTML::Template eat only Arrey of Hashes and Hash keys should 
+        # be in low case. HTML::Template in new-html-template brunch 
+        # will be much clever.
+
+        # RAKUDO: @($arrayref) not implemented yet, so:
+        # my @list = map { {PAGE => $_} }, @($index); 
+        # do not work. Workaround:
+        my @list;
+        loop ( my $i = 0; $i < $index.elems; $i++ ) {
+            @list.push( { page => $index[$i] } );
+        }
+
+        $template.param('LIST'   => @list);
+        $template.param('LOGGED_IN' => self.logged_in());
+
+        $.cgi.send_response(
+            $template.output()
+        );
     }
 }
 

@@ -45,7 +45,8 @@ class November__Storage__File is November__Storage {
 
     method write_modification ( $modification_id, $modification ) {
         my $data = $modification.perl;
-        r_remove($data);
+        # WTF?
+        # r_remove($data);
 
         my $file =  $.modifications_path ~ $modification_id;
         my $fh = open( $file, :w );
