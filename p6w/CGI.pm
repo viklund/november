@@ -86,7 +86,7 @@ class CGI {
             $string .= subst('+', ' ');
         }
         # RAKUDO: This could also be rewritten as a single .subst :g call.
-        while $string ~~ /\%(..)/ {
+        while $string ~~ /\%(<[ABCDEF0..9]>**2)/ {
             my $match = $0;
             my $character = chr(:16($match));
             # RAKUDO: DOTTY

@@ -81,7 +81,7 @@ a.nonexistent {
     clear:both;
     line-height:1.9em;
     width: 200px;
-    padding:20px;
+    padding: 0 0 30px 30px;
     background:#ccc;
 }
 

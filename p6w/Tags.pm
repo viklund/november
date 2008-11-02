@@ -1,7 +1,5 @@
 use v6;
 
-use Impatience;
-
 class Tags {
     method page_tags($page) {};
     method cloud_tags() {};
@@ -91,8 +89,7 @@ class Tags {
 
     method read_page_tags($page) {
         my $file = $.page_tags_path ~ $page;
-        # RAKUDO: use :e
-        return '' unless file_exists( $file );
+        return '' unless $file ~~ :e;
         return slurp($file);
     }
 
@@ -105,8 +102,7 @@ class Tags {
    
     method read_tags_count {
         my $file = $.tags_count_path;
-        # RAKUDO: use :e
-        return {} unless file_exists($file);
+        return {} unless $file ~~ :e;
         return eval( slurp($file) );
     }
 
@@ -119,8 +115,7 @@ class Tags {
 
     method read_tags_index {  
         my $file = $.tags_index_path;
-        # RAKUDO: use :e
-        return {} unless file_exists($file);
+        return {} unless $file ~~ :e;
         return eval( slurp($file) );
     }
 
@@ -165,7 +160,7 @@ class Tags {
                 ~ self.tag_count_normalize(self.get_tag_count($_), 
                                       $min, 
                                       $max ) 
-                ~ '" href="?action=toc&tag=' ~ $_ ~'">' 
+                ~ '" href="?action=all_pages&tag=' ~ $_ ~'">' 
                 ~ $_ ~ '</a>'}, @page_tags;
 
             $page_tags = @page_tags.join(', ');
@@ -186,7 +181,7 @@ class Tags {
                 if $tags{$tag} > 0 {
                     $tags_str ~= '<a class="t' 
                         ~ self.tag_count_normalize( $tags{$tag}, $min, $max ) 
-                        ~ '" href="?action=toc&tag=' ~ $tag ~ '">' 
+                        ~ '" href="?action=all_pages&tag=' ~ $tag ~ '">' 
                         ~ $tag ~ '</a> ';
                 }
             }

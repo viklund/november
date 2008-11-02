@@ -2,7 +2,6 @@ use v6;
 
 use CGI;
 use Tags;
-use Impatience;
 use HTML__Template;            # RAKUDO: :: in module names doesn't fully work
 use Text__Markup__Wiki__MediaWiki;
 use November__Storage__File;  
@@ -33,7 +32,7 @@ role Session {
     }
 
     method read_sessions {
-        return {} unless file_exists( $.sessionfile_path );
+        return {} unless $.sessionfile_path ~~ :e;
         my $string = slurp( $.sessionfile_path );
         my $stuff = eval( $string );
         return $stuff;
@@ -84,6 +83,7 @@ class November does Session {
             when 'log_in'         { self.log_in();              return; }
             when 'log_out'        { self.log_out();             return; }
             when 'recent_changes' { self.list_recent_changes(); return; }
+            when 'all_pages'      { self.list_all_pages;        return; }
         }
 
         self.not_found();
@@ -148,10 +148,10 @@ class November does Session {
         # POST data. The difference is the presence of the 'articletext'
         # parameter -- if there is one, the action is considered a save.
         if $.cgi.param<articletext> || $.cgi.param<tags> {
-            my $new_text = $.cgi.param<articletext>;
-            my $tags = $.cgi.param<tags>;
+            my $new_text   = $.cgi.param<articletext>;
+            my $tags       = $.cgi.param<tags>;
             my $session_id = $.cgi.cookie<session_id>;
-            my $author = $sessions{$session_id}<user_name>;
+            my $author     = $sessions{$session_id}<user_name>;
             $.storage.save_page($page, $new_text, $author);
 
             # TODO: we need plugin system (see topics in mail-list)
@@ -195,8 +195,7 @@ class November does Session {
     }
 
     method read_users {
-        # RAKUDO: use :e
-        return {} unless file_exists( $.userfile_path );
+        return {} unless $.userfile_path ~~ :e;
         return eval( slurp( $.userfile_path ) );
     }
 
@@ -332,6 +331,46 @@ class November does Session {
         );
 
         return;
+    }
+
+    method list_all_pages {
+        my $template = HTML__Template.new(
+                filename => $.template_path ~ 'list_all_pages.tmpl');
+
+        my $t = Tags.new();
+        $template.param('TAGS' => $t.cloud_tags() );
+
+        my $index;
+
+        my $tag = $.cgi.param<tag>;
+        if $tag {
+            # TODO: we need plugin system (see topics in mail-list)
+            my $tags_index = $t.read_tags_index;
+            my $h = $tags_index{$tag};
+            $index = $h.keys;
+
+            $template.param('TAG' => $.cgi.param<tag> );
+        } 
+        else {
+            $index = $.storage.read_index;
+        }
+
+
+        # HTML::Template eat only Arrey of Hashes and Hash keys should 
+        # be in low case. HTML::Template in new-html-template brunch 
+        # will be much clever.
+
+        # RAKUDO: @($arrayref) not implemented yet, so:
+        # my @list = map { { page => $_ } }, @($index); 
+        # do not work. Workaround:
+        my @list = map { { page => $_ } }, $index.values; 
+
+        $template.param('LIST'   => @list);
+        $template.param('LOGGED_IN' => self.logged_in());
+
+        $.cgi.send_response(
+            $template.output()
+        );
     }
 }
 
