@@ -28,10 +28,17 @@ class HTML__Template {
             my $directive = $0;
             my $name = $1;
 
-            # `$s ne $a & $b` means `$s ne $a || $s ne $b`,
-            # which is confusing, so we'll write it like this instead:
+            # RAKUDO: The below method with junctions stopped working somewhere
+            # between r31963 and r32280.
             die "Unrecognized directive: TMPL_$directive"
-              if !($directive eq 'VAR' | 'LOOP' | 'IF');
+              if $directive ne 'VAR'
+                 && $directive ne "LOOP"
+                 && $directive ne "IF";
+
+#            # `$s ne $a & $b` means `$s ne $a || $s ne $b`,
+#            # which is confusing, so we'll write it like this instead:
+#            die "Unrecognized directive: TMPL_$directive"
+#              if !($directive eq 'VAR' | 'LOOP' | 'IF');
 
             my $value = %!params{$name};
             if !defined($value) && $directive ne 'IF' {
