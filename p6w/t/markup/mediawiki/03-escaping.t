@@ -3,7 +3,7 @@ use v6;
 use Test;
 plan 4;
 
-use Text::Markup::Wiki::MediaWiki;
+use Text__Markup__Wiki__MediaWiki;
 
 my %h =
     '<'  => 'lt',
@@ -11,7 +11,7 @@ my %h =
     '&'  => 'amp',
     '\'' => '#039';
 
-my $converter = Text::Markup::Wiki::MediaWiki.new;
+my $converter = Text__Markup__Wiki__MediaWiki.new;
 
 for %h.kv -> $input, $abbr {
     my $expected_escape = '&' ~ $abbr ~ ';';
