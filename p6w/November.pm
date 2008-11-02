@@ -357,12 +357,9 @@ class November does Session {
         # will be much clever.
 
         # RAKUDO: @($arrayref) not implemented yet, so:
-        # my @list = map { {PAGE => $_} }, @($index); 
+        # my @list = map { { page => $_ } }, @($index); 
         # do not work. Workaround:
-        my @list;
-        loop ( my $i = 0; $i < $index.elems; $i++ ) {
-            @list.push( { page => $index[$i] } );
-        }
+        my @list = map { { page => $_ } }, $index.values; 
 
         $template.param('LIST'   => @list);
         $template.param('LOGGED_IN' => self.logged_in());
