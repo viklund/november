@@ -136,13 +136,10 @@ class Tags {
         return $counts{$tag};
     }
 
-    method update_tags ($page, $tags) {
-
-        my $old_tags = self.read_page_tags($page);
-
-        self.remove_tags($page, $old_tags);
-        self.add_tags($page, $tags);
-        self.write_page_tags($page, $tags);
+    method update_tags ($_: $page, $tags) {
+        .remove_tags( $page, .read_page_tags($page) );
+        .add_tags($page, $tags);
+        .write_page_tags($page, $tags);
     }
 
     method page_tags ( $page ) {
