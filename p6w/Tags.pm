@@ -1,8 +1,8 @@
 use v6;
 
 class Tags {
-    method page_tags($page) {};
-    method cloud_tags() {};
+    # RAKUDO: default value do not implement with has keyword
+    # has $.page_tags_path is rw = 'data/page_tags/'; 
     my $.page_tags_path      = 'data/page_tags/';
     my $.tags_count_path     = 'data/tags_count';
     my $.tags_index_path     = 'data/tags_index';
@@ -134,14 +134,14 @@ class Tags {
             return 1;
         }
         return $counts{$tag};
-            
     }
 
-    method save_tags ($page, $tags) {
-        my $old_tags = self.read_page_tags($page); 
+    method update_tags ($page, $tags) {
+
+        my $old_tags = self.read_page_tags($page);
+
         self.remove_tags($page, $old_tags);
         self.add_tags($page, $tags);
-
         self.write_page_tags($page, $tags);
     }
 
@@ -187,15 +187,6 @@ class Tags {
             }
         }
         return $tags_str;
-    }
-
-    method update_tags ($page, $tags) {
-
-        my $old_tags = self.read_page_tags($page);
-
-        self.remove_tags($page, $old_tags);
-        self.add_tags($page, $tags);
-        self.write_page_tags($page, $tags);
     }
 }
 
