@@ -1,6 +1,6 @@
 use v6;
 
-sub r_remove( $str is rw ) {
+sub r_remove( $str is rw ) is export {
     # RAKUDO: :g not implemented yet :( 
     while $str ~~ /\\r/ {
         $str = $str.subst( /\\r/, '' );

@@ -1,5 +1,6 @@
 use v6;
 use November__Storage;  # RAKUDO: :: in module names doesn't fully work
+use Impatience;
 
 # RAKUDO: :: in class names doesn't fully work
 class November__Storage__File is November__Storage {
@@ -45,8 +46,7 @@ class November__Storage__File is November__Storage {
 
     method write_modification ( $modification_id, $modification ) {
         my $data = $modification.perl;
-        # WTF?
-        # r_remove($data);
+        r_remove($data);
 
         my $file =  $.modifications_path ~ $modification_id;
         my $fh = open( $file, :w );
