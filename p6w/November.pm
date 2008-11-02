@@ -334,17 +334,20 @@ class November does Session {
                 filename => $.template_path ~ 'list_all_pages.tmpl');
 
         my $t = Tags.new();
-        $template.param('TAGS' => $t.cloud_tags() );
+        $template.param('TAGS' => $t.cloud_tags() ) if $t;
 
         my $index;
 
         my $tag = $.cgi.param<tag>;
-        if $tag {
+        if $tag and $t {
             # TODO: we need plugin system (see topics in mail-list)
             my $tags_index = $t.read_tags_index;
             my $h = $tags_index{$tag};
-            $index = $h.keys;
 
+            # Just $h.keys when we found how to delete some key from the 
+            # Hash and implement that in Tags.pm 
+            $index = grep { $h{$_} > 0 }, $h.keys;
+    
             $template.param('TAG' => $.cgi.param<tag> );
         } 
         else {
