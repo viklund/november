@@ -5,21 +5,30 @@ plan 2;
 
 use Tags;
 
-my @counts_to_test = (
-    [ { one => 2, foo => 5, bar => 6, her => 14 }, 
-      { one => 0, foo => 4, bar => 5, her => 10} ],
-    [ { one => 5, foo => 5, bar => 2, her => 1 }, 
-      { one => 10, foo => 10, bar => 4, her => 0} ],
-);
+my @counts_to_test = 
+        [ 2, 5, 6, 14 ], 
+        [ 0, 4, 5, 10 ],
 
-for @counts_to_test -> $each {
-    my $tags = $each[0];
-    my $expected = $each[1];
+        [ 5,  5,  2, 1 ], 
+        [ 10, 10, 4, 0 ];
 
-    my %out;
-    for $tags.kv -> $tag, $count {
-        %out{$tag} = Tags.new.norm($count, $tags.values.min, $tags.values.max);
-    } 
+my $t = Tags.new;
 
-    is_deeply( %out , $expected, 'Normalize: ' ~ $tags.perl );
+for @counts_to_test -> $in, $expected {
+
+    # RAKUDO: list assigment do not implemented
+    # my $min, $max = $in.min, $in.max;
+    my $min = $in.min;
+    my $max = $in.max;
+    
+    # debugging
+    # say $in.perl ~ " min:$min, max:$max";
+
+    # RAKUDO: min and max there save its values, and I cant reasign it :( 
+    # So, second map work with wrong min and max
+    my $out = map { $t.norm($_, $min, $max) }, $in.values;
+
+    is_deeply( $out, $expected, 'Normalize: ' ~ $in.perl );
 }
+
+
