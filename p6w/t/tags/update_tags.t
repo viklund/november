@@ -5,12 +5,12 @@ plan 4;
 
 use Tags;
 
-my $t = Tags.new;
+my $t = Tags.new does Testing;
 $t.page_tags_path  = 't/tags/data/page_tags/';
 $t.tags_count_path = 't/tags/data/tags_count';
 $t.tags_index_path = 't/tags/data/tags_index';
 
-clear($t);
+$t.clear;
 
 $t.update_tags('Test_Page', 'Foo, Bar');
 
@@ -22,11 +22,13 @@ $t.update_tags('Test_Page', 'Bar, Her');
 is( $t.read_tags_count.perl, '{"foo" => 0, "bar" => 1, "her" => 1}', 'Tags counting after add and remove');
 is( $t.read_tags_index.perl, '{"foo" => [], "bar" => ["Test_Page"], "her" => ["Test_Page"]}', 'Tags indexing after add and remove' );
 
-clear($t);
+$t.clear;
 
-sub clear (Tags $t) {
-    my $c = {};
-    $t.write_tags_count( $c );
-    $t.write_tags_index( $c );
-    $t.write_page_tags('Test_Page', '');
+role Testing {
+    method clear ($_:) {
+        my $c = {};
+        .write_tags_count($c);
+        .write_tags_index($c);
+        .write_page_tags('Test_Page', '');
+    }
 }
