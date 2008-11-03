@@ -7,6 +7,12 @@ class Tags {
     my $.tags_count_path     = 'data/tags_count';
     my $.tags_index_path     = 'data/tags_index';
 
+    method update_tags ($_: $page, $tags) {
+        .remove_tags( $page, .read_page_tags($page) );
+        .add_tags($page, $tags);
+        .write_page_tags($page, $tags);
+    }
+
     method tags_parse ($tags) {
         my @tags = $tags.lc.split(/ \s* ( ',' | \n ) \s* /);
         # split in p6 don`t trim
@@ -41,13 +47,12 @@ class Tags {
         my $index = self.read_tags_index;
 
         for @tags -> $t {
-            # I think it`s must be Hash of Arrays, but right now look like 
-            # with Hash of Hashes it`s simply to realize.
             unless $index{$t} {
-                $index{$t} = {};
+                $index{$t} = [];
             }
-            unless $index{$t}{$page} {
-                $index{$t}{$page} = 1;
+            unless any($index{$t}) eq $page {
+                $index{$t}.push($page);
+                $index{$t} = grep { $_ ne '' }, $index{$t}.values;
             }
 
         }
@@ -78,10 +83,8 @@ class Tags {
         my $index = self.read_tags_index;
 
         for @tags -> $t {
-            # I think it`s must be Hash of Arrays, but right now look like with
-            # Hash of Hashes it`s simply to realize.
-            if $index{$t} && $index{$t}{$page} {
-                    $index{$t}{$page} = 0;
+            if $index{$t} && any($index{$t}) eq $page {
+                    $index{$t} = grep { $_ ne $page }, $index{$t}.values;
             }
         }
         self.write_tags_index($index);
@@ -134,12 +137,6 @@ class Tags {
             return 1;
         }
         return $counts{$tag};
-    }
-
-    method update_tags ($_: $page, $tags) {
-        .remove_tags( $page, .read_page_tags($page) );
-        .add_tags($page, $tags);
-        .write_page_tags($page, $tags);
     }
 
     method page_tags ( $page ) {

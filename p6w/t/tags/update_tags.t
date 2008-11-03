@@ -14,18 +14,13 @@ clear($t);
 
 $t.update_tags('Test_Page', 'Foo, Bar');
 
-is( $t.read_tags_count.perl, '{"foo" => 1, "bar" => 1}', 'Tags count');
-is( $t.read_tags_index.perl, '{"foo" => {"Test_Page" => 1}, "bar" => {"Test_Page" => 1}}', 'Tags index' );
-
-# I think in future index may look like:
-#is( $t.read_tags_index.perl, '{"foo" => ["Test_Page"], "bar" => ["Test_Page"]}', 'Tags index' );
+is( $t.read_tags_count.perl, '{"foo" => 1, "bar" => 1}', 'Simple tags counting');
+is( $t.read_tags_index.perl, '{"foo" => ["Test_Page"], "bar" => ["Test_Page"]}', 'Simple tags indexing' );
 
 $t.update_tags('Test_Page', 'Bar, Her');
 
-is( $t.read_tags_count.perl, '{"foo" => 0, "bar" => 1, "her" => 1}', 'Tags count');
-
-# TODO: Ooops! Now there "bar" => {"Test_Page" => 0} but it`s bugging all_pages list
-is( $t.read_tags_index.perl, '{"bar" => {"Test_Page" => 1}, "her" => {"Test_Page" => 1}}', 'Tags index' );
+is( $t.read_tags_count.perl, '{"foo" => 0, "bar" => 1, "her" => 1}', 'Tags counting after add and remove');
+is( $t.read_tags_index.perl, '{"foo" => [], "bar" => ["Test_Page"], "her" => ["Test_Page"]}', 'Tags indexing after add and remove' );
 
 clear($t);
 
