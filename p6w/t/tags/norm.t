@@ -18,7 +18,7 @@ for @counts_to_test -> $each {
 
     my %out;
     for $tags.kv -> $tag, $count {
-        %out{$tag} = Tags.new.tag_count_normalize($count, $tags.values.min, $tags.values.max);
+        %out{$tag} = Tags.new.norm($count, $tags.values.min, $tags.values.max);
     } 
 
     is_deeply( %out , $expected, 'Normalize: ' ~ $tags.perl );
