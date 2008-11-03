@@ -57,12 +57,14 @@ class Tags {
 
         my @tags = self.tags_parse($tags);
         for @tags -> $t {
-            # RAKUDO: Decrement not implemented in class 'Undef'
             if $count{$t} && $count{$t} > 0 {
                 $count{$t}--;
             } 
-            else {
-                $count{$t} = 0;
+            
+            if $count{$t} == 0 {
+                # RAKUDO: :delete on Hash not implemented yet
+                # $count{$t} :delete;
+                $count.delete($t); 
             }
         }
 
@@ -126,12 +128,13 @@ class Tags {
 
     method norm_counts (@tags?) {
         my $counts = self.read_tags_count;
+
         my $min = $counts.values.min; 
         my $max = $counts.values.max;
 
         my $norm_counts = {};
         for ( @tags or $counts.keys ) { 
-            $norm_counts{$_} = self.norm( $counts{$_}, $min, $max ) if $counts{$_} > 0; 
+            $norm_counts{$_} = self.norm( $counts{$_}, $min, $max ); 
         }
 
         return $norm_counts;
@@ -140,10 +143,11 @@ class Tags {
     
     # method norm (Int $count, Int $min, Int $max) {
     method norm ($count, $min, $max) {
-        # debuging
+        # debugging
+        # say "norm IN c:$count, min:$min, max:$max";
         # die "c:" ~$count.WHAT~", min:"~$min.WHAT~", max:"~$max.WHAT;
         my $step = ($count - $min) / (($max - $min) || 1);
-        ceiling( ( log($step + 1 ) * 10 ) / log 2 ); 
+        return ceiling( ( log($step + 1 ) * 10 ) / log 2 ); 
     }
     
     method page_tags (Str $page) {

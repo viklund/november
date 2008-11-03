@@ -19,7 +19,7 @@ is( $t.read_tags_index.perl, '{"foo" => ["Test_Page"], "bar" => ["Test_Page"]}',
 
 $t.update_tags('Test_Page', 'Bar, Her');
 
-is( $t.read_tags_count.perl, '{"foo" => 0, "bar" => 1, "her" => 1}', 'Tags counting after add and remove');
+is( $t.read_tags_count.perl, '{"bar" => 1, "her" => 1}', 'Tags counting after add and remove');
 is( $t.read_tags_index.perl, '{"foo" => [], "bar" => ["Test_Page"], "her" => ["Test_Page"]}', 'Tags indexing after add and remove' );
 
 $t.clear;
