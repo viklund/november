@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 2;
+plan 3;
 
 use Tags;
 my $t = Tags.new does Testing;
@@ -13,10 +13,14 @@ is( $t.norm_counts.perl, '{}', 'With empty tags_count norm_counts produce empty 
 my $in = { foo => 5, bar => 5, baz => 2, her => 1 };
 $t.write_tags_count( $in );
 
-is( $t.norm_counts.perl, '{"foo" => 10, "bar" => 10, "baz" => 4, "her" => 0}', 'Normalize: ' ~ $in.perl );
+is( $t.norm_counts.perl, '{"foo" => 10, "bar" => 10, "baz" => 4, "her" => 0}', 'Normalize all from: ' ~ $in.perl );
+
+my @tags = <foo baz>;
+is( $t.norm_counts(@tags).perl, '{"foo" => 10, "baz" => 4}', 'Normalize foo and baz from: ' ~ $in.perl );
 
 
 $t.clear;
+
 role Testing {
     method clear {
         my $c = {};
