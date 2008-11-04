@@ -5,6 +5,8 @@ class CGI {
     has %.cookie is rw;
     has @.keywords is rw;
 
+    has $!crlf;
+
     # RAKUDO: BUILD method not supported
     method init() {
         my %params;
@@ -22,6 +24,7 @@ class CGI {
         $.param = %params;
 
         self.eat_cookie( %*ENV<HTTP_COOKIE> );
+        $!crlf = "\x[0D]\x[0A]";
     }
 
     # For debugging
@@ -33,21 +36,37 @@ class CGI {
         $debug.close;
     }
 
+# From `perldoc perlop`:
+#
+#      All systems use the virtual "\n" to represent a line terminator, called
+#      a "newline".  There is no such thing as an unvarying, physical newline
+#      character.  It is only an illusion that the operating system, device
+#      drivers, C libraries, and Perl all conspire to preserve.  Not all
+#      systems read "\r" as ASCII CR and "\n" as ASCII LF.  For example, on a
+#      Mac, these are reversed, and on systems without line terminator,
+#      printing "\n" may emit no actual data.  In general, use "\n" when you
+#      mean a "newline" for your system, but use the literal ASCII when you
+#      need an exact character.  For example, most networking protocols expect
+#      and prefer a CR+LF ("\015\012" or "\cM\cJ") for line terminators, and
+#      although they often accept just "\012", they seldom tolerate just
+#      "\015".  If you get in the habit of using "\n" for networking, you may
+#      be burned some day.
+
     method send_response($contents, %opts?) {
         # The header
-        print "Content-Type: text/html\r\n";
+        print "Content-Type: text/html$!crlf";
         if %opts && %opts<cookie> {
-            print 'Set-Cookie: ' ~ %opts<cookie> ~ "; path=/;\r\n";
+            print "Set-Cookie: {%opts<cookie>}; path=/;$!crlf";
         }
-        print "\r\n";
+        print "$!crlf";
         print $contents;
     }
 
     method redirect($uri, %opts?) {
         my $status = '302 Moved' || %opts<status>;
-        print "Status: $status\r\n";
+        print "Status: $status$!crlf";
         print "Location: $uri";
-        print "\r\n\r\n";
+        print "$!crlf$!crlf";
     }
 
     method parse_params(Hash %params is rw, $string) {
@@ -86,7 +105,7 @@ class CGI {
             $string .= subst('+', ' ');
         }
         # RAKUDO: This could also be rewritten as a single .subst :g call.
-        while $string ~~ /\%(<[ABCDEF0..9]>**2)/ {
+        while $string ~~ /\%(<[0..9A..F]>**2)/ {
             my $match = $0;
             my $character = chr(:16($match));
             # RAKUDO: DOTTY
@@ -113,7 +132,6 @@ class CGI {
             %params{$key} = $value;
         }
     }
-
 }
 
 # vim:ft=perl6
