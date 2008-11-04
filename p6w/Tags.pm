@@ -133,10 +133,11 @@ class Tags {
         my $max = $counts.values.max;
 
         my $norm_counts = {};
-        for ( @tags or $counts.keys ) { 
+        # RAKUDO: stringify Array here
+        #for @tags || $counts.keys {
+         for @tags.?values || $counts.keys {
             $norm_counts{$_} = self.norm( $counts{$_}, $min, $max ); 
         }
-
         return $norm_counts;
     }
 
