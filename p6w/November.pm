@@ -111,10 +111,8 @@ class November does Session {
 
         # TODO: we need plugin system (see topics in mail-list)
         my $t = Tags.new();
-        my $page_tags = $t.page_tags( $page );
-        $template.param('PAGETAGS' => $page_tags);
-        my $cloud_tags = $t.cloud_tags();
-        $template.param('TAGS' => $cloud_tags);
+        $template.param( 'PAGETAGS' => $t.page_tags: $page );
+        $template.param( 'TAGS'     => $t.cloud_tags );
         
         $template.param('LOGGED_IN' => self.logged_in());
 
