@@ -2,19 +2,12 @@ PARROT_DIR=<PARROT_DIR>
 
 SOURCES=HTML__Template.pm CGI.pm Text__Markup__Wiki__Minimal.pm \
         Text/Markup/Wiki/MediaWiki.pm November.pm Test.pm \
-        November__Storage.pm November__Storage__File.pm
+        November__Storage.pm November__Storage__File.pm Tags.pm \
+		Impatience.pm
 
 PIRS=$(SOURCES:.pm=.pir)
 
-all:
-	@echo "================================================================================"
-	@echo "Dear builder:" 
-	@echo "Right now Rakudo doesn't work properly with modules in PIR format [perl #59104]."
-	@echo "Until that is fixed, you likely don't want to run make.  If you do, however,"
-	@echo "you can remove the 'exit 1' line after this message in the Makefile."
-	@echo "================================================================================"
-	@exit 1
-	$(PIRS)
+all: $(PIRS)
 
 %.pir: %.pm
 	$(PARROT_DIR)/parrot $(PARROT_DIR)/languages/perl6/perl6.pbc --target=pir $<  > $@
@@ -22,3 +15,8 @@ all:
 clean:
 	rm $(PIRS)
 
+tests:
+	@for i in t/*.t; do echo $$i; perl6 $$i; done;
+	@for i in t/tags/*.t; do echo $$i; perl6 $$i; done;
+	@for i in t/markup/minimal/*.t; do echo $$i; perl6 $$i; done;
+	@for i in t/markup/mediawiki/*.t; do echo $$i; perl6 $$i; done;
