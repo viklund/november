@@ -1,7 +1,6 @@
-#!perl6
+use v6;
 
 use Test;
-
 plan 22;
 
 use CGI;
@@ -87,4 +86,6 @@ for @cookies -> $in, $expected {
     $cgi.eat_cookie($in);
     is_deeply($cgi.cookie, $expected, 'Parse cookies: ' ~ $in);
 }
+
+# vim:ft=perl6
 

@@ -10,3 +10,5 @@ try {
 }
 
 ok( $used_successfully, "use Text::Markup::Wiki::MediaWiki" );
+
+# vim:ft=perl6

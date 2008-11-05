@@ -31,4 +31,4 @@ for @counts_to_test -> $in, $expected {
     is_deeply( $out, $expected, 'Normalize: ' ~ $in.perl );
 }
 
-
+# vim:ft=perl6

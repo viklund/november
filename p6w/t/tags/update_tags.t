@@ -32,3 +32,5 @@ role Testing {
         .write_page_tags('Test_Page', '');
     }
 }
+
+# vim:ft=perl6

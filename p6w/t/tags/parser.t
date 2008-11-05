@@ -29,3 +29,5 @@ my $t = Tags.new;
 for @to_parse -> $in, $expected {
     is_deeply( $t.tags_parse($in), $expected, 'Parse tags: ' ~ $in.perl);
 }
+
+# vim:ft=perl6

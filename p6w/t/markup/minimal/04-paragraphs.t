@@ -17,3 +17,5 @@ my $actual_output   = $converter.format($input);
 
 is( $actual_output, $expected_output,
     'paragraphs are turned into separate <p> blocks' );
+
+# vim:ft=perl6
