@@ -1,6 +1,6 @@
 use v6;
 
-class HTML__Template {
+class HTML::Template {
 
     has $.filename;
     has %!params;
