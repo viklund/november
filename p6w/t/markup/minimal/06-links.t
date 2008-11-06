@@ -4,8 +4,6 @@ use Test;
 plan 11;
 
 use Text::Markup::Wiki::Minimal;
-
-
 my $converter = Text::Markup::Wiki::Minimal.new( link_maker => &make_link);
 
 {

@@ -4,7 +4,6 @@ use Test;
 plan 1;
 
 use Text::Markup::Wiki::Minimal;
-
 my $converter = Text::Markup::Wiki::Minimal.new;
 
 my $input = 'normal text';
