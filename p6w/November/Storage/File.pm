@@ -58,7 +58,7 @@ class November::Storage::File is November__Storage {
         # RAKUDO: @ $index not impemented yet :(
         # unless any( @ $index) eq $page {
         unless any($index.values) eq $page {
-            $index.push($page) ;
+            $index.push($page);
             my $fh = open($.index_path, :w);
             $fh.say($index.perl);
             $fh.close;

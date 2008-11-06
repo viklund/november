@@ -8,7 +8,10 @@ class Tags {
     my $.tags_index_path     = 'data/tags_index';
 
     method update_tags ($_: Str $page, Str $tags) {
-        .remove_tags($page, .read_page_tags: $page);
+        my $old_tags = .read_page_tags($page).chomp;
+        return 1 if $tags eq $old_tags;
+
+        .remove_tags($page, $old_tags);
         .add_tags($page, $tags);
         .write_page_tags($page, $tags);
     }
@@ -38,7 +41,7 @@ class Tags {
             unless $index{$t} {
                 $index{$t} = [];
             }
-            unless any($index{$t}) eq $page {
+            unless any($index{$t}.values) eq $page {
                 $index{$t}.push($page);
                 $index{$t} = grep { $_ ne '' }, $index{$t}.values;
             }
@@ -73,7 +76,7 @@ class Tags {
         my $index = self.read_tags_index;
 
         for @tags -> $t {
-            if $index{$t} && any($index{$t}) eq $page {
+            if $index{$t} && any($index{$t}.values) eq $page {
                     $index{$t} = grep { $_ ne $page }, $index{$t}.values;
             }
         }
@@ -157,7 +160,7 @@ class Tags {
         my $tags_str;
         if @page_tags {
             my $norm_counts = self.norm_counts(@page_tags); 
-            @page_tags = map { tag_html($_, $norm_counts) }, @page_tags.uniq;
+            @page_tags = map { tag_html($_, $norm_counts) }, @page_tags;
             $tags_str = @page_tags.join(', ');
         }
         return $tags_str;
