@@ -157,7 +157,7 @@ class Tags {
         my $tags_str;
         if @page_tags {
             my $norm_counts = self.norm_counts(@page_tags); 
-            @page_tags = map { tag_html($_, $norm_counts) }, @page_tags;
+            @page_tags = map { tag_html($_, $norm_counts) }, @page_tags.uniq;
             $tags_str = @page_tags.join(', ');
         }
         return $tags_str;
