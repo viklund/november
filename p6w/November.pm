@@ -2,9 +2,9 @@ use v6;
 
 use CGI;
 use Tags;
-use HTML__Template;            # RAKUDO: :: in module names doesn't fully work
-use Text__Markup__Wiki__Minimal;
-use November__Storage__File;  
+use HTML::Template;
+use Text::Markup::Wiki::Minimal;
+use November::Storage::File;  
 
 sub get_unique_id {
     # hopefully pretty unique ID
@@ -56,7 +56,6 @@ class November does Session {
     has $.template_path;
     has $.userfile_path;
 
-    # RAKUDO: :: in module names doesn't fully work
     has November__Storage $.storage;
     has CGI     $.cgi;
 
@@ -66,7 +65,7 @@ class November does Session {
         $!userfile_path = 'data/users';
 
         # RAKUDO: :: in module names doesn't fully work
-        $!storage = November__Storage__File.new();
+        $!storage = November::Storage::File.new();
         Session::init(self);
     }
 
@@ -97,12 +96,12 @@ class November does Session {
             return;
         }
 
-        my $template = HTML__Template.new(
+        my $template = HTML::Template.new(
             filename => $.template_path ~ 'view.tmpl');
 
         $template.param('TITLE' => $page);
 
-        my $minimal = Text__Markup__Wiki__Minimal.new( link_maker => { self.make_link($^p, $^t) } );
+        my $minimal = Text::Markup::Wiki::Minimal.new( link_maker => { self.make_link($^p, $^t) } );
         $template.param('CONTENT' => $minimal.format($.storage.read_page($page)) );
 
         # TODO: we need plugin system (see topics in mail-list)
@@ -155,7 +154,7 @@ class November does Session {
             return self.view_page();
         }
 
-        my $template = HTML__Template.new(
+        my $template = HTML::Template.new(
             filename => $.template_path ~ 'edit.tmpl');
 
         $template.param('PAGE'      => $page);
@@ -174,7 +173,7 @@ class November does Session {
     }
 
     method not_authorized() {
-        my $template = HTML__Template.new(
+        my $template = HTML::Template.new(
             filename => $.template_path ~ 'action_not_authorized.tmpl');
 
         # TODO: file bug, without "'" it is interpreted as named args and not
@@ -194,7 +193,7 @@ class November does Session {
     }
 
     method not_found() {
-        my $template = HTML__Template.new(
+        my $template = HTML::Template.new(
             filename => $.template_path ~ 'not_found.tmpl');
 
         $template.param('PAGE'      => 'Action Not found');
@@ -223,7 +222,7 @@ class November does Session {
                 my $session_id = self.new_session($user_name);
                 my $session_cookie = "session_id=$session_id";
 
-                my $template = HTML__Template.new(
+                my $template = HTML::Template.new(
                     filename => $.template_path ~ 'login_succeeded.tmpl');
 
                 $.cgi.send_response(
@@ -234,7 +233,7 @@ class November does Session {
                 return;
             }
 
-            my $template = HTML__Template.new(
+            my $template = HTML::Template.new(
                 filename => $.template_path ~ 'login_failed.tmpl');
 
             $.cgi.send_response(
@@ -244,7 +243,7 @@ class November does Session {
             return;
         }
 
-        my $template = HTML__Template.new(
+        my $template = HTML::Template.new(
             filename => $.template_path ~ 'log_in.tmpl');
 
         $.cgi.send_response(
@@ -262,7 +261,7 @@ class November does Session {
 
             my $session_cookie = "session_id=";
 
-            my $template = HTML__Template.new(
+            my $template = HTML::Template.new(
                 filename => $.template_path ~ 'logout_succeeded.tmpl');
 
             $.cgi.send_response(
@@ -273,7 +272,7 @@ class November does Session {
             return;
         }
 
-        my $template = HTML__Template.new(
+        my $template = HTML::Template.new(
             filename => $.template_path ~ 'logout_succeeded.tmpl');
 
         $.cgi.send_response(
@@ -314,7 +313,7 @@ class November does Session {
                 'author' => $modification[2] || 'somebody' };
         }
 
-        my $template = HTML__Template.new(
+        my $template = HTML::Template.new(
                 filename => $.template_path ~ 'recent_changes.tmpl');
 
         $template.param('CHANGES'   => @changes);
@@ -328,7 +327,7 @@ class November does Session {
     }
 
     method list_all_pages {
-        my $template = HTML__Template.new(
+        my $template = HTML::Template.new(
                 filename => $.template_path ~ 'list_all_pages.tmpl');
 
         my $t = Tags.new();

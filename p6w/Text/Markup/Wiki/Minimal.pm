@@ -25,7 +25,7 @@ grammar Text__Markup__Wiki__Minimal__Syntax {
     token malformed { '[' || ']' }
 }
 
-class Text__Markup__Wiki__Minimal {
+class Text::Markup::Wiki::Minimal {
     has $.link_maker is rw;
 
     method format($text ) {

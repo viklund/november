@@ -1,9 +1,8 @@
 use v6;
-use November__Storage;  # RAKUDO: :: in module names doesn't fully work
+use November__Storage;
 use Impatience;
 
-# RAKUDO: :: in class names doesn't fully work
-class November__Storage__File is November__Storage {
+class November::Storage::File is November__Storage {
     my $.content_path        = 'data/articles/';
     my $.modifications_path  = 'data/modifications/';
     my $.recent_changes_path = 'data/recent-changes';
