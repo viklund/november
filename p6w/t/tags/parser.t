@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 8;
+plan 9;
 
 use Tags;
 
@@ -21,6 +21,8 @@ my @to_parse = (
     'Foo',
       ['foo'],
     'foo, BAR',
+      ['foo', 'bar'],
+    'foo, foo, bar, bar, bar',
       ['foo', 'bar'],
 );
 

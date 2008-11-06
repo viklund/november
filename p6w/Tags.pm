@@ -11,6 +11,8 @@ class Tags {
         my $old_tags = .read_page_tags($page).chomp;
         return 1 if $tags eq $old_tags;
 
+        # TODO: what about more intelegent system? 
+        # Should remove and add only nessesary.
         .remove_tags($page, $old_tags);
         .add_tags($page, $tags);
         .write_page_tags($page, $tags);
@@ -92,8 +94,8 @@ class Tags {
     method write_page_tags (Str $page, Str $tags) {
         my $file = $.page_tags_path ~ $page;
         my $fh = open( $file, :w );
-        $fh.say( $tags );
-        $fh.close();
+        $fh.say($tags);
+        $fh.close;
     }
    
     method read_tags_count {
@@ -106,7 +108,7 @@ class Tags {
         my $file = $.tags_count_path;
         my $fh = open( $file, :w );
         $fh.say( $counts.perl );
-        $fh.close();
+        $fh.close;
     }
 
     method read_tags_index {  
@@ -119,13 +121,13 @@ class Tags {
         my $file = $.tags_index_path;
         my $fh = open( $file, :w );
         $fh.say( $index.perl );
-        $fh.close();
+        $fh.close;
     }
 
     method tags_parse (Str $tags) {
         my @tags = $tags.lc.split(/ \s* ( ',' | \n ) \s* /);
         # split in p6 don`t trim
-        @tags = grep { $_ ne "" }, @tags;
+        @tags = grep { $_ ne "" }, @tags.uniq;
         return @tags;
     }
 
@@ -138,16 +140,14 @@ class Tags {
         my $norm_counts = {};
         # RAKUDO: stringify Array here
         #for @tags || $counts.keys {
-         for @tags.?values || $counts.keys {
-            $norm_counts{$_} = self.norm( $counts{$_}, $min, $max ); 
+        for @tags.?values || $counts.keys {
+            $norm_counts{$_} = self.norm( +$counts{$_}, $min, $max ); 
         }
         return $norm_counts;
     }
 
     
-    # method norm (Int $count, Int $min, Int $max) {
-    method norm ($count, $min, $max) {
-        # debugging
+    method norm (Int $count, Int $min, Int $max) {
         # say "norm IN c:$count, min:$min, max:$max";
         # die "c:" ~$count.WHAT~", min:"~$min.WHAT~", max:"~$max.WHAT;
         my $step = ($count - $min) / (($max - $min) || 1);
