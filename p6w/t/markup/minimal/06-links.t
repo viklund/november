@@ -3,10 +3,10 @@ use v6;
 use Test;
 plan 11;
 
-use Text__Markup__Wiki__Minimal;
+use Text/Markup/Wiki/Minimal;
 
 
-my $converter = Text__Markup__Wiki__Minimal.new( link_maker => &make_link);
+my $converter = Text/Markup/Wiki/Minimal.new( link_maker => &make_link);
 
 {
     my $input = 'An example of a [[link]]';
@@ -30,7 +30,7 @@ my $converter = Text__Markup__Wiki__Minimal.new( link_maker => &make_link);
     my $input = 'An example of a [[link]]';
     my $expected_output
         = '<p>An example of a [[link]]</p>';
-    my $converter = Text__Markup__Wiki__Minimal.new;
+    my $converter = Text/Markup/Wiki/Minimal.new;
     my $actual_output = $converter.format($input);
 
     is( $actual_output, $expected_output, 'link conversion works' );

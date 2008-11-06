@@ -3,9 +3,9 @@ use v6;
 use Test;
 plan 1;
 
-use Text__Markup__Wiki__Minimal;
+use Text/Markup/Wiki/Minimal;
 
-my $converter = Text__Markup__Wiki__Minimal.new;
+my $converter = Text/Markup/Wiki/Minimal.new;
 
 my @pars =
   "==heading 1==",
