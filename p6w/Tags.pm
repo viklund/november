@@ -140,7 +140,7 @@ class Tags {
 
     method tags_parse (Str $tags) {
         return () if $tags ~~ m/^ \s* $/;
-        my @tags = $tags.lc.split(/ \s* ( ',' | \n ) \s* /);
+        my @tags = $tags.lc.split(/ \s* ( ',' | \n | '.' ) \s* /);
         grep { $_ ne "" }, @tags.uniq;
     }
 

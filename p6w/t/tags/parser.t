@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 9;
+plan 11;
 
 use Tags;
 
@@ -24,6 +24,10 @@ my @to_parse = (
       ['foo', 'bar'],
     'foo, foo, bar, bar, bar',
       ['foo', 'bar'],
+    'foo, bar.',
+      ['foo', 'bar'],
+    'foo. bar. Perl 6',
+      ['foo', 'bar', 'perl 6'],
 );
 
 my $t = Tags.new;
