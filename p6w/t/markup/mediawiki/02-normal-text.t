@@ -3,9 +3,9 @@ use v6;
 use Test;
 plan 1;
 
-use Text__Markup__Wiki__MediaWiki;
+use Text::Markup::Wiki::MediaWiki;
 
-my $converter = Text__Markup__Wiki__MediaWiki.new;
+my $converter = Text::Markup::Wiki::MediaWiki.new;
 
 my $input = 'normal text';
 my $expected_output = '<p>normal text</p>';

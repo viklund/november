@@ -5,7 +5,7 @@ plan 1;
 
 my $used_successfully = False;
 try {
-  use Text__Markup__Wiki__MediaWiki;
+  use Text::Markup::Wiki::MediaWiki;
   $used_successfully = True;
 }
 

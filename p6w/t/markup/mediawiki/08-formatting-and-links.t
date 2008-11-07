@@ -3,9 +3,9 @@ use v6;
 use Test;
 plan 6;
 
-use Text__Markup__Wiki__MediaWiki;
+use Text::Markup::Wiki::MediaWiki;
 
-my $converter = Text__Markup__Wiki__MediaWiki.new;
+my $converter = Text::Markup::Wiki::MediaWiki.new;
 my $link_maker = { "<a href=\"/?page=$^page\">$^page</a>" }
 
 {
