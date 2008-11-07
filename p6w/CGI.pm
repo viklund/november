@@ -1,16 +1,16 @@
 use v6;
 
 class CGI {
-    has %.param is rw;
-    has %.cookie is rw;
-    has @.keywords is rw;
+    has %.params;
+    has %.request;
+    has %.cookie;
+    has @.keywords;
 
     has $!crlf;
 
     # RAKUDO: BUILD method not supported
     method init() {
-        my %params;
-        self.parse_params(%params, %*ENV<QUERY_STRING>);
+        self.parse_params(%*ENV<QUERY_STRING>);
 
         # It's prudent to handle CONTENT_LENGTH too, but right now that's not
         # a priority. It would make our tests scripts more complicated, with
@@ -19,9 +19,8 @@ class CGI {
         if %*ENV<REQUEST_METHOD> eq 'POST' {
             # Maybe check content_length here and only take that many bytes?
             my $input = $*IN.slurp();
-            self.parse_params(%params, $input);
+            self.parse_params($input);
         }
-        $.param = %params;
 
         self.eat_cookie( %*ENV<HTTP_COOKIE> );
         $!crlf = "\x[0D]\x[0A]";
@@ -69,13 +68,13 @@ class CGI {
         print "$!crlf$!crlf";
     }
 
-    method parse_params(Hash %params is rw, $string) {
+    method parse_params($string) {
         if $string ~~ / '&' | ';' | '=' / {
             my @param_values = $string.split(/ '&' | ';' /);
 
             for @param_values -> $param_value {
                 my @kvs = split('=', $param_value);
-                self.add_param( %params, @kvs[0], unescape(@kvs[1]) );
+                self.add_param( @kvs[0], unescape(@kvs[1]) );
             }
         } 
         else {
@@ -114,23 +113,27 @@ class CGI {
         return $string;
     }
 
-    method add_param ( Hash %params is rw, Str $key, $value ) {
+    method add_param ( Str $key, $value ) {
         # RAKUDO: синтаксис Hash.:exists{key} еще не реализован 
         #        (Hash.:exists{key} not implemented yet)
-        # if %params.:exists{$key} {
+        # if %.params.:exists{$key} {
 
-        if %params.exists($key) {
+        if %.params.exists($key) {
             # RAKUDO: ~~ Scalar
-            if %params{$key} ~~ Str | Int {
-                %params{$key} = [ %params{$key}, $value ];
+            if %.params{$key} ~~ Str | Int {
+                %.params{$key} = [ %.params{$key}, $value ];
             } 
-            elsif %params{$key} ~~ Array {
-                %params{$key}.push( $value );
+            elsif %.params{$key} ~~ Array {
+                %.params{$key}.push( $value );
             } 
         }
         else {
-            %params{$key} = $value;
+            %.params{$key} = $value;
         }
+    }
+
+    method param ($key) {
+       return %.params{$key};
     }
 }
 

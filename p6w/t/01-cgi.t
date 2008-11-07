@@ -1,12 +1,13 @@
 use v6;
 
 use Test;
-plan 22;
+plan 23;
 
 use CGI;
 ok(1,'We use CGI and we are still alive');
 
-my $cgi = CGI.new();
+my $cgi;
+$cgi = CGI.new();
 isa_ok( $cgi, 'CGI', 'Instant it');
 
 # Don't know why I do this
@@ -37,9 +38,9 @@ my @queries = (
     );
 
 for @queries -> $in, $expected {
-    my %res;
-    $cgi.parse_params(%res, $in);
-    is_deeply(%res, $expected, 'Parse param: ' ~ $in);
+    my $c = CGI.new();
+    $c.parse_params($in);
+    is_deeply($c.params, $expected, 'Parse param: ' ~ $in);
 }
 
 my @keywords = (
@@ -50,11 +51,12 @@ my @keywords = (
     );
 
 for @keywords -> $in, $expected {
-    $cgi.parse_params(my %res, $in);
+    $cgi.parse_params($in);
     is_deeply($cgi.keywords, $expected , 'Parse param (keywords): ' ~ $in);
 }
 
-my %start = {};
+$cgi = CGI.new();
+
 my @add_params = (
     :key1<val> , { :key1<val> },
     :key2<val> , { :key1<val>,      :key2<val> },
@@ -64,16 +66,18 @@ my @add_params = (
 
     # Do not consistency :( but we don`t have adverbial syntax to set pairs with undef value
     # see http://www.nntp.perl.org/group/perl.perl6.language/2008/09/msg29610.html
-    # Skip now, because is_deeply do not work properl with undef :(
+    # Skip now, because is_deeply do not work properly with undef :(
     #key2 => undef , { :key1<val val2>, key2 => ["val", undef], :key3<4>, :key4<4.1> },
 );
 
 for @add_params -> $in, $expected {
     my $key = $in.key;
     my $val = $in.value;
-    $cgi.add_param( %start, $key, $val);
-    is_deeply( %start, $expected, "Add kv: :$key<" ~ ($val or '') ~ ">" );
+    $cgi.add_param($key, $val);
+    is_deeply( $cgi.params, $expected, "Add kv: :$key<" ~ ($val or '') ~ ">" );
 }
+
+is(  $cgi.param('key3'), '4', 'Test param' );
 
 my @cookies = (
     'foo=bar',
