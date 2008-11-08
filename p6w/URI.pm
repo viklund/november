@@ -1,0 +1,68 @@
+use v6;
+
+grammar URI__Official {
+    #my($scheme, $authority, $path, $query, $fragment) =
+    #$uri =~ m|(?:([^:/?#]+):)?
+    #          (?://([^/?#]*))?
+    #          ([^?#]*)
+    #          (?:\?([^#]*))?
+    #          (?:#(.*))?|;
+    token TOP      { ^ <URI> $ };
+    token URI       { <scheme>? <authority>? <path> <query>? <fragment>? };
+    token scheme    { (<-[:/&?#]>+) ':' };
+    token authority { '//' (<-[/&?#]>*) };
+    token path      { (<-[?#]>*) };
+    token query     { '?' (<-[#]>*) };
+    token fragment  { '#' (.*) };
+}
+
+class URI {
+    # RAKUDO: Cant assign Match object :(
+    #my Match $.parts;
+    # workaround:
+    my $.parts = {};
+    
+    method init ($str) {
+        $str ~~ URI__Official::TOP;
+        unless $/ { die "Could not parse URI: $str" }
+
+        # RAKUDO: Cant assign Match object :(
+        #$.parts = $/<URI>;
+
+        $.parts<scheme>    = $/<URI><scheme>;
+        $.parts<authority> = $/<URI><authority>;
+        $.parts<path>      = $/<URI><path>;
+        $.parts<query>     = $/<URI><query>;
+        $.parts<fragment>  = $/<URI><fragment>;
+    }
+
+    method scheme {
+        ~$.parts<scheme> ~~ m/<-[:]>+/;
+        return $/.lc;
+    }
+
+    method host {
+        ~$.parts<authority> ~~ m/ <-[/:]>+ /;
+        return $/.lc;
+    }
+
+    method port {
+        ~$.parts<authority> ~~ m/ <.after ':'> \d+ $/;
+        return $/
+    }
+
+    method path {
+        ~$.parts<path>;
+    }
+
+    method Str() {
+        return 
+            $.parts<scheme> 
+            ~ $.parts<authority> 
+            ~ $.parts<path> 
+            ~ $.parts<query> 
+            ~ $.parts<fragment>;
+    }
+}
+
+# vim:ft=perl6

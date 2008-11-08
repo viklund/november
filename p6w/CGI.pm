@@ -2,9 +2,9 @@ use v6;
 
 class CGI {
     has %.params;
-    has %.request;
     has %.cookie;
     has @.keywords;
+    has URI $uri;
 
     has $!crlf;
 
@@ -24,6 +24,9 @@ class CGI {
 
         self.eat_cookie( %*ENV<HTTP_COOKIE> );
         $!crlf = "\x[0D]\x[0A]";
+        $.uri = URI.new;
+        $.uri.init( 'http://' ~ %*ENV<SERVER_NAME> ~ ':' ~ %*ENV<SERVER_PORT> ~  %*ENV<REQUEST_URI> );
+
     }
 
     # For debugging
