@@ -114,10 +114,9 @@ class CGI {
     }
 
     method add_param ( Str $key, $value ) {
-        # RAKUDO: синтаксис Hash.:exists{key} еще не реализован 
-        #        (Hash.:exists{key} not implemented yet)
-        # if %.params.:exists{$key} {
-
+        # RAKUDO: синтаксис Hash :exists{key} еще не реализован 
+        #        (Hash :exists{key} not implemented yet)
+        # if %.params :exists{$key} {
         if %.params.exists($key) {
             # RAKUDO: ~~ Scalar
             if %.params{$key} ~~ Str | Int {
