@@ -1,10 +1,11 @@
 use v6;
+use URI;
 
 class CGI {
     has %.params;
     has %.cookie;
     has @.keywords;
-    has URI $uri;
+    has URI $.uri is rw;
 
     has $!crlf;
 

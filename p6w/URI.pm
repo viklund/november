@@ -8,12 +8,12 @@ grammar URI__Official {
     #          (?:\?([^#]*))?
     #          (?:#(.*))?|;
     token TOP      { ^ <URI> $ };
-    token URI       { <scheme>? <authority>? <path> <query>? <fragment>? };
-    token scheme    { (<-[:/&?#]>+) ':' };
-    token authority { '//' (<-[/&?#]>*) };
-    token path      { (<-[?#]>*) };
-    token query     { '?' (<-[#]>*) };
-    token fragment  { '#' (.*) };
+    token URI        { [<scheme> ':']? [ '//' <authority>]? <path> ['?' <query>]? ['#' <fragment>]? };
+    token scheme     { <-[:/&?#]>+ };
+    token authority  { <-[/&?#]>* };
+    token path       { <-[?#]>* };
+    token query      { <-[#]>* };
+    token fragment   { .* };
 }
 
 class URI {
@@ -37,8 +37,7 @@ class URI {
     }
 
     method scheme {
-        ~$.parts<scheme> ~~ m/<-[:]>+/;
-        return $/.lc;
+        return  ~$.parts<scheme>.lc;
     }
 
     method host {
@@ -52,16 +51,23 @@ class URI {
     }
 
     method path {
-        ~$.parts<path>;
+        ~$.parts<path>.lc;
+    }
+
+    method query {
+        ~$.parts<query>;
+    }
+    method frag {
+        ~$.parts<fragment>.lc;
     }
 
     method Str() {
         return 
-            $.parts<scheme> 
-            ~ $.parts<authority> 
-            ~ $.parts<path> 
-            ~ $.parts<query> 
-            ~ $.parts<fragment>;
+            $.parts<scheme> ~ 
+            '://' ~ $.parts<authority> ~ 
+             ~ $.parts<path> ~
+            '?' ~ $.parts<query> ~
+            '#' ~ $.parts<fragment>;
     }
 }
 
