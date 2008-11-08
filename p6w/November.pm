@@ -56,7 +56,7 @@ class November does Session {
     has $.template_path;
     has $.userfile_path;
 
-    has November__Storage $.storage;
+    has November::Storage $.storage;
     has CGI     $.cgi;
 
     method init {

@@ -2,7 +2,7 @@ PARROT_DIR=<PARROT_DIR>
 
 SOURCES=HTML/Template.pm CGI.pm Text/Markup/Wiki/Minimal.pm \
         Text/Markup/Wiki/MediaWiki.pm November.pm Test.pm \
-        November__Storage.pm November/Storage/File.pm Tags.pm \
+        November/Storage.pm November/Storage/File.pm Tags.pm \
 		Impatience.pm
 
 PIRS=$(SOURCES:.pm=.pir)
