@@ -8,6 +8,7 @@ use Text::Markup::Wiki::MediaWiki;
 my $converter = Text::Markup::Wiki::MediaWiki.new;
 my $link_maker = { "<a href=\"/?page=$^page\">$^page</a>" }
 
+# Especially test capitalization in some way. The two first tests are wrong.
 {
     my $input = 'An example of a [[link]]';
     my $expected_output
