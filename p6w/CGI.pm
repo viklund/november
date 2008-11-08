@@ -2,7 +2,6 @@ use v6;
 
 class CGI {
     has %.params;
-    has %.request;
     has %.cookie;
     has @.keywords;
 
@@ -84,7 +83,7 @@ class CGI {
 
     method parse_keywords (Str $string is copy) {
         my $kws = unescape($string); 
-        @.keywords = $kws.split(/ \s+ /);
+        @!keywords = $kws.split(/ \s+ /);
     }
 
     method eat_cookie(Str $http_cookie) {
@@ -94,7 +93,7 @@ class CGI {
 
         for @param_values -> $param_value {
             my @kvs = split('=', $param_value);
-            %.cookie{ @kvs[0] } = unescape( @kvs[1] );
+            %!cookie{ @kvs[0] } = unescape( @kvs[1] );
         }
     }
 
@@ -120,14 +119,14 @@ class CGI {
         if %.params.exists($key) {
             # RAKUDO: ~~ Scalar
             if %.params{$key} ~~ Str | Int {
-                %.params{$key} = [ %.params{$key}, $value ];
+                %!params{$key} = [ %.params{$key}, $value ];
             } 
             elsif %.params{$key} ~~ Array {
-                %.params{$key}.push( $value );
+                %!params{$key}.push( $value );
             } 
         }
         else {
-            %.params{$key} = $value;
+            %!params{$key} = $value;
         }
     }
 
