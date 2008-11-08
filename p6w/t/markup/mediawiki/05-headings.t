@@ -15,10 +15,10 @@ my @pars =
   "par 2";
 my $input           = join "\n\n", @pars;
 my $expected_output = join "\n\n",
-   '<h1>heading 1</h1>',
+   '<h2>heading 1</h2>',
    '<p>par 1</p>',
-   '<h1>heading 2</h1>',
-   '<h1>heading 3</h1>',
+   '<h2>heading 2</h2>',
+   '<h2>heading 3</h2>',
    '<p>par 2</p>';
 my $actual_output = $converter.format($input);
 
