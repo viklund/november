@@ -15,5 +15,6 @@ is( $actual_output, $expected_output, '<br/> line breaks work' );
 
 # RAKUDO: $input ~~ s{<br/>}{<br>};
 $input.=trans( [ '<br/>' ] => [ '<br>' ] );
+$actual_output = $converter.format($input);
 
 is( $actual_output, $expected_output, '<br> line breaks work' );
