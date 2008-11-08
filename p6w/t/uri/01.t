@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 8;
+plan 11;
 
 use URI;
 ok(1,'We use URI and we are still alive');
@@ -14,6 +14,10 @@ is($u.port, '80', 'port');
 is($u.path, '/about/us', 'path'); 
 is($u.query, 'foo', 'query'); 
 is($u.frag, 'bar', 'frag'); 
+
+is($u.chunks.perl, '["about", "us"]', 'first chunk'); 
+is($u.chunks[0], 'about', 'first chunk'); 
+is($u.chunks[1], 'us', 'second chunk'); 
 
 is( ~$u, 'http://her.com:80/about/us?foo#bar', 'Sringification');
 

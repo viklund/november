@@ -7,11 +7,12 @@ grammar URI__Official {
     #          ([^?#]*)
     #          (?:\?([^#]*))?
     #          (?:#(.*))?|;
-    token TOP      { ^ <URI> $ };
+    token TOP        { ^ <URI> $ };
     token URI        { [<scheme> ':']? [ '//' <authority>]? <path> ['?' <query>]? ['#' <fragment>]? };
     token scheme     { <-[:/&?#]>+ };
     token authority  { <-[/&?#]>* };
-    token path       { <-[?#]>* };
+    token path       { '/'? [ <chunk> '/'?]+ };
+    token chunk      { <-[/?#]>+ };
     token query      { <-[#]>* };
     token fragment   { .* };
 }
@@ -21,6 +22,7 @@ class URI {
     #my Match $.parts;
     # workaround:
     my $.parts = {};
+    my @.chunks;
     
     method init ($str) {
         $str ~~ URI__Official::TOP;
@@ -34,6 +36,7 @@ class URI {
         $.parts<path>      = $/<URI><path>;
         $.parts<query>     = $/<URI><query>;
         $.parts<fragment>  = $/<URI><fragment>;
+        @.chunks = $/<URI><path><chunk>.values;
     }
 
     method scheme {
