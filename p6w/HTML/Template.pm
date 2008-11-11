@@ -1,7 +1,7 @@
 use v6;
 
 use Text::Escape;
-use HTML::Template::Grammar;
+use HTML__Template__Grammar;
 
 class HTML::Template {
     has $.input;
@@ -31,14 +31,14 @@ class HTML::Template {
     sub parse( Str $in ) {
         # RAKUDO: when #58676 will be resolved use: 
         # $in ~~ HTML::Template::Grammar.new;
-        $in ~~ HTML::Template::Grammar::TOP;
-        die("No match") unless $/;
+        $in ~~ HTML__Template__Grammar::TOP;
+        die("No match") unless ~$/;
         return $/<contents>;
     }
 
     # RAKUDO: We eventually want to do this using {*} ties.
     sub substitute( $contents, %params ) {
-        my $output = $contents<plaintext>;
+        my $output = ~$contents<plaintext>;
 
         for ($contents<chunk> // ()) -> $chunk {
 
@@ -47,17 +47,21 @@ class HTML::Template {
             # parameters in if statements. [perl #58396]
             #if $chunk<directive><insertion> -> $_ { # and so on for the others
             if $chunk<directive><insertion> {
-                my $key = $chunk<directive><insertion><attributes><name>;
+                my $key = ~$chunk<directive><insertion><attributes><name>;
                 my $value = %params{$key};
 
                 if $chunk<directive><insertion><attributes><escape> {
-                    $value = escape( $value, $chunk<directive><insertion><attributes><escape> );
+                    # RAKUDO: argh! We cannt assign this, its always became 1 if true :(
+                    # ~$chunk<directive><insertion><attributes><escape>.say; # HTML
+                    # my $et = ~$chunk<directive><insertion><attributes><escape>; # 1
+                    #$value = escape( $value, ~$chunk<directive><insertion><attributes><escape> );
+
+                    $value = escape( $value, 'HTML' );
                 }
- 
-                $output ~= $value;
+                $output ~= ~$value;
             }
             elsif $chunk<directive><if_statement> {
-                my $key = $chunk<directive><if_statement><attributes><name>;
+                my $key = ~$chunk<directive><if_statement><attributes><name>;
                 my $condition = %params{$key};
                 if $condition {
                     $output ~= substitute(
@@ -73,7 +77,7 @@ class HTML::Template {
                 }
             }
             elsif $chunk<directive><for_statement> {
-                my $key = $chunk<directive><for_statement><attributes><name><val>;
+                my $key = ~$chunk<directive><for_statement><attributes><name><val>;
                 my $iterations = %params{$key};
                 # RAKUDO: This should exhibit the correct behaviour, but due
                 # to a bug having to do with for loops and recursion, it
@@ -86,7 +90,7 @@ class HTML::Template {
                 }
             }
             elsif $chunk<directive><include> {
-                my $file = $chunk<directive><include><attributes><name><val>;
+                my $file = ~$chunk<directive><include><attributes><name><val>;
                 if $file ~~ :e  {
                     $output ~= substitute(
                                  parse( slurp($file) ),
@@ -95,7 +99,7 @@ class HTML::Template {
                 }
             }
 
-            $output ~= $chunk<plaintext>;
+            $output ~= ~$chunk<plaintext>;
         }
         return $output;
     }
