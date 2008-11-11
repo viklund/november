@@ -1,12 +1,10 @@
 use Impatience;
 
 sub escape($str, $how) {
-    # RAKUDO: .lc not emplemented yet
-    #my $m = $how.lc;
-    my $m = $how;
-    return $str if $m eq 'none' | 'NONE';
-    return escape_str($str, &escape_html_char) if $m eq 'html' | 'HTML';
-    return escape_str($str, &escape_uri_char ) if $m eq 'url' | 'uri' | 'URL' | 'URI';
+    my $m = $how.lc;
+    return $str if $m eq 'none';
+    return escape_str($str, &escape_html_char) if $m eq 'html';
+    return escape_str($str, &escape_uri_char ) if $m eq 'url' | 'uri';
     die "Don't know how to escape format '$how' yet";
 }
 
@@ -31,7 +29,7 @@ sub escape_uri_char($c) {
 }
 
 sub escape_str($str, $callback) {
-    my $result = '';
+    my $result;
     for 0 .. ($str.chars -1 ) -> $index {
         $result ~= $callback($str.substr($index, 1));
     }
