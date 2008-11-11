@@ -87,7 +87,7 @@ class HTML::Template {
             }
             elsif $chunk<directive><include> {
                 my $file = $chunk<directive><include><attributes><name><val>;
-                if file_exists( $file ) {
+                if $file ~~ :e  {
                     $output ~= substitute(
                                  parse( slurp($file) ),
                                  %params
@@ -101,14 +101,4 @@ class HTML::Template {
     }
 }
 
-
-sub file_exists( $file ) {
-    # RAKUDO: use ~~ :e
-    my $exists = False;
-    try {
-        my $fh = open( $file );
-        $exists = True;
-    }
-    return $exists;
-}
 # vim:ft=perl6
