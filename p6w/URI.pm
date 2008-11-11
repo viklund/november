@@ -22,7 +22,7 @@ class URI {
     #my Match $.parts;
     # workaround:
     my $.parts = {};
-    my @.chunks;
+    has @.chunks;
     
     method init ($str) {
         $str ~~ URI__Official::TOP;
@@ -33,10 +33,10 @@ class URI {
 
         $.parts<scheme>    = $/<URI><scheme>;
         $.parts<authority> = $/<URI><authority>;
-        $.parts<path>      = $/<URI><path>;
+        $.parts<path>      = ~$/<URI><path>;
         $.parts<query>     = $/<URI><query>;
         $.parts<fragment>  = $/<URI><fragment>;
-        @.chunks = $/<URI><path><chunk>.values;
+        @!chunks = $/<URI><path><chunk>.values;
     }
 
     method scheme {

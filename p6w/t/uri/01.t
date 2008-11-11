@@ -14,7 +14,6 @@ is($u.port, '80', 'port');
 is($u.path, '/about/us', 'path'); 
 is($u.query, 'foo', 'query'); 
 is($u.frag, 'bar', 'frag'); 
-
 is($u.chunks.perl, '["about", "us"]', 'first chunk'); 
 is($u.chunks[0], 'about', 'first chunk'); 
 is($u.chunks[1], 'us', 'second chunk'); 
