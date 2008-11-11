@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 19;
+plan 22;
 
 use HTML::Template;
 
@@ -9,11 +9,21 @@ my @inputs_that_should_parse = (
 
     [ 'foo', {},
       'foo', 'plain text' ],
+
     [ 'pre<TMPL_VAR NAME=BAR>post', { 'BAR' => 50 },
       'pre50post', 'simple variable insertion' ],
 
+    [ 'pre<TMPL_VAR BAR ESCAPE=NONE>post', { 'BAR' => 'YaY' },
+       'preYaYpost', 'variable insertion with NONE  escape' ],
+
     [ 'pre<TMPL_VAR BAR ESCAPE=HTML>post', { 'BAR' => '<' },
-       'pre&lt;post', 'variable insertion with ESCAPE in it' ],
+       'pre&lt;post', 'variable insertion with HTML escape' ],
+
+    [ 'pre<TMPL_VAR BAR ESCAPE=URL>post', { 'BAR' => ' ' },
+       'pre+%41+post', 'variable insertion with URL escape' ],
+
+    [ 'pre<TMPL_VAR BAR ESCAPE=URI>post', { 'BAR' => ' ' },
+       'pre+%41+post', 'variable insertion with URI escape' ],
 
     [ 'pre<TMPL_VAR NAME=BAR>between<TMPL_VAR NAME=BAZ>post',
       { 'BAR' => '!', 'BAZ' => '!!' },
@@ -25,6 +35,7 @@ my @inputs_that_should_parse = (
     [ 'pre<TMPL_IF NAME=FOO>bar</TMPL_IF>post', { 'FOO' => 0 },
       'prepost', 'false condition (because the parameter was false)' ],
 
+    # 10
     [ 'pre<TMPL_IF NAME=FOO>bar</TMPL_IF>post', {},
       'prepost', 'false condition (because the parameter was not declared)' ],
 
@@ -41,7 +52,6 @@ my @inputs_that_should_parse = (
       'ac',
       'nested if directives, inner one false' ],
 
-    # 10
     [ '<TMPL_IF NAME=FOO>a<TMPL_IF NAME=BAR>b</TMPL_IF>c</TMPL_IF>',
       { 'FOO' => 1, BAR => 1 },
       'abc',
