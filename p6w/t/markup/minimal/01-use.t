@@ -10,3 +10,5 @@ try {
 }
 
 ok( $used_successfully, "use Text::Markup::Wiki::Minimal" );
+
+# vim:ft=perl6

@@ -16,7 +16,8 @@ CONTRIBUTING
 
 We'll hand out commit bits liberally. If you want to contribute, create an
 account on github.org and send your github handle to Johan
-(johan.viklund@gmail.com).  Patches are ok too, if you prefer those.
+(johan.viklund@gmail.com).  Patches are ok too, if you prefer those.  See
+docs/COMMITTERS if these thoughts intrigue you.
 
 PREREQUISITES
 -------------
@@ -31,17 +32,24 @@ REPOSITORY LAYOUT
 
 /
 │
-├─p6w/    Perl 6 wiki implementation
+├─p6w/       Perl 6 wiki implementation
 │
-└─p5w/    Perl 5 reference implementation
+├─p5w/       Perl 5 reference implementation
+│
+├─docs/      Developer documentation for both p5w and p6w
+│
+├─talks/     Presentations and links to videos about November
+│
+└─logotype/  Graphics files for the November logotype
 
 RUNNING NOVEMBER
 ----------------
 
  $ perl Makefile.PL
- $ make # not required, only for speed
+ $ make # not required, but ~x10 speed up
+ $ make tests # not required 
 
-* From the command line
+* Running November on the command line
   
   This will generate the Main_Page on STDOUT:
 
@@ -50,18 +58,19 @@ RUNNING NOVEMBER
   To specify which page to view you need to specify the GET paramters on the
   command line, as follows:
 
+    $ ./test_wiki.sh
     $ ./test_wiki.sh 'action=view&page=Main_Page'
 
-  You can actually skip the 'action=view' part since viewing is the default
-  action.
+  The above two commands are equivalent, since 'view' is the default action,
+  and 'Main_Page' is the default page for the 'view' action.
 
-  The other actions we have so far are edit, log_in, log_out and
-  recent_changes. 
+  The other actions we have so far are 'edit', 'log_in', 'log_out' and
+  'recent_changes'.
 
-* On a web server
+* Running November through a web server
 
-  We have only tested it on Apache. You need to put these files and
-  directories in the cgi-bin directory of apache:
+  We have only tested the following on the Apache web server. You need to put
+  these files and directories in the 'cgi-bin' directory of Apache:
 
     wiki.sh
     wiki
@@ -72,9 +81,9 @@ RUNNING NOVEMBER
     Wiki.pm
     data/
 
-  If you have compiled november you can copy the .pir files instead of the .pm
-  files. And make sure that the files and directories below data/ are readable
-  and writable by the webbserver. Also, if you want a styled wiki you need to
+  If you have compiled November you can copy the .pir files instead of the .pm
+  files. Make sure that the files and directories below data/ are readable
+  and writable by the web server. Also, if you want a styled wiki you need to
   copy the following files into the root of your web server:
   
     skin/spartan.css

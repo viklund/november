@@ -23,3 +23,5 @@ my $expected_output = join "\n\n",
 my $actual_output = $converter.format($input);
 
 is( $actual_output, $expected_output, 'mixing paragraphs and headings works' );
+
+# vim:ft=perl6

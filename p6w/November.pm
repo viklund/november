@@ -1,59 +1,19 @@
 use v6;
 
 use CGI;
+use Tags;
 use HTML::Template;
 use Text::Escape;
 use Text::Markup::Wiki::Minimal;
-use Storage::File;
-
-sub file_exists( $file ) {
-    # RAKUDO: use ~~ :e
-    my $exists = False;
-    try {
-        my $fh = open( $file );
-        $exists = True;
-    }
-    return $exists;
-}
+use November::Storage::File;  
 
 sub get_unique_id {
     # hopefully pretty unique ID
     return int(time%1000000/100) ~ time%100
 }
 
-sub r_remove( $str is rw ) {
-    # RAKUDO: :g not implemented yet :( 
-    while $str ~~ /\\r/ {
-        $str = $str.subst( /\\r/, '' );
-    }
-}
-
-sub tags_parse ($tags) {
-    # RAKODO: we need regexp in split [perl 57378]
-    # my @tags = $tags.split(/ \s* , \s* /)
-    # workaround:
-    my @tags = $tags.split(',');
-    @tags = map { .subst(/ ^ \s+ /, '') }, @tags;
-    @tags = map { .subst(/  \s+ $ /, '') }, @tags;
-
-    @tags = map { .subst(/ \n /, '') }, @tags;
-    return @tags;
-}
-
-
-sub tag_count_normalize ($count) {
-    # TODO: log need here, faking it for now
-    if $count < 10 {
-        return $count; 
-    }
-    else {
-        return 10; 
-    }
-}
-
 role Session {
     has $.sessionfile_path  is rw;
-    has $.sessions          is rw;
 
     method init {
         # RAKUDO: set the attributes when declaring them
@@ -73,7 +33,7 @@ role Session {
     }
 
     method read_sessions {
-        return {} unless file_exists( $.sessionfile_path );
+        return {} unless $.sessionfile_path ~~ :e;
         my $string = slurp( $.sessionfile_path );
         my $stuff = eval( $string );
         return $stuff;
@@ -92,30 +52,28 @@ role Session {
     }
 }
 
-class Wiki does Session {
+class November does Session {
 
-    my $.template_path       is rw;
-    my $.userfile_path       is rw;
+    has $.template_path;
+    has $.userfile_path;
 
-    has Storage $.storage    is rw;
-    has CGI     $.cgi        is rw;
+    has November::Storage $.storage;
+    has CGI     $.cgi;
 
     method init {
         # RAKUDO: set the attributes when declaring them
-        $.template_path = 'skin/';
-        $.userfile_path = 'data/users';
+        $!template_path = 'skin/';
+        $!userfile_path = 'data/users';
 
-        # Multiple dispatch doesn't work
-        $.storage = Storage::File.new();
-        $.storage.init();
-        #Storage::File::init(self);
+        # RAKUDO: :: in module names doesn't fully work
+        $!storage = November::Storage::File.new();
         Session::init(self);
     }
 
     method handle_request(CGI $cgi) {
-        $.cgi = $cgi;
+        $!cgi = $cgi;
 
-        my $action = $cgi.param<action> // 'view';
+        my $action = $cgi.params<action> // 'view';
 
         # Maybe we should consider turning this given into a lookup hash.
         # RAKUDO: 'when' doesn't break out by default yet, #57652
@@ -125,13 +83,14 @@ class Wiki does Session {
             when 'log_in'         { self.log_in();              return; }
             when 'log_out'        { self.log_out();             return; }
             when 'recent_changes' { self.list_recent_changes(); return; }
+            when 'all_pages'      { self.list_all_pages;        return; }
         }
 
         self.not_found();
     }
 
     method view_page() {
-        my $page = $.cgi.param<page> // 'Main_Page';
+        my $page = $.cgi.params<page> // 'Main_Page';
 
         unless $.storage.wiki_page_exists($page) {
             self.not_found;
@@ -140,40 +99,16 @@ class Wiki does Session {
 
         my $template = HTML::Template.from_file($.template_path ~ 'view.tmpl');
 
-        $template.param('TITLE'     => $page);
-        $template.param('CONTENT'   => Text::Markup::Wiki::Minimal.new.format(
-                                           $.storage.read_page($page),
-                                           { self.make_link($^page) }
-                                       ));
+        $template.param('TITLE' => $page);
 
-        my $page_tags = $.storage.read_page_tags($page);
-        my @page_tags = tags_parse($page_tags); 
+        my $minimal = Text::Markup::Wiki::Minimal.new( link_maker => { self.make_link($^p, $^t) } );
+        $template.param('CONTENT' => $minimal.format($.storage.read_page($page)) );
 
-        # does exist clearest way to check @tags... mb @t ~~ [] ?
-        if @page_tags[0] {
-            @page_tags = map { '<a class="t' ~ $.storage.get_tag_count($_) 
-                ~ '" href="?action=toc?tag=' ~ $_ ~'">' ~ $_ ~ '</a>'}, @page_tags;
-
-            $page_tags = @page_tags.join(', ');
-        }
-    
-        $template.param('PAGETAGS' => $page_tags);
-
-        my $tags = $.storage.read_tags_count;
-
-        my $tags_str;
-        if $tags {
-            for $tags.keys -> $tag {
-                if $tags{$tag} > 0 {
-                    $tags_str = $tags_str ~ '<a class="t' 
-                        ~ tag_count_normalize( $tags{$tag} ) 
-                        ~ '" href="?action=toc?tag=' ~ $tag ~ '">' 
-                        ~ $tag ~ '</a> ';
-                }
-            }
-        }
-        $template.param('TAGS' => $tags_str);
-
+        # TODO: we need plugin system (see topics in mail-list)
+        my $t = Tags.new();
+        $template.param( 'PAGETAGS' => $t.page_tags: $page );
+        $template.param( 'TAGS'     => $t.cloud_tags );
+        
         $template.param('LOGGED_IN' => self.logged_in());
 
         $.cgi.send_response(
@@ -190,7 +125,7 @@ class Wiki does Session {
     }
 
     method edit_page() {
-        my $page = $.cgi.param<page> // 'Main_Page';
+        my $page = $.cgi.params<page> // 'Main_Page';
 
         my $sessions = self.read_sessions();
 
@@ -205,12 +140,17 @@ class Wiki does Session {
         # The 'edit' action handles both showing the form and accepting the
         # POST data. The difference is the presence of the 'articletext'
         # parameter -- if there is one, the action is considered a save.
-        if $.cgi.param<articletext> || $.cgi.param<tags> {
-            my $new_text = $.cgi.param<articletext>;
-            my $tags = $.cgi.param<tags>;
+        if $.cgi.params<articletext> || $.cgi.params<tags> {
+            my $new_text   = $.cgi.params<articletext>;
+            my $tags       = $.cgi.params<tags>;
             my $session_id = $.cgi.cookie<session_id>;
-            my $author = $sessions{$session_id}<user_name>;
-            $.storage.save_page($page, $new_text, $author, $tags);
+            my $author     = $sessions{$session_id}<user_name>;
+            $.storage.save_page($page, $new_text, $author);
+
+            # TODO: we need plugin system (see topics in mail-list)
+            my $t = Tags.new();
+            $t.update_tags($page, $tags);
+
             return self.view_page();
         }
 
@@ -220,7 +160,10 @@ class Wiki does Session {
         $template.param('TITLE'     => $title);
         $template.param('CONTENT'   => $old_content);
 
-        $template.param('TAGS'      => $.storage.read_page_tags($page));
+        # TODO: we need plugin system (see topics in mail-list)
+        my $t = Tags.new;
+        $template.param('PAGETAGS' => $t.read_page_tags($page));
+
         $template.param('LOGGED_IN' => True);
 
         $.cgi.send_response(
@@ -243,8 +186,7 @@ class Wiki does Session {
     }
 
     method read_users {
-        # RAKUDO: use :e
-        return {} unless file_exists( $.userfile_path );
+        return {} unless $.userfile_path ~~ :e;
         return eval( slurp( $.userfile_path ) );
     }
 
@@ -263,9 +205,9 @@ class Wiki does Session {
     }
 
     method log_in {
-        if my $user_name = $.cgi.param<user_name> {
+        if my $user_name = $.cgi.params<user_name> {
 
-            my $password = $.cgi.param<password>;
+            my $password = $.cgi.params<password>;
 
             my %users = self.read_users();
 
@@ -340,12 +282,20 @@ class Wiki does Session {
         return;
     }
 
-    method make_link($page) {
-        return sprintf('<a href="?action=%s&page=%s"%s>%s</a>',
-                       $.storage.wiki_page_exists($page)
-                         ?? ('view', $page, '')
-                         !! ('edit', $page, ' class="nonexistent"'),
-                       $page);
+    method make_link($page, $title?) {
+        if $title {
+            if $page ~~ m/':'/ {
+                return "<a href=\"$page\">$title</a>";
+            } else {
+                return "<a href=\"?action=view&page=$page\">$title</a>";
+            }
+        } else {
+            return sprintf('<a href="?action=%s&page=%s"%s>%s</a>',
+                           $.storage.wiki_page_exists($page)
+                             ?? ('view', $page, '')
+                             !! ('edit', $page, ' class="nonexistent"'),
+                           $page);
+        }
     }
 
     method list_recent_changes {
@@ -373,5 +323,45 @@ class Wiki does Session {
 
         return;
     }
+
+    method list_all_pages {
+        my $template = HTML::Template.new(
+                filename => $.template_path ~ 'list_all_pages.tmpl');
+
+        my $t = Tags.new();
+        $template.param('TAGS' => $t.cloud_tags() ) if $t;
+
+        my $index;
+
+        my $tag = $.cgi.params<tag>;
+        if $tag and $t {
+            # TODO: we need plugin system (see topics in mail-list)
+            my $tags_index = $t.read_tags_index;
+            $index = $tags_index{$tag};
+    
+            $template.param('TAG' => $.cgi.params<tag> );
+        } 
+        else {
+            $index = $.storage.read_index;
+        }
+
+
+        # HTML::Template eat only Arrey of Hashes and Hash keys should 
+        # be in low case. HTML::Template in new-html-template brunch 
+        # will be much clever.
+
+        # RAKUDO: @($arrayref) not implemented yet, so:
+        # my @list = map { { page => $_ } }, @($index); 
+        # do not work. Workaround:
+        my @list = map { { page => $_ } }, $index.values; 
+
+        $template.param('LIST'   => @list);
+        $template.param('LOGGED_IN' => self.logged_in());
+
+        $.cgi.send_response(
+            $template.output()
+        );
+    }
 }
+
 # vim:ft=perl6

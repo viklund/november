@@ -20,3 +20,5 @@ for %h.kv -> $input, $abbr {
 
     is( $actual_output, $expected_output, "$input -> $expected_escape" );
 }
+
+# vim:ft=perl6

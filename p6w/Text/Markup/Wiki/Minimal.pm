@@ -1,8 +1,8 @@
 use v6;
 
-grammar Text::Markup::Wiki::Minimal::Syntax {
+grammar Text__Markup__Wiki__Minimal__Syntax {
 
-    token paragraph { ^ [<heading> || <parchunk>+] $ };
+    token TOP { ^ [<heading> || <parchunk>+] $ };
 
     token heading { '==' <parchunk>+ '==' };
 
@@ -15,7 +15,10 @@ grammar Text::Markup::Wiki::Minimal::Syntax {
 
     token whitespace { ' ' | \n };
 
-    token wikimark { '[[' <twext> ']]' };
+    token wikimark { '[[' \s?  <link> [\s+ <link_title>]? \s? ']]' };
+    
+    regex link { <[:/._@\-0..9]+alpha>+ };
+    regex link_title { <-[\]]>+ };
 
     token metachar { '<' || '>' || '&' || \' };
 
@@ -23,46 +26,53 @@ grammar Text::Markup::Wiki::Minimal::Syntax {
 }
 
 class Text::Markup::Wiki::Minimal {
+    has $.link_maker is rw;
 
-    method format($text, :$link_maker) {
-        # RAKUDO: $text.split( /\n\n/ )
+    method format($text ) {
         my @pars = grep { $_ ne "" },
                    map { $_.subst( / ^ \n /, '' ) },
-                   $text.split("\n\n");
+                   $text.split( /\n\n/ );
 
         my @formatted;
         for @pars -> $par {
 
             my $result;
 
-            # RAKUDO: when #58676 will be resolved use: 
+            # RAKUDO: when #58676 and #59928 will be resolved use: 
             # $par ~~ Text::Markup::Wiki::Minimal::Syntax.new;
-            if $par ~~ Text::Markup::Wiki::Minimal::Syntax::paragraph {
+            if $par ~~ Text__Markup__Wiki__Minimal__Syntax::TOP {
 
                 if $/<heading> {
                     my $heading = $/<heading><parchunk>[0];
-                    $heading = $heading.subst( / ^ \s+ /, '' );
-                    $heading = $heading.subst( / \s+ $ /, '' );
+                    $heading .= subst( / ^ \s+ /, '' );
+                    $heading .= subst( / \s+ $ /, '' );
                     $result = "<h1>$heading</h1>";
                 }
                 else {
                     $result = '<p>';
 
-                    for $/<parchunk> -> $chunk {
-                        my $text = $chunk.values[0];
-                        given $chunk.keys[0] {
-                            when 'twext'     { $result ~= $text }
-                            when 'wikimark' {
-                                if $link_maker.defined {
-                                    my $page = substr($text, 2, -2);
-                                    $result ~= $link_maker($page);
-                                }
-                                else {
-                                    $result ~= $text;
-                                }
+                    for $/<parchunk> {
+                        if $_<twext> { 
+                            $result ~= $_<twext>;
+                        }
+                        elsif $_<wikimark> {
+                            if $.link_maker {
+                                # RAKUDO: second arg transform to '1' by some dark magic 
+                                # $result ~= $.link_maker( ~$_<wikimark><link>, ~$_<wikimark><link_title> );
+                                # workaround:
+                                my $title = $_<wikimark><link_title>;
+  
+                                $result ~= $.link_maker( ~$_<wikimark><link>, $title );
                             }
-                            when 'metachar'  { $result ~= quote($text) }
-                            when 'malformed' { $result ~= $text }
+                            else {
+                                $result ~= $_<wikimark>;
+                            }
+                        }
+                        elsif $_<metachar>  { 
+                            $result ~= quote($_<metachar>) 
+                        }
+                        elsif $_<malformed> { 
+                            $result ~= $_<malformed> 
                         }
                     }
                     $result ~= "</p>";
@@ -86,6 +96,7 @@ class Text::Markup::Wiki::Minimal {
         return '&amp;'  if $metachar eq '&';
         return $metachar;
     }
+
 }
 
 # vim:ft=perl6
