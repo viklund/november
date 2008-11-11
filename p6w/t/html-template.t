@@ -1,11 +1,14 @@
 use v6;
 
 use Test;
-plan 18;
+plan 19;
 
 use HTML::Template;
 
 my @inputs_that_should_parse = (
+
+    [ 'foo', {},
+      'foo', 'plain text' ],
     [ 'pre<TMPL_VAR NAME=BAR>post', { 'BAR' => 50 },
       'pre50post', 'simple variable insertion' ],
 
