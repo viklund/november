@@ -27,3 +27,5 @@ role Testing {
         self.write_tags_count( $c );
     }
 }
+
+# vim:ft=perl6

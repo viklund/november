@@ -65,3 +65,5 @@ my $link_maker = { "<a href=\"/?page=$^page\">$^page</a>" }
     is( $actual_output, $expected_output,
         'in-link italic markers ignored if italic already active outside II' );
 }
+
+# vim:ft=perl6

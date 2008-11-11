@@ -50,3 +50,5 @@ my $link_maker = { "<a href=\"/?page=$^page\">$^page</a>" }
 
     is( $actual_output, $expected_output, 'malformed link III' );
 }
+
+# vim:ft=perl6

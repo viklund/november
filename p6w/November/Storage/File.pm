@@ -1,8 +1,8 @@
 use v6;
-use November__Storage;
+use November::Storage;
 use Impatience;
 
-class November::Storage::File is November__Storage {
+class November::Storage::File is November::Storage {
     my $.content_path        = 'data/articles/';
     my $.modifications_path  = 'data/modifications/';
     my $.recent_changes_path = 'data/recent-changes';
@@ -55,10 +55,14 @@ class November::Storage::File is November__Storage {
 
     method add_to_index ($page) {
         my $index = self.read_index;
-        $index.push($page);
-        my $fh = open($.index_path, :w);
-        $fh.say($index.perl);
-        $fh.close;
+        # RAKUDO: @ $index not impemented yet :(
+        # unless any( @ $index) eq $page {
+        unless any($index.values) eq $page {
+            $index.push($page);
+            my $fh = open($.index_path, :w);
+            $fh.say($index.perl);
+            $fh.close;
+        }
     }
 
     method read_index {
