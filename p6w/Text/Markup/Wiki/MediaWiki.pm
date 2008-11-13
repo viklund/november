@@ -2,7 +2,12 @@ use v6;
 
 class Text::Markup::Wiki::MediaWiki {
 
+    sub entities($words) {
+        return map { "&$_;" }, $words;
+    }
+
     method format($text, :$link_maker) {
+        say $text;
         my @result_pars;
 
         my @split = gather {
@@ -40,8 +45,23 @@ class Text::Markup::Wiki::MediaWiki {
             }
 
             my $cleaned_of_whitespace = join ' ', @cleaned_pars;
+            #my $xml_escaped = $cleaned_of_whitespace.trans(
+            #    [           '<', '>', '&', '\''  ] =>
+            #    [ entities < lt   gt  amp  #039> ]
+            #);
+            my %conversions =
+                ( '<' => 'lt', '>' => 'gt', '&' => 'amp', '\'' => '#039' );
 
-            push @result_pars, "<p>$cleaned_of_whitespace</p>";
+            my @xml_escaped_new;
+            for split '', $cleaned_of_whitespace -> $c {
+                say $c, '!', %conversions{$c}, '!', entities %conversions{$c};
+                push @xml_escaped_new, %conversions.exists( $c )
+                        ?? entities %conversions{$c}
+                        !! $c;
+            }
+            my $xml_escaped = join '', @xml_escaped_new;
+
+            push @result_pars, "<p>$xml_escaped</p>";
         }
 
         return join "\n\n", @result_pars;
