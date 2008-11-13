@@ -36,7 +36,7 @@ class HTML::Template {
         return $/<contents>;
     }
 
-    # RAKUDO: We eventually want to do this using {*} ties.
+    # We doing this using {*} in asterisk brunch.
     sub substitute( $contents, %params ) {
         my $output = ~$contents<plaintext>;
 
@@ -51,7 +51,7 @@ class HTML::Template {
                 my $value = %params{$key};
 
                 if $chunk<directive><insertion><attributes><escape> {
-                    # RAKUDO: argh! We cannt assign this, its always became 1 if true :(
+                    # RAKUDO:
                     # ~$chunk<directive><insertion><attributes><escape>.say; # HTML
                     # my $et = ~$chunk<directive><insertion><attributes><escape>; # 1
                     #$value = escape( $value, ~$chunk<directive><insertion><attributes><escape> );

@@ -36,6 +36,6 @@ grammar HTML__Template__Grammar {
     token tag_start  { '<TMPL_' };
     token name       { $<val>=\w+ | <.qq> $<val>=[ <[ 0..9 '/._' \- // ] +alpha>* ] <.qq> };
     regex qq         { '"' };
-    token escape     { 'NONE' | 'HTML' | 'URL' | 'JS' | 'JAVASCRIPT' };
+    token escape     { 'NONE' | 'HTML' | 'URL' | 'URI' | 'JS' | 'JAVASCRIPT' };
     token attributes { \s+ 'NAME='? <name> [\s+ 'ESCAPE=' <escape> ]? };
 };
