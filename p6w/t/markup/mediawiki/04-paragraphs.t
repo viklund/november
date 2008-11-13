@@ -12,7 +12,8 @@ my @pars =
   "par 2\nwith\nnewlines in it",
   "par 3";
 my $input           = join "\n\n", @pars;
-my $expected_output = join "\n\n", map { "<p>$_</p>" }, @pars;
+my $expected_output = join "\n\n", map { "<p>$_</p>" },
+                      "par 1", "par 2 with newlines in it", "par 3";
 my $actual_output   = $converter.format($input);
 
 is( $actual_output, $expected_output,
