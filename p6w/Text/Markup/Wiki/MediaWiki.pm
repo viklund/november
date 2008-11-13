@@ -7,22 +7,20 @@ class Text::Markup::Wiki::MediaWiki {
     }
 
     method format($text, :$link_maker) {
-        say $text;
         my @result_pars;
 
-        my @split = gather {
-            my $text_copy = $text;
-            while $text_copy.index("\n\n") -> $ix {
-                take $text_copy.substr(0, $ix);
-                $text_copy .= substr($ix);
-                while $text_copy.substr(0,1) eq "\n" {
-                    $text_copy .= substr(1);
-                }
+        my @split;
+        my $text_copy = $text;
+        while $text_copy.index("\n\n") -> $ix {
+            push @split, $text_copy.substr(0, $ix);
+            $text_copy .= substr($ix);
+            while $text_copy.substr(0,1) eq "\n" {
+                $text_copy .= substr(1);
             }
-            if $text_copy {
-                take $text_copy;
-            }
-        };
+        }
+        if $text_copy {
+            push @split, $text_copy;
+        }
 
         # RAKUDO: Awaiting HLL type conversion
         #for split(/\n ** 2..*/, $text) -> $paragraph {
@@ -54,7 +52,6 @@ class Text::Markup::Wiki::MediaWiki {
 
             my @xml_escaped_new;
             for split '', $cleaned_of_whitespace -> $c {
-                say $c, '!', %conversions{$c}, '!', entities %conversions{$c};
                 push @xml_escaped_new, %conversions.exists( $c )
                         ?? entities %conversions{$c}
                         !! $c;
