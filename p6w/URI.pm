@@ -2,8 +2,8 @@ use v6;
 
 class URI;
 
-# RAKUDO: Match object do not assign clear :(
-#my Match $.parts; dies in init with Type mismatch in assignment;
+# RAKUDO: Match object does not assigning properly :(
+#my Match $.parts; dies in init with 'Type mismatch in assignment';
 # workaround:
 has $.uri;
 has @.chunks;
