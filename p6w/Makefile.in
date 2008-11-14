@@ -16,6 +16,8 @@ all: $(PIRS)
 clean:
 	rm $(PIRS)
 
+test: tests
+
 tests:
 	@for i in t/*.t; do echo $$i; $(RAKUDO) $$i; done;
 	@for i in t/tags/*.t; do echo $$i; $(RAKUDO) $$i; done;
