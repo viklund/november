@@ -2,8 +2,8 @@ use v6;
 
 class URI;
 
-# RAKUDO: Cant assign Match object :(
-#my Match $.parts;
+# RAKUDO: Match object do not assign clear :(
+#my Match $.parts; dies in init with Type mismatch in assignment;
 # workaround:
 has $.uri;
 has @.chunks;
@@ -13,7 +13,6 @@ method init ($str) {
     $str ~~ URI::Grammar::TOP;
     unless $/ { die "Could not parse URI: $str" }
 
-    # RAKUDO: Cant assign Match object :(
     $!uri = $/;
 
     @!chunks = $/<path><chunk>;
@@ -30,7 +29,7 @@ method authority {
 }
 
 method host {
-    #RAKUDO: $.uri<authority> return 1, and that try 1<port> and die :( 
+    #RAKUDO: $.uri<authority> return 1, and than we try 1<port> and die :( 
     #$.uri<authority><host>;
     # workaround:
     my %p = $.uri<authority>;
@@ -39,7 +38,7 @@ method host {
 }
 
 method port {
-    #RAKUDO: $.uri<authority> return 1, and that try 1<port> and die :( 
+    #RAKUDO: $.uri<authority> return 1, and than try 1<port> and die :( 
     #$.uri<authority><port>;
     # workaround:
     my %p = $.uri<authority>;
@@ -81,5 +80,31 @@ method Str() {
     $str ~= '#' ~ $.frag if $.frag;
     return $str; 
 }
+
+=begin pod
+
+=haed NAME
+
+URI — Uniform Resource Identifiers (absolute and relative) 
+
+=haed SYNOPSYS
+
+    use URI;
+    my $u = URI.new;
+    $u.init('http://her.com/foo/bar?tag=woow#bla');
+
+    my $scheme = $u.scheme;
+    my $authority = $u.authority;
+    my $host = $u.host;
+    my $port = $u.port;
+    my $path = $u.path;
+    my $query = $u.query;
+    my $frag = $u.frag; # or $u.fragment;
+
+    my $is_absolute = $u.absolute;
+    my $is_relative = $u.relative;
+
+=end pod
+
 
 # vim:ft=perl6
