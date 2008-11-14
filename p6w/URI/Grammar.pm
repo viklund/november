@@ -5,11 +5,13 @@ grammar URI::Grammar {
     #          ([^?#]*)
     #          (?:\?([^#]*))?
     #          (?:#(.*))?|;
-    token TOP        { ^ <URI> $ };
-    token URI        { [<scheme> ':']? [ '//' <authority>]? <path> ['?' <query>]? ['#' <fragment>]? };
+    token TOP        { ^ [<scheme> ':']? [ '//' <authority>]? <path> ['?' <query>]? ['#' <fragment>]? $ };
     token scheme     { <-[:/&?#]>+ };
-    token authority  { <-[/&?#]>* };
-    token path       { '/'? [ <chunk> '/'?]+ };
+    token authority  { <host> [':' <port>]? };
+    token host       { <-[/&?#:]>* };
+    token port       { \d+ };
+    token path       { <slash>? [ <chunk> '/'?]* }; # * here mb wrong, because that allow '' URI
+    token slash      { '/' };
     token chunk      { <-[/?#]>+ };
     token query      { <-[#]>* };
     token fragment   { .* };

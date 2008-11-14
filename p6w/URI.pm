@@ -5,7 +5,7 @@ class URI;
 # RAKUDO: Cant assign Match object :(
 #my Match $.parts;
 # workaround:
-my $.parts = {};
+has $.uri;
 has @.chunks;
 
 method init ($str) {
@@ -14,48 +14,72 @@ method init ($str) {
     unless $/ { die "Could not parse URI: $str" }
 
     # RAKUDO: Cant assign Match object :(
-    #$.parts = $/<URI>;
+    $!uri = $/;
 
-    $.parts<scheme>    = $/<URI><scheme>;
-    $.parts<authority> = $/<URI><authority>;
-    $.parts<path>      = ~$/<URI><path>;
-    $.parts<query>     = $/<URI><query>;
-    $.parts<fragment>  = $/<URI><fragment>;
-    @!chunks = $/<URI><path><chunk>.values;
+    @!chunks = $/<path><chunk>;
 }
 
 method scheme {
-    return  ~$.parts<scheme>.lc;
+    my $s = $.uri<scheme> // '';
+    return $s.lc;
+}
+
+method authority {
+    my $a = $.uri<authority> // '';
+    return $a.lc;
 }
 
 method host {
-    ~$.parts<authority> ~~ m/ <-[/:]>+ /;
-    return $/.lc;
+    #RAKUDO: $.uri<authority> return 1, and that try 1<port> and die :( 
+    #$.uri<authority><host>;
+    # workaround:
+    my %p = $.uri<authority>;
+    my $h =  %p<host> // '';
+    return $h.lc;
 }
 
 method port {
-    ~$.parts<authority> ~~ m/ <.after ':'> \d+ $/;
-    return $/
+    #RAKUDO: $.uri<authority> return 1, and that try 1<port> and die :( 
+    #$.uri<authority><port>;
+    # workaround:
+    my %p = $.uri<authority>;
+    my $p = %p<port> // '';
+    return $p;
 }
 
 method path {
-    ~$.parts<path>.lc;
+    my $p = $.uri<path> // '';
+    return $p.lc;
+}
+
+method absolute {
+    my %p = $.uri<path>;
+    ? (%p<slash> // 0);
+}
+
+method relative {
+    my %p = $.uri<path>;
+    ! (%p<slash> // 0);
 }
 
 method query {
-    ~$.parts<query>;
+    item $.uri<query> // '';
 }
 method frag {
-    ~$.parts<fragment>.lc;
+    my $f = $.uri<fragment> // '';
+    return $f.lc;
 }
 
+method fragment { $.frag }
+
 method Str() {
-    return 
-        $.parts<scheme> ~ 
-        '://' ~ $.parts<authority> ~ 
-         ~ $.parts<path> ~
-        '?' ~ $.parts<query> ~
-        '#' ~ $.parts<fragment>;
+    my $str;
+    $str ~= $.scheme if $.scheme;
+    $str ~= '://' ~ $.authority if $.authority;
+    $str ~= $.path;
+    $str ~= '?' ~ $.query if $.query;
+    $str ~= '#' ~ $.frag if $.frag;
+    return $str; 
 }
 
 # vim:ft=perl6
