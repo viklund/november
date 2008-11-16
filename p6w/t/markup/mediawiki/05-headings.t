@@ -37,7 +37,7 @@ my $converter = Text::Markup::Wiki::MediaWiki.new;
     my $actual_output = $converter.format($input);
 
     is( $actual_output, $expected_output,
-        'really mixing paragraphs and headings works I';
+        'really mixing paragraphs and headings works I' );
 }
 
 {
@@ -50,7 +50,7 @@ my $converter = Text::Markup::Wiki::MediaWiki.new;
     my $actual_output = $converter.format($input);
 
     is( $actual_output, $expected_output,
-        'really mixing paragraphs and headings works II';
+        'really mixing paragraphs and headings works II' );
 }
 
 {
@@ -65,7 +65,7 @@ Paragraph.';
     my $actual_output = $converter.format($input);
 
     is( $actual_output, $expected_output,
-        'really mixing paragraphs and headings works III';
+        'really mixing paragraphs and headings works III' );
 }
 
 # vim:ft=perl6
