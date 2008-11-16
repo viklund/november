@@ -11,18 +11,29 @@ class Text::Markup::Wiki::MediaWiki {
 
         for split(/\n ** 2..*/, $text) -> $paragraph {
             # RAKUDO: Needed right now due to HLL non-mapping.
-            $paragraph = $paragraph;
-            my $cleaned_of_whitespace = $paragraph.trans(
+            my $paragraph_copy = $paragraph;
+
+            my $partype = 'p';
+            if $paragraph ~~ /^ '==' (.*) '==' $/ {
+                $partype = 'h2';
+                $paragraph_copy = ~$/[0];
+            }
+
+            my $trimmed = $paragraph_copy;
+            $trimmed .= subst( / ^ \s+ /, '' );
+            $trimmed .= subst( / \s+ $ /, '' );
+
+            my $cleaned_of_whitespace = $trimmed.trans(
                 [ /\s+/ => ' ' ]
             );
 
             my $xml_escaped = $cleaned_of_whitespace.trans(
-                [           '<', '>', '&', '\''  ] =>
-                [ entities < lt   gt  amp  #039> ]
+                [           '<', '>', '&', '\''   ] =>
+                [ entities < lt   gt  amp  #039 > ]
             );
-            #my $xml_escaped = $cleaned_of_whitespace;
 
-            push @result_pars, "<p>$xml_escaped</p>";
+            push @result_pars,
+                 sprintf '<%s>%s</%s>', $partype, $xml_escaped, $partype;
         }
 
         return join "\n\n", @result_pars;
