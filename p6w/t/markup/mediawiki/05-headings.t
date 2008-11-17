@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 1;
+plan 4;
 
 use Text::Markup::Wiki::MediaWiki;
 
