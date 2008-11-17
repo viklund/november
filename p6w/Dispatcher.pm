@@ -19,12 +19,12 @@ method dispatch (@chunks) {
 
     my @applyable;
     for @!rules -> $r {
-        @applyable.push($r) if $r.is_applyable(@chunks);
+        @applyable.push($r) if $r.match(@chunks);
     }
     #say "Applyable:" ~ @applyable;
 
     if @applyable {
-        @applyable[-1].apply(@chunks);
+        @applyable[-1].apply;
     }
     elsif $.default {
         $.default();

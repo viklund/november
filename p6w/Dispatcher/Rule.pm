@@ -7,12 +7,7 @@ has @.tokens;
 has @.args;
 has $.way;
 
-method is_applyable(@chunks) {
-    #say ".is_applyable chunks:'~ @chunks;
-    self.apply(@chunks, :try);
-}
-
-method apply (@chunks, $try?) {
+method match (@chunks) {
     #say '.apply chunks:'~ @chunks ~ ' tokens:' ~ @.tokens;
     return False if @chunks != @.tokens;
 
@@ -26,8 +21,11 @@ method apply (@chunks, $try?) {
             return False;
         }
     }
-    return True if $try;
- 
+
+    return True;
+}
+
+method apply {
     if @.args {
         # RAKUDO: | do not implemented yet, so only one param now
         $.way(@.args[0]);
