@@ -11,14 +11,13 @@ ok(1,'We use Dispatcher::Rule and we are still alive');
 
 my $d = Dispatcher.new;
 my $r = Dispatcher::Rule.new( :name('test'), :tokens('foo', 'bar'), way => sub { return "Yay" } );
-# RAKUDO: can`t set attr-array in new
-$r.tokens = 'foo', 'bar';
 
 $d.add($r);
 
 is( $d.dispatch(['foo', 'bar']), "Yay", 'Dispatch to Rule'  );
 
 # TODO: if I put that test first, prev die with 0 return... WTF?
-ok( ! $d.dispatch(['foo']), 'Return False in can`t finde match Rule and do not have default'  );
+ok( ! $d.dispatch(['foo']), 'Return False in can`t find match Rule and do not have default'  );
+
 
 # vim:ft=perl6
