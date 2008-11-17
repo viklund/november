@@ -22,7 +22,7 @@ method dispatch (@chunks) {
     #say "Applyable:" ~ @applyable;
 
     if @applyable {
-        @applyable[0].apply(@chunks);
+        @applyable[-1].apply(@chunks);
     }
     elsif $.default {
         $.default();

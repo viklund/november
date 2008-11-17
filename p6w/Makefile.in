@@ -2,8 +2,9 @@ PARROT_DIR=<PARROT_DIR>
 
 SOURCES=HTML/Template.pm CGI.pm Text/Markup/Wiki/Minimal.pm \
         Text/Markup/Wiki/MediaWiki.pm November.pm Test.pm \
-        November__Storage.pm November/Storage/File.pm Tags.pm \
-		Impatience.pm URI.pm URI/Grammar.pm
+        November/Storage.pm November/Storage/File.pm Tags.pm \
+		Impatience.pm URI.pm URI/Grammar.pm Dispatcher.pm \
+		Dispatcher/Rule.pm
 
 PIRS=$(SOURCES:.pm=.pir)
 
@@ -22,3 +23,4 @@ tests:
 	@for i in t/markup/minimal/*.t; do echo $$i; perl6 $$i; done;
 #	@for i in t/markup/mediawiki/*.t; do echo $$i; perl6 $$i; done;
 	@for i in t/uri/*.t; do echo $$i; perl6 $$i; done;
+	@for i in t/dispatcher/*.t; do echo $$i; perl6 $$i; done;
