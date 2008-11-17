@@ -1,9 +1,7 @@
 use v6;
 class Dispatcher::Rule;
 
-has $.name;
 has @.tokens;
-
 has @.args;
 has $.way;
 
@@ -17,7 +15,7 @@ method match (@chunks) {
             @!args.push($/) if $/;
         }
         else {
-            @!args = undef;
+            self.clear;
             return False;
         }
     }
@@ -26,9 +24,20 @@ method match (@chunks) {
 }
 
 method apply {
-    if @.args {
-        # RAKUDO: | do not implemented yet, so only one param now
+    #say "args: { @.args.elems }";
+    # RAKUDO: | do not implemented yet :( so... only two args now
+    # RAKUDO: strange bug here, assign 0 there if I nested ifs
+    #if @.args {
+    if @.args == 1 {
         $.way(@.args[0]);
+
+        # RAKUDO: strange bug here, assign 0 there if I nested ifs
+        #$.way(@.args[0]) if @.args == 1;
+        #$.way(@.args[0], @.args[1]) if @.args == 2;
+        #$.way(@.args[0], @.args[1], @.args[2]) if @.args == 3;
+    }
+    elsif @.args == 2 {
+            $.way(@.args[0], @.args[1]);
     }
     else {
         $.way();
@@ -36,11 +45,12 @@ method apply {
 }
 
 method is_complite {
-    if $.name && @.tokens && $.way {
-        return True;
-    }
-    
+    if @.tokens && $.way { return True }
     return False;
+}
+
+method clear {
+    @!args = ();
 }
 
 # vim:ft=perl6

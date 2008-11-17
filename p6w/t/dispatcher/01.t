@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 11;
+plan 14;
 
 use Dispatcher;
 ok(1,'We use Dispatcher and we are still alive');
@@ -11,41 +11,43 @@ ok(1,'We use Dispatcher::Rule and we are still alive');
 
 my $d = Dispatcher.new;
 
-my $r = Dispatcher::Rule.new( :name('test'), 
-                              :tokens('foo', 'bar'), 
-                              way => sub { return "Yay" } );
-$d.add($r);
+$d.add: Dispatcher::Rule.new( :tokens('foo', 'bar'), way => { "Yay" } );
 
 ok( ! $d.dispatch(['foo']), 
     'Return False if can`t find match Rule and do not have default'  );
 
 is( $d.dispatch(['foo', 'bar']), 
     "Yay", 
-    'Dispatch to Rule (foo/bar)'
+    'Dispatch to Rule (foo bar)'
 );
 
 $d.default = sub { return "Woow" };
 
 is( $d.dispatch(['foo', 'bar', 'her']), 
     "Woow", 
-    'Dispatch to default (foo/bar/her)'  
+    'Dispatch to default'  
 );
 
-my $r2 = Dispatcher::Rule.new( :name('regexp'), 
-                               :tokens('foo', /^ \d+ $/), 
-                               way => { return $^d } );
-$d.add($r2);
+$d.add: Dispatcher::Rule.new( :tokens('foo', 'a'|'b'), way => { "Zzzz" } );
+
+is( $d.dispatch(['foo', 'a']), 
+    'Zzzz', 
+    'Dispatch to rule with Junction (foo/a|b) a'  
+);
+
+is( $d.dispatch(['foo', 'b']), 
+    'Zzzz', 
+    'Dispatch to rule with Junction (foo/a|b) b'  
+);
+
+$d.add: Dispatcher::Rule.new( :tokens('foo', /^ \d+ $/), way => { $^d } );
 
 is( $d.dispatch(['foo', '50']), 
     '50', 
     'Dispatch to rule with regexp (foo/50)'  
 );
 
-my $r3 = Dispatcher::Rule.new( :name('regexp2'), 
-                               :tokens('foo', / \d+ /), 
-                               way => { return ($^d + 10) } 
-                             );
-$d.add($r3);
+$d.add: Dispatcher::Rule.new( :tokens('foo', / \d+ /), way => { $^d + 10 } );
 
 is( $d.dispatch(['foo', '50']), 
     '60', 
@@ -54,26 +56,36 @@ is( $d.dispatch(['foo', '50']),
 
 is( $d.dispatch(['foo', 'a50z']), 
     '60', 
-    'Dispatch to rule with regexp (foo/a50z)'  
+    'Rule with regexp (foo/a50z)'  
 );
 
 is( $d.dispatch(['foo', 'bar']), 
     "Yay", 
-    'Dispatch to simple rule, test after add more rules (foo/bar)' 
+    'Dispatch to simple Rule, test after add more rules (foo/bar)' 
 );
 
-my $r4 = Dispatcher::Rule.new( 
-    :name('rgexep_inside'), 
-    :tokens('foo', / \d+ /, 'bar' ), 
-    way => sub { return ($^d + 1) } 
-);
-$d.add($r4);
+$d.add: Dispatcher::Rule.new( :tokens('foo', / \d+ /, 'bar' ), 
+                              way => { $^d + 1 } );
 
 is( $d.dispatch(['foo', 'item4', 'bar']), 
     '5', 
-    'Dispatch to rule with regexp inside (foo/item4/bar)'
+    'Rule with regexp in center (foo/\d+/bar)'
 );
 
-is( $d.forward('test'), "Yay", "Forward, dispatch by Rule name");
+$d.add: Dispatcher::Rule.new( :tokens('summ', / \d+ /, / \d+ / ), 
+                              way => { $^a + $^b } );
+
+
+is( $d.dispatch(['summ', '2', '3']), 
+    '5', 
+    'Rule with two regexp (summ/\d+/\d+)'
+);
+
+
+is( $d.dispatch(['summ', '12', '23']), 
+    '35', 
+    'Rule with two regexp again (summ/\d+/\d+)'
+);
+
 
 # vim:ft=perl6
