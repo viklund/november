@@ -1,7 +1,7 @@
 use v6;
 class Dispatcher;
 
-has @!rules;
+has @.rules;
 has $.default is rw;
 
 method add ($rule) {
@@ -10,7 +10,17 @@ method add ($rule) {
 }
 
 method dispatch (@chunks) {
-    my @applyable =  @!rules.grep: { .is_applyable(@chunks) };    
+
+    # that make clsure:
+    #my @applyable =  @!rules.grep: { .is_applyable(@chunks) };    
+    # so workaround:
+
+    my @applyable;
+    for @!rules -> $r {
+        @applyable.push($r) if $r.is_applyable(@chunks);
+    }
+    #say "Applyable:" ~ @applyable;
+
     if @applyable {
         @applyable[0].apply(@chunks);
     }

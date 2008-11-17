@@ -2,26 +2,27 @@ use v6;
 class Dispatcher::Rule;
 
 has $.name;
-# RAKUDO: can`t set attr-array in new
-has @.tokens is rw;
+has @.tokens;
 
 has @.args;
 has $.way;
 
 method is_applyable(@chunks) {
+    #say ".is_applyable chunks:'~ @chunks;
     self.apply(@chunks, :try);
 }
 
 method apply (@chunks, $try?) {
-
+    #say '.apply chunks:'~ @chunks ~ ' tokens:' ~ @.tokens;
     return False if @chunks != @.tokens;
 
     for @.tokens Z @chunks -> $token, $chunk {
+        #say "t: $token, c:$chunk";
         if $chunk ~~ $token {
             @!args.push($/) if $/;
         }
         else {
-            $!arg = undef;
+            @!args = undef;
             return False;
         }
     }
