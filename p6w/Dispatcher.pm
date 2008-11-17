@@ -4,10 +4,19 @@ class Dispatcher;
 has @.rules;
 has $.default is rw;
 
+#multi method add ($rule) {
 method add ($rule) {
     die "Only complite rules accepteable there." unless $rule.?is_complite;
     @!rules.push($rule);
 }
+
+#multi method add (@tokens, $way){
+#    use Dispatcher::Rule;
+#    my $rule =  Dispatcher::Rule.new( tokens => @tokens, way => $way );
+#    @!rules.push($rule);
+#}
+
+
 
 method dispatch (@chunks) {
     # that make clsure:

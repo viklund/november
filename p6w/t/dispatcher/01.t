@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 14;
+plan 15;
 
 use Dispatcher;
 ok(1,'We use Dispatcher and we are still alive');
@@ -11,9 +11,12 @@ ok(1,'We use Dispatcher::Rule and we are still alive');
 
 my $d = Dispatcher.new;
 
+dies_ok( { $d.add: Dispatcher::Rule.new }, 
+         'Dispatch add only complite Rule object' );
+
 $d.add: Dispatcher::Rule.new( :tokens('foo', 'bar'), way => { "Yay" } );
 
-ok( ! $d.dispatch(['foo']), 
+nok( $d.dispatch(['foo']), 
     'Return False if can`t find match Rule and do not have default'  );
 
 is( $d.dispatch(['foo', 'bar']), 
@@ -87,5 +90,6 @@ is( $d.dispatch(['summ', '12', '23']),
     'Rule with two regexp again (summ/\d+/\d+)'
 );
 
+#lives_ok ( { $d.add( ['boo'], { "A-a-a" } ) }, 'Add Rule object shortcut' );
 
 # vim:ft=perl6

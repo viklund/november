@@ -6,7 +6,7 @@ has @.args;
 has $.way;
 
 method match (@chunks) {
-    #say '.apply chunks:'~ @chunks ~ ' tokens:' ~ @.tokens;
+    #say 'match chunks:'~ @chunks.elems ~ ' tokens:' ~ @.tokens.elems;
     return False if @chunks != @.tokens;
 
     for @.tokens Z @chunks -> $token, $chunk {
