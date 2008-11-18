@@ -12,14 +12,13 @@ method match (@chunks) {
     for @.tokens Z @chunks -> $token, $chunk {
         #say "t: $token, c:$chunk";
         if ~$chunk ~~ $token {
-            @!args.push($/) if $/;
+            @!args.push(~$/) if $/;
         }
         else {
             self.clear;
             return False;
         }
     }
-
     return True;
 }
 
@@ -45,8 +44,8 @@ method apply {
 }
 
 method is_complite {
-    if @.tokens && $.way { return True }
-    return False;
+    if @.tokens && $.way { return True  }
+    else                 { return False }
 }
 
 method clear {

@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 15;
+plan 18;
 
 use Dispatcher;
 ok(1,'We use Dispatcher and we are still alive');
@@ -12,9 +12,10 @@ ok(1,'We use Dispatcher::Rule and we are still alive');
 my $d = Dispatcher.new;
 
 dies_ok( { $d.add: Dispatcher::Rule.new }, 
-         'Dispatch add only complite Rule object' );
+         'Dispatch .add add only complite Rule object' );
 
-$d.add: Dispatcher::Rule.new( :tokens('foo', 'bar'), way => { "Yay" } );
+ok( $d.add_rule( ['foo', 'bar'], { "Yay" } ), 
+           'Dispatch .add_rule -- shorcut for fast add Rule object' );
 
 nok( $d.dispatch(['foo']), 
     'Return False if can`t find match Rule and do not have default'  );
@@ -90,6 +91,19 @@ is( $d.dispatch(['summ', '12', '23']),
     'Rule with two regexp again (summ/\d+/\d+)'
 );
 
-#lives_ok ( { $d.add( ['boo'], { "A-a-a" } ) }, 'Add Rule object shortcut' );
+$d.add_rule( [''], { "Krevedko" } );
+
+is( $d.dispatch(['']), 
+    'Krevedko', 
+    "Root Rule  ([''])"
+);
+
+$d.add_rule( [/^ \w+ $/], { "Yep!" if $^w ~~ Str } );
+
+is( $d.dispatch(['so']), 
+    'Yep!', 
+    "Args is Str"
+);
+
 
 # vim:ft=perl6
