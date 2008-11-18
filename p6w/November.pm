@@ -32,21 +32,24 @@ class November does Session {
 
         my $action = $cgi.params<action> // 'view';
 
-        my $d = Dispatcher.new( default => { self.view_page } );
-        $d.add: Dispatcher::Rule.new( :tokens('view', /^ \w+ $/),
-                                      way => { self.view_page(~$^page) } );
+        my $d = Dispatcher.new( default => { self.not_found } );
+
+        $d.add_rule( [''], { self.view_page } );
+
+        $d.add_rule( ['view', /^ \w+ $/], { self.view_page($^page) } );
+
+        $d.add_rule( ['edit', /^ \w+ $/], { self.edit_page($^page) } );
+
+        $d.add_rule( ['in'], { self.log_in } );
+
+        $d.add_rule( ['out'], { self.log_out } );
+
+        $d.add_rule( ['recent'], { self.list_recent_changes } );
+
+        $d.add_rule( ['all'], { self.list_all_pages } );
+
         my @chunks =  $cgi.uri.chunks.list;
         $d.dispatch(@chunks);
-
-        #given $action {
-        #    when 'edit'           { self.edit_page();           return; }
-        #    when 'log_in'         { self.log_in();              return; }
-        #    when 'log_out'        { self.log_out();             return; }
-        #    when 'recent_changes' { self.list_recent_changes(); return; }
-        #    when 'all_pages'      { self.list_all_pages;        return; }
-        #}
-
-        #self.not_found();
     }
 
     method view_page($page='Main_Page') {
@@ -76,17 +79,7 @@ class November does Session {
         );
     }
 
-    method logged_in() {
-        my $sessions = self.read_sessions();
-        my $session_id = $.cgi.cookie<session_id>;
-        # RAKUDO: 'defined' should maybe be 'exists', although here it doesn't
-        # matter.
-        defined $session_id && defined $sessions{$session_id}
-    }
-
-    method edit_page() {
-        my $page = $.cgi.params<page> // 'Main_Page';
-
+    method edit_page($page) {
         my $sessions = self.read_sessions();
 
         return self.not_authorized() unless self.logged_in();
@@ -132,7 +125,15 @@ class November does Session {
         );
     }
 
-    method not_authorized() {
+    method logged_in() {
+        my $sessions = self.read_sessions();
+        my $session_id = $.cgi.cookie<session_id>;
+        # RAKUDO: 'defined' should maybe be 'exists', although here it doesn't
+        # matter.
+        defined $session_id && defined $sessions{$session_id}
+    }
+
+    method not_authorized {
         my $template = HTML::Template.new(
             filename => $.template_path ~ 'action_not_authorized.tmpl');
 
@@ -152,7 +153,7 @@ class November does Session {
         return eval( slurp( $.userfile_path ) );
     }
 
-    method not_found() {
+    method not_found {
         my $template = HTML::Template.new(
             filename => $.template_path ~ 'not_found.tmpl');
 
