@@ -2,15 +2,6 @@ use v6;
 
 class Text::Markup::Wiki::MediaWiki {
 
-    # RAKUDO: real slices don't work yet
-    sub slice(@a, @i) {
-        my @res;
-        for @i.values -> $ix {
-            @res.push(@a[$ix])
-        }
-        return @res
-    }
-
     sub entities(*@words) {
         return map { "&$_;" }, @words.values;
     }
@@ -19,7 +10,7 @@ class Text::Markup::Wiki::MediaWiki {
         for 0 ..^ @parlist.elems-1 -> $ix {
             if @parlist[$ix] ~~ /^'<p>'/ && @parlist[$ix+1] ~~ /^'<p>'/ {
                 @parlist[$ix+1] = @parlist[$ix] ~ @parlist[$ix+1];
-                # RAKUDO: .= is broken here, for some reason [perl #60620]
+                # RAKUDO: `@a[$i] .=` is broken [perl #60620]
                 @parlist[$ix+1] = @parlist[$ix+1].subst( '</p><p>', ' ' );
 
                 @parlist[$ix] = '<';
@@ -28,7 +19,6 @@ class Text::Markup::Wiki::MediaWiki {
 
         return @parlist.grep( { $_ ne '<' } );
     }
-
 
     sub format_line($line is rw) {
         my $partype = 'p';
