@@ -24,7 +24,7 @@ my $link_maker = { "<a href=\"/?page=$^page\">$^page</a>" }
         = '<p>An example of a [[link]]</p>';
     my $actual_output = $converter.format($input);
 
-    is( $actual_output, $expected_output, 'link conversion works' );
+    is( $actual_output, $expected_output, 'no link maker, no conversion' );
 }
 
 {
