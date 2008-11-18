@@ -1,3 +1,4 @@
+use v6;
 grammar URI::Grammar {
     token TOP        { ^ [<scheme> ':']? [ '//' <authority>]? <path> ['?' <query>]? ['#' <fragment>]? $ };
     token scheme     { <-[:/&?#]>+ };
@@ -6,7 +7,7 @@ grammar URI::Grammar {
     token port       { \d+ };
     token path       { <slash>? [ <chunk> '/'?]* }; # * mb wrong, because that allow '' URI
     token slash      { '/' };
-    token chunk      { <-[/?#]>+ };
+    token chunk      { <-[/?#:]>+ };
     token query      { <-[#]>* };
     token fragment   { .* };
 }
@@ -20,3 +21,5 @@ grammar URI::Grammar {
 #           (?:\?([^#]*))?
 #           (?:#(.*))?
 #         /x;
+
+# vim:ft=perl6

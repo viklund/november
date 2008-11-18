@@ -5,51 +5,9 @@ use Tags;
 use HTML::Template;
 use Text::Markup::Wiki::Minimal;
 use November::Storage::File;  
-
-sub get_unique_id {
-    # hopefully pretty unique ID
-    return int(time%1000000/100) ~ time%100
-}
-
-role Session {
-    has $.sessionfile_path  is rw;
-
-    method init {
-        # RAKUDO: set the attributes when declaring them
-        $.sessionfile_path = 'data/sessions';
-    }
-
-    method add_session( $id, %stuff) {
-        my $sessions = self.read_sessions();
-        $sessions{$id} = %stuff;
-        self.write_sessions($sessions);
-    }
-
-    method remove_session($id) {
-        my $sessions = self.read_sessions();
-        $sessions.delete($id);
-        self.write_sessions($sessions);
-    }
-
-    method read_sessions {
-        return {} unless $.sessionfile_path ~~ :e;
-        my $string = slurp( $.sessionfile_path );
-        my $stuff = eval( $string );
-        return $stuff;
-    }
-
-    method write_sessions( $sessions ) {
-        my $fh = open( $.sessionfile_path, :w );
-        $fh.say( $sessions.perl );
-        $fh.close;
-    }
-
-    method new_session($user_name) {
-        my $session_id = get_unique_id();
-        self.add_session( $session_id, { user_name => $user_name } );
-        return $session_id;
-    }
-}
+use Session;
+use Dispatcher;
+use Dispatcher::Rule;
 
 class November does Session {
 
@@ -74,22 +32,24 @@ class November does Session {
 
         my $action = $cgi.params<action> // 'view';
 
-        # Maybe we should consider turning this given into a lookup hash.
-        # RAKUDO: 'when' doesn't break out by default yet, #57652
-        given $action {
-            when 'view'           { self.view_page();           return; }
-            when 'edit'           { self.edit_page();           return; }
-            when 'log_in'         { self.log_in();              return; }
-            when 'log_out'        { self.log_out();             return; }
-            when 'recent_changes' { self.list_recent_changes(); return; }
-            when 'all_pages'      { self.list_all_pages;        return; }
-        }
+        my $d = Dispatcher.new( default => { self.view_page } );
+        $d.add: Dispatcher::Rule.new( :tokens('view', /^ \w+ $/),
+                                      way => { self.view_page(~$^page) } );
+        my @chunks =  $cgi.uri.chunks.list;
+        $d.dispatch(@chunks);
 
-        self.not_found();
+        #given $action {
+        #    when 'edit'           { self.edit_page();           return; }
+        #    when 'log_in'         { self.log_in();              return; }
+        #    when 'log_out'        { self.log_out();             return; }
+        #    when 'recent_changes' { self.list_recent_changes(); return; }
+        #    when 'all_pages'      { self.list_all_pages;        return; }
+        #}
+
+        #self.not_found();
     }
 
-    method view_page() {
-        my $page = $.cgi.params<page> // 'Main_Page';
+    method view_page($page='Main_Page') {
 
         unless $.storage.wiki_page_exists($page) {
             self.not_found;
