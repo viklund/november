@@ -13,11 +13,11 @@ class Text::Markup::Wiki::MediaWiki {
                 # RAKUDO: `@a[$i] .=` is broken [perl #60620]
                 @parlist[$ix+1] = @parlist[$ix+1].subst( '</p><p>', ' ' );
 
-                @parlist[$ix] = '<';
+                @parlist[$ix] = undef;
             }
         }
 
-        return @parlist.grep( { $_ ne '<' } );
+        return @parlist.grep( { $_ } );
     }
 
     sub format_line($line is rw) {
