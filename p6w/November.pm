@@ -244,10 +244,10 @@ class November does Session {
             if $page ~~ m/':'/ {
                 return "<a href=\"$page\">$title</a>";
             } else {
-                return "<a href=\"?action=view&page=$page\">$title</a>";
+                return "<a href=\"/view/$page\">$title</a>";
             }
         } else {
-            return sprintf('<a href="?action=%s&page=%s"%s>%s</a>',
+            return sprintf('<a href="/%s/%s" %s >%s</a>',
                            $.storage.wiki_page_exists($page)
                              ?? ('view', $page, '')
                              !! ('edit', $page, ' class="nonexistent"'),

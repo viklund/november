@@ -193,7 +193,7 @@ class Tags {
     # when new-html-template give us include 
     sub tag_html ($tag, $norm_counts) {
         return '<a class="t' ~ $norm_counts{$tag} 
-               ~ '" href="?action=all_pages&tag=' ~ $tag ~ '">' 
+               ~ '" href="/all?tag=' ~ $tag ~ '">' 
                ~ $tag ~ '</a> '
     }
 }
