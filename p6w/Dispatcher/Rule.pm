@@ -12,7 +12,7 @@ method match (@chunks) {
     for @.tokens Z @chunks -> $token, $chunk {
         #say "t: $token, c:$chunk";
         if ~$chunk ~~ $token {
-            @!args.push(~$/) if $/;
+            @!args.push($/) if $/;
         }
         else {
             self.clear;

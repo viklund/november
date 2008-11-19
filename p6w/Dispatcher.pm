@@ -29,7 +29,7 @@ method add_rules(@rules) {
 }
 
 method dispatch (@chunks) {
-    # that make clsure:
+    # RAKUDO: grep make closure
     #my @matched =  @!rules.grep: { .match(@chunks) };    
     # so workaround:
 

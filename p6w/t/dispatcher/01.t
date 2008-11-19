@@ -14,96 +14,95 @@ my $d = Dispatcher.new;
 dies_ok( { $d.add: Dispatcher::Rule.new }, 
          'Dispatch .add add only complite Rule object' );
 
+$d.add: Dispatcher::Rule.new( :tokens(''), way => { "Krevedko" } );
+
+is( $d.dispatch(['']), 
+    'Krevedko', 
+    "Dispatch to Rule ['']"
+);
+
 ok( $d.add_rule( ['foo', 'bar'], { "Yay" } ), 
-           'Dispatch .add_rule -- shorcut for fast add Rule object' );
+           'Dispatch .add_rule -- shortcut for fast add Rule object' );
 
 nok( $d.dispatch(['foo']), 
-    'Return False if can`t find match Rule and do not have default'  );
+    'Dispatcher return False if can`t find match Rule and do not have default'  );
+
 
 is( $d.dispatch(['foo', 'bar']), 
     "Yay", 
-    'Dispatch to Rule (foo bar)'
+    "Dispatch to Rule ['foo', 'bar'])"
 );
 
-$d.default = sub { return "Woow" };
+$d.default = { "Woow" };
 
 is( $d.dispatch(['foo', 'bar', 'her']), 
     "Woow", 
-    'Dispatch to default'  
+    'Dispatch to default, when have no matched Rule'  
 );
 
-$d.add: Dispatcher::Rule.new( :tokens('foo', 'a'|'b'), way => { "Zzzz" } );
+$d.add_rule: ['foo', 'a'|'b'], { "Zzzz" };
 
 is( $d.dispatch(['foo', 'a']), 
     'Zzzz', 
-    'Dispatch to rule with Junction (foo/a|b) a'  
+    'Dispatch to Rule with Junction a'  
 );
 
 is( $d.dispatch(['foo', 'b']), 
     'Zzzz', 
-    'Dispatch to rule with Junction (foo/a|b) b'  
+    'Dispatch to Rule with Junction (foo/a|b) b'  
 );
 
-$d.add: Dispatcher::Rule.new( :tokens('foo', /^ \d+ $/), way => { $^d } );
+$d.add_rule: ['foo', /^ \d+ $/], { $^d };
 
 is( $d.dispatch(['foo', '50']), 
     '50', 
-    'Dispatch to rule with regexp (foo/50)'  
+    "Dispatch to Rule with regexp ['foo', /^ \d+ $/])"  
 );
 
-$d.add: Dispatcher::Rule.new( :tokens('foo', / \d+ /), way => { $^d + 10 } );
+$d.add_rule( [/^ \w+ $/], { "Yep!" if $^w.WHAT eq 'Match' } );
+
+is( $d.dispatch(['so']), 
+    'Yep!', 
+    "Argument is Match"
+);
+
+$d.add_rule: ['foo', / \d+ /], { $^d + 10 };
 
 is( $d.dispatch(['foo', '50']), 
     '60', 
-    'Dispatch to last rule when applyable two (foo/50)'  
+    "Dispatch ['foo', '50'] to last matched Rule" 
 );
 
 is( $d.dispatch(['foo', 'a50z']), 
     '60', 
-    'Rule with regexp (foo/a50z)'  
+    'Rule catch right arg'  
 );
 
-is( $d.dispatch(['foo', 'bar']), 
-    "Yay", 
-    'Dispatch to simple Rule, test after add more rules (foo/bar)' 
-);
-
-$d.add: Dispatcher::Rule.new( :tokens('foo', / \d+ /, 'bar' ), 
-                              way => { $^d + 1 } );
+$d.add_rule: ['foo', / \d+ /, 'bar' ], { $^d + 1 };
 
 is( $d.dispatch(['foo', 'item4', 'bar']), 
     '5', 
     'Rule with regexp in center (foo/\d+/bar)'
 );
 
-$d.add: Dispatcher::Rule.new( :tokens('summ', / \d+ /, / \d+ / ), 
-                              way => { $^a + $^b } );
+$d.add_rule: ['summ', / \d+ /, / \d+ / ], { $^a + $^b };
 
 
 is( $d.dispatch(['summ', '2', '3']), 
     '5', 
-    'Rule with two regexp (summ/\d+/\d+)'
+    'Dispatch to Rule with two regexp'
 );
 
+$d.add_rule: ['summ', / \w+ /, 1|2 ], { $^a ~ "oo" };
 
-is( $d.dispatch(['summ', '12', '23']), 
-    '35', 
-    'Rule with two regexp again (summ/\d+/\d+)'
+is( $d.dispatch(['summ', 'Z', 2]), 
+    'Zoo', 
+    'Rule with regexp and junction'
 );
 
-$d.add_rule( [''], { "Krevedko" } );
-
-is( $d.dispatch(['']), 
-    'Krevedko', 
-    "Root Rule  ([''])"
+is( $d.dispatch(['foo', 'bar']), 
+    "Yay", 
+    'Dispatch to simple Rule, test after add so many Rules' 
 );
-
-$d.add_rule( [/^ \w+ $/], { "Yep!" if $^w ~~ Str } );
-
-is( $d.dispatch(['so']), 
-    'Yep!', 
-    "Args is Str"
-);
-
 
 # vim:ft=perl6
