@@ -24,7 +24,7 @@ my %dispatch = (
     'all_pages'      => \&list_all_pages,
 );
 
-my $SKIN_USED = 'DeleteMe';
+my $SKIN_USED = 'CleanAndSoft';
 
 my $TEMPLATE_PATH = "skins/$SKIN_USED/";
 my $CONTENT_PATH = 'data/articles/';
@@ -48,7 +48,7 @@ sub handle_request {
     my ($self, $cgi) = @_;
 
     my $path = $cgi->path_info();
-    if ( $path =~ m{^/\w+\.css$} ) {
+    if ( $path =~ m{^/\w+\.(?:css|png)$} ) {
         print status_ok(),
               read_file( $TEMPLATE_PATH . $path );
         return;
