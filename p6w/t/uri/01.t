@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 23;
+plan 26;
 
 use URI;
 ok(1,'We use URI and we are still alive');
@@ -30,16 +30,24 @@ $u.init('/foo/bar/her');
 
 is($u.chunks, 'foo bar her', 'chunks from absolute path'); 
 ok($u.absolute, 'absolut path'); 
-ok( ! $u.relative, 'not relative path'); 
+nok($u.relative, 'not relative path'); 
 
 $u.init('foo/bar/her');
 
 is($u.chunks, 'foo bar her', 'chunks from relative path'); 
 ok( $u.relative, 'relative path'); 
-ok( ! $u.absolute, 'not absolut path'); 
+nok($u.absolute, 'not absolut path'); 
 
 is($u.chunks[0], 'foo', 'first chunk'); 
 is($u.chunks[1], 'bar', 'second chunk'); 
 is($u.chunks[-1], 'her', 'last chunk'); 
+
+$u.init('http://foo.com');
+
+ok($u.chunks.list.perl eq '[""]', ".chunks return [''] for empty path");
+ok($u.absolute, 'http://foo.com have absolute path'); 
+nok($u.relative, 'http://foo.com have not relative path'); 
+
+
 
 # vim:ft=perl6

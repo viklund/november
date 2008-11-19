@@ -15,7 +15,7 @@ method init ($str) {
 
     $!uri = $/;
 
-    @!chunks = $/<path><chunk>;
+    @!chunks = $/<path><chunk> // ('');
 }
 
 method scheme {
@@ -53,12 +53,12 @@ method path {
 
 method absolute {
     my %p = $.uri<path>;
-    ? (%p<slash> // 0);
+    ? (%p<slash> // 0) || $.scheme;
 }
 
 method relative {
     my %p = $.uri<path>;
-    ! (%p<slash> // 0);
+    ! (%p<slash> // 0) && ! $.scheme;
 }
 
 method query {
