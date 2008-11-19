@@ -7,7 +7,6 @@ use Text::Markup::Wiki::Minimal;
 use November::Storage::File;  
 use Session;
 use Dispatcher;
-use Dispatcher::Rule;
 
 class November does Session {
 
