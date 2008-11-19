@@ -13,8 +13,19 @@ method add ($rule) {
 #multi method add (@tokens, $way){
 method add_rule (@tokens, $way) {
     use Dispatcher::Rule;
-    my $rule = Dispatcher::Rule.new( tokens => @tokens.values, way => $way );
+    my $rule = Dispatcher::Rule.new( tokens => @tokens.list, way => $way );
     @!rules.push($rule);
+}
+
+# I think Hash better there, but Rakudo make string from all keys
+method add_rules(@rules) {
+    use Dispatcher::Rule;
+    # RAKUDO: this method return Iterator, workaround:
+    my $r;
+    for @rules.list -> $tokens, $way {
+        $r = self.add_rule([$tokens.list], $way);
+    }
+    return $r;
 }
 
 method dispatch (@chunks) {
