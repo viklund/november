@@ -34,19 +34,16 @@ class November does Session {
 
         my $d = Dispatcher.new( default => { self.not_found } );
 
-        $d.add_rule( [''], { self.view_page } );
+        my @rules = 
+            [''],                { self.view_page },
+            ['view', /^ \w+ $/], { self.view_page(~$^page) },
+            ['edit', /^ \w+ $/], { self.edit_page(~$^page) },
+            ['in'],              { self.log_in },
+            ['out'],             { self.log_out },
+            ['recent'],          { self.list_recent_changes },
+            ['all'],             { self.list_all_pages };
 
-        $d.add_rule( ['view', /^ \w+ $/], { self.view_page($^page) } );
-
-        $d.add_rule( ['edit', /^ \w+ $/], { self.edit_page($^page) } );
-
-        $d.add_rule( ['in'], { self.log_in } );
-
-        $d.add_rule( ['out'], { self.log_out } );
-
-        $d.add_rule( ['recent'], { self.list_recent_changes } );
-
-        $d.add_rule( ['all'], { self.list_all_pages } );
+        $d.add_rules(@rules);
 
         my @chunks =  $cgi.uri.chunks.list;
         $d.dispatch(@chunks);
