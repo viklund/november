@@ -25,8 +25,9 @@ class HTML::Template {
         my @loops;
 
         while ( $text ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' / ) {
-            my $directive = $0;
-            my $name = $1;
+            # RAKUDO: strange Hash-Match in $0, $1, $3 etc
+            my $directive = ~$0;
+            my $name = ~$1;
 
             # RAKUDO: The below method with junctions stopped working somewhere
             # between r31963 and r32280.
@@ -52,7 +53,7 @@ class HTML::Template {
                                   '</TMPL_LOOP>' / {
                     die "No closing </TMPL_LOOP>"
                 }
-                my $loop_inside = $0;
+                my $loop_inside = ~$0;
 
                 $text .= subst( / '<TMPL_LOOP NAME=' \w+ '>' .*?
                                   '</TMPL_LOOP>' /,
@@ -66,12 +67,12 @@ class HTML::Template {
                                   '</TMPL_IF>' / {
                     die "No closing </TMPL_IF>"
                 }
-                my $text_inside = $0;
+                my $text_inside = ~$0;
                 my $if_inside = $text_inside;
                 my $else_inside = '';
                 if $text_inside ~~ / ^ (.*?) '<TMPL_ELSE>' (.*) $ / {
-                    $if_inside = $0;
-                    $else_inside = $1;
+                    $if_inside = ~$0;
+                    $else_inside = ~$1;
                 }
                 # TODO: In a perfect world, the contents should also be
                 # parsed and substituted.
@@ -103,8 +104,8 @@ class HTML::Template {
     method serialize_iteration($text, %hash) {
         my $result = $text;
         while ( $result ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' / ) {
-            my $directive = $0;
-            my $name = $1;
+            my $directive = ~$0;
+            my $name = ~$1;
 
             die "Nested TMPL_LOOPs not supported" if $directive eq 'LOOP';
 

@@ -179,15 +179,13 @@ class Tags {
     }
 
     method cloud_tags {
-        # RAKUDO: can`t concatenate with undef. "Multiple Dispatch: No suitable 
-        # candidate found for 'i_concatenate', with signature 'PP'"
-        my $tags_str = '';
-
         my $norm_counts = self.norm_counts; 
+        my $tags_str;
 
         if $norm_counts {
             $tags_str ~= tag_html($_, $norm_counts) for $norm_counts.keys;
         }
+
         return $tags_str;
     }
 

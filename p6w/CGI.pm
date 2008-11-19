@@ -92,8 +92,7 @@ class CGI {
     }
 
     method eat_cookie(Str $http_cookie) {
-        # RAKODO: split(/ ; ' '? /) produce [""] on "" 
-        # and ["foo;", ""] on 'foo;'
+        # RAKODO: split(/ ; ' '? /) produce [""] on "", perl #60228 should cure that 
         my @param_values  = $http_cookie.split('; ');
 
         for @param_values -> $param_value {
