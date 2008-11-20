@@ -26,7 +26,10 @@ class CGI {
         self.eat_cookie( %*ENV<HTTP_COOKIE> );
         $!crlf = "\x[0D]\x[0A]";
         $!uri = URI.new;
-        $.uri.init( 'http://' ~ %*ENV<SERVER_NAME> ~ ':' ~ %*ENV<SERVER_PORT> ~  %*ENV<REQUEST_URI> );
+        my $uri_str = 'http://' ~ %*ENV<SERVER_NAME>;
+        $uri_str ~= ':' ~ %*ENV<SERVER_PORT> if %*ENV<SERVER_PORT>;  
+        $uri_str ~=  %*ENV<REQUEST_URI>;
+        $.uri.init($uri_str);
 
     }
 
