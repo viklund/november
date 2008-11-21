@@ -71,8 +71,14 @@ class November does Session {
         my $t = Tags.new();
         $template.param( 'PAGETAGS' => $t.page_tags: $page );
         $template.param( 'TAGS'     => $t.cloud_tags );
-        
-        $template.param('LOGGED_IN' => self.logged_in());
+       
+        # I think we should give only ten; all pages on the root, 
+        # current pages in other cases 
+        my @changes = self.get_all_pages_changes;
+
+        $template.param('RECENTLY' => @changes);
+
+        $template.param('LOGGED_IN' => self.logged_in);
 
         $.cgi.send_response(
             $template.output(),
@@ -261,20 +267,7 @@ class November does Session {
     }
 
     method list_recent_changes {
-
-        # RAKUDO: Seemingly impossible to get the right number of list
-        # containers using an array variable @recent_changes here.
-        my $recent_changes = $.storage.read_recent_changes();
-
-        my @changes;
-        for $recent_changes.values -> $modification_id {
-            my $modification = $.storage.read_modification($modification_id);
-            push @changes, {
-                'page' => self.make_link($modification[0]),
-                'time' => $modification_id,
-                'author' => $modification[2] || 'somebody' };
-        }
-
+        my @changes = self.get_all_pages_changes;
         my $template = HTML::Template.new(
                 filename => $.template_path ~ 'recent_changes.tmpl');
 
@@ -286,6 +279,23 @@ class November does Session {
         );
 
         return;
+    }
+
+    method get_all_pages_changes {
+        # RAKUDO: Seemingly impossible to get the right number of list
+        # containers using an array variable @recent_changes here.
+        my $recent_changes = $.storage.read_recent_changes();
+
+        my @changes;
+        for $recent_changes.list -> $modification_id {
+            my $modification = $.storage.read_modification($modification_id);
+            push @changes, {
+                'page' => self.make_link($modification[0]),
+                'time' => $modification_id,
+                'author' => $modification[2] || 'somebody' 
+                };
+        }
+        return @changes;
     }
 
     method list_all_pages {

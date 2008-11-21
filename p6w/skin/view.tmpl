@@ -24,11 +24,11 @@
 
         <TMPL_IF NAME=RECENTLY>
         <div class="block-right">
-            <h3>All tags</h3>
-            <ul>
+            <h3>Recently changed</h3>
+            <ul class="list-simple">
                 <TMPL_LOOP NAME=RECENTLY>
                     <li>
-                        <a href="/view/<TMPL_VAR NAME=PAGE>"><TMPL_VAR NAME=PAGE></a>
+                        <TMPL_VAR NAME=PAGE> by <TMPL_VAR NAME=AUTHOR>
                     </li>
                 </TMPL_LOOP>
             </ul>
