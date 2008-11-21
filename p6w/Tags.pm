@@ -167,12 +167,17 @@ class Tags {
     }
     
     method page_tags (Str $page) {
+        #my @tags = self.tags_parse( self.read_page_tags: $page ); 
+        #@tags.map: { { tag => $_ } }; 
+
+        # that`s ugly, we must use template instead, 
+        # when new-html-template give us ability to 
+        # know last element in the list 
         my @page_tags = self.tags_parse( self.read_page_tags: $page ); 
 
         my $tags_str;
         if @page_tags {
-            my $norm_counts = self.norm_counts(@page_tags); 
-            @page_tags = map { tag_html($_, $norm_counts) }, @page_tags;
+            @page_tags = @page_tags.map: { tag_html($_) };
             $tags_str = @page_tags.join(', ');
         }
         return $tags_str;
@@ -191,10 +196,10 @@ class Tags {
 
     # that`s ugly, we must use template instead, 
     # when new-html-template give us include 
-    sub tag_html ($tag, $norm_counts) {
-        return '<a class="t' ~ $norm_counts{$tag} 
-               ~ '" href="/all?tag=' ~ $tag ~ '">' 
-               ~ $tag ~ '</a>'
+    sub tag_html ($tag, $norm_counts?) {
+        my $html =  '<a';
+        $html ~= ' class="t' ~ $norm_counts{$tag} ~ '"' if $norm_counts;
+        $html ~= ' href="/all?tag=' ~ $tag ~ '">' ~ $tag ~ '</a>'
     }
 }
 
