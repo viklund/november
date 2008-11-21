@@ -48,6 +48,7 @@ h1 {
 
 #content {
     padding: 20px 40px 0;
+    margin-right:284px;
 }
 
 .diff .insertion {
@@ -73,16 +74,22 @@ a.nonexistent {
     color: #00c;
 }
 
-.cloud a {
-    margin-right:12px;
-}
 .cloud {
     float:right;
-    clear:both;
-    line-height:1.9em;
+    line-height:1.8em;
     width: 200px;
-    padding: 0 0 30px 30px;
-    background:#ccc;
+    padding:20px;
+    margin: 52px 40px 20px 20px;
+    border: 2px solid #863;
+    clear:both;
+}
+.cloud h3 {
+margin:0 0 10px 0;
+color:#330;
+}
+
+.cloud a {
+    margin-right:12px;
 }
 
 .pagetags {
