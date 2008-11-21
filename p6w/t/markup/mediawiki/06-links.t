@@ -6,23 +6,22 @@ plan 5;
 use Text::Markup::Wiki::MediaWiki;
 
 my $converter = Text::Markup::Wiki::MediaWiki.new;
-my $link_maker = { "<a href=\"/?page=$^page\">$^page</a>" }
+my $link_maker = { my $l = $^page.ucfirst; "<a href=\"/?page=$l\">$^page</a>" }
 
-# Especially test capitalization in some way. The two first tests are wrong.
 {
     my $input = 'An example of a [[link]]';
     my $expected_output
-        = '<p>An example of a <a href="/?page=link">link</a></p>';
-    my $actual_output = $converter.format($input, $link_maker);
+        = '<p>An example of a <a href="/?page=Link">link</a></p>';
+    my $actual_output = $converter.format($input, :$link_maker);
 
     is( $actual_output, $expected_output, 'link conversion works' );
 }
 
 {
     my $input = 'An example of a [[link]]';
-    my $expected_output
-        = '<p>An example of a [[link]]</p>';
+    my $expected_output = '<p>An example of a [[link]]</p>';
     my $actual_output = $converter.format($input);
+    say $actual_output, "|", $expected_output;
 
     is( $actual_output, $expected_output, 'no link maker, no conversion' );
 }
@@ -44,7 +43,7 @@ my $link_maker = { "<a href=\"/?page=$^page\">$^page</a>" }
 }
 
 {
-    my $input = '[[A Link\nSpanning Two Lines]]';
+    my $input = "[[A Link\nSpanning Two Lines]]";
     my $expected_output = '<p>[[A Link Spanning Two Lines]]</p>';
     my $actual_output = $converter.format($input, $link_maker);
 
