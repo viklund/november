@@ -183,7 +183,7 @@ class Tags {
         my $tags_str;
 
         if $norm_counts {
-            $tags_str ~= tag_html($_, $norm_counts) for $norm_counts.keys;
+            $tags_str ~= tag_html($_, $norm_counts) ~ ' ' for $norm_counts.keys;
         }
 
         return $tags_str;
@@ -194,7 +194,7 @@ class Tags {
     sub tag_html ($tag, $norm_counts) {
         return '<a class="t' ~ $norm_counts{$tag} 
                ~ '" href="/all?tag=' ~ $tag ~ '">' 
-               ~ $tag ~ '</a> '
+               ~ $tag ~ '</a>'
     }
 }
 
