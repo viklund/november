@@ -16,8 +16,8 @@ h1 {
 }
 
 h3 {
-    font-size:1.25em; /* 20px */
-    margin:1em 0 0.625em 0;
+    font-size:1.125em; /* 18px */
+    margin:1em 0 0.5625em 0;
     color:#330;
 }
 
@@ -74,7 +74,30 @@ a.nonexistent {
     color: #F00;
 }
 
+.block-right {
+    float:right;
+    clear:both;
+    margin: 1.5625em 40px 0px 20px;
+    border: 2px solid #863;
 
+    width: 200px;
+    padding:0 20px 20px 20px;
+}
+.space-top-h1 {
+    margin-top:5.1875em /* 83px */
+}
+
+.list-simple {
+    margin:0; padding:0;
+    list-style:none;
+}
+
+.list-simple li {
+    margin-bottom:0.3em;
+}
+
+/* Tags
+----------------------------------------------*/
 .pagetags a, .cloud a {
     color: #333;
 }
@@ -113,17 +136,4 @@ a.nonexistent {
 .t8 { font-size:1.6em;}
 .t9 { font-size:1.7em;}
 .t10 { font-size:1.8em;}
-
-.block-right {
-    float:right;
-    clear:both;
-    margin: 1.5625em 40px 0px 20px;
-    border: 2px solid #863;
-
-    width: 200px;
-    padding:0 20px 20px 20px;
-}
-.space-top-h1 {
-    margin-top:5.1875em /* 83px */
-}
 
