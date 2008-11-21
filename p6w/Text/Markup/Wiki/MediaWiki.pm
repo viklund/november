@@ -20,7 +20,7 @@ class Text::Markup::Wiki::MediaWiki {
         return @parlist.grep( { $_ } );
     }
 
-    sub format_line($line is rw) {
+    sub format_line($line is rw, :$link_maker) {
         my $partype = 'p';
         if $line ~~ /^ '==' (.*) '==' $/ {
             $partype = 'h2';
@@ -31,22 +31,29 @@ class Text::Markup::Wiki::MediaWiki {
         $trimmed .= subst( / ^ \s+ /, '' );
         $trimmed .= subst( / \s+ $ /, '' );
 
-        my $cleaned_of_whitespace = $trimmed.trans(
-            [ /\s+/ => ' ' ]
-        );
+        my $cleaned_of_whitespace = $trimmed.trans( [ /\s+/ => ' ' ] );
 
         my $xml_escaped = $cleaned_of_whitespace.trans(
             [           '<', '>', '&', '\''   ] =>
             [ entities < lt   gt  amp  #039 > ]
         );
 
-        return sprintf '<%s>%s</%s>', $partype, $xml_escaped, $partype;
+        my $result = $xml_escaped;
+
+        if defined $link_maker {
+            my $link_regex = / \[\[ (<-[\]]>+) \]\] /; # /
+            while $result ~~ $link_regex {
+                $result .= subst( $link_regex, { $link_maker($0) } );
+            }
+        }
+
+        return sprintf '<%s>%s</%s>', $partype, $result, $partype;
     }
 
-    sub format_paragraph($paragraph) {
+    sub format_paragraph($paragraph, :$link_maker) {
         # RAKUDO: This could use some ==>
         return merge_consecutive_paragraphs
-               map { format_line($^line) },
+               map { format_line($^line, :$link_maker) },
                $paragraph.split("\n");
     }
 
@@ -58,7 +65,7 @@ class Text::Markup::Wiki::MediaWiki {
             # RAKUDO: Needed right now due to HLL non-mapping.
             my $paragraph_copy = $paragraph;
 
-            push @result_pars, format_paragraph($paragraph_copy);
+            push @result_pars, format_paragraph($paragraph_copy, :$link_maker);
         }
 
         return join "\n\n", @result_pars;
