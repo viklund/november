@@ -60,8 +60,12 @@ class November does Session {
 
         $template.param('TITLE' => $page);
 
-        my $minimal = Text::Markup::Wiki::Minimal.new( link_maker => { self.make_link($^p, $^t) } );
-        $template.param('CONTENT' => $minimal.format($.storage.read_page($page)) );
+        my $minimal = Text::Markup::Wiki::Minimal.new( 
+                        link_maker => { self.make_link($^p, $^t) } 
+                      );
+        $template.param(
+            'CONTENT' => $minimal.format($.storage.read_page: $page) 
+        );
 
         # TODO: we need plugin system (see topics in mail-list)
         my $t = Tags.new();
@@ -113,7 +117,7 @@ class November does Session {
 
         # TODO: we need plugin system (see topics in mail-list)
         my $t = Tags.new;
-        $template.param('PAGETAGS' => $t.read_page_tags($page));
+        $template.param('PAGETAGS' => $t.read_page_tags: $page);
 
         $template.param('LOGGED_IN' => True);
 
