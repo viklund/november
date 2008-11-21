@@ -1,6 +1,7 @@
 use v6;
 use November::Storage;
 use Impatience;
+use Utils;
 
 class November::Storage::File is November::Storage {
     my $.content_path        = 'data/articles/';
@@ -17,7 +18,7 @@ class November::Storage::File is November::Storage {
         return eval( slurp( $.recent_changes_path ) );
     }
 
-    method write_recent_changes ( $recent_changes ) {
+    method write_recent_changes ($recent_changes) {
         my $fh = open($.recent_changes_path, :w);
         $fh.say($recent_changes.perl);
         $fh.close;
@@ -30,7 +31,7 @@ class November::Storage::File is November::Storage {
         return $page_history;
     }
 
-    method write_page_history( $page, $page_history ) {
+    method write_page_history($page, $page_history) {
         my $file = $.content_path ~ $page;
         my $fh = open($file, :w);
         $fh.say( $page_history.perl );
@@ -43,14 +44,18 @@ class November::Storage::File is November::Storage {
         return eval( slurp($file) );
     }
 
-    method write_modification ( $modification_id, $modification ) {
+    method write_modification ($modification) {
         my $data = $modification.perl;
         r_remove($data);
+
+        my $modification_id = get_unique_id;
 
         my $file =  $.modifications_path ~ $modification_id;
         my $fh = open( $file, :w );
         $fh.say( $data );
         $fh.close();
+
+        return $modification_id;
     }
 
     method add_to_index ($page) {
