@@ -288,7 +288,7 @@ class November does Session {
                 filename => $.template_path ~ 'list_all_pages.tmpl');
 
         my $t = Tags.new();
-        $template.param('TAGS' => $t.cloud_tags() ) if $t;
+        $template.param('TAGS' => $t.cloud_tags) if $t;
 
         my $index;
 
@@ -298,7 +298,7 @@ class November does Session {
             my $tags_index = $t.read_tags_index;
             $index = $tags_index{$tag};
     
-            $template.param('TAG' => $.cgi.params<tag> );
+            $template.param('TAG' => $tag ) if $index;
         } 
         else {
             $index = $.storage.read_index;
@@ -312,10 +312,10 @@ class November does Session {
         # RAKUDO: @($arrayref) not implemented yet, so:
         # my @list = map { { page => $_ } }, @($index); 
         # do not work. Workaround:
-        my @list = map { { page => $_ } }, $index.values; 
+        my @list = map { { page => $_ } }, $index.list; 
 
-        $template.param('LIST'   => @list);
-        $template.param('LOGGED_IN' => self.logged_in());
+        $template.param('LIST' => @list);
+        $template.param('LOGGED_IN' => self.logged_in);
 
         $.cgi.send_response(
             $template.output()
