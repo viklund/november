@@ -21,7 +21,8 @@ class November::Storage {
     method save_page($page, $new_text, $author) {
         self.add_to_index($page) unless self.wiki_page_exists($page); 
 
-        my $modification_id = get_unique_id();
+        use Utils;
+        my $modification_id = get_unique_id;
 
         my $page_history = self.read_page_history($page);
         $page_history.unshift( $modification_id );

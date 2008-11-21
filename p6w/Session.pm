@@ -35,14 +35,10 @@ method write_sessions( $sessions ) {
 }
 
 method new_session($user_name) {
-    my $session_id = get_unique_id();
+    use Utils;
+    my $session_id = get_unique_id;
     self.add_session( $session_id, { user_name => $user_name } );
     return $session_id;
-}
-
-sub get_unique_id {
-    # hopefully pretty unique ID
-    return int(time%1000000/100) ~ time%100
 }
 
 # vim:ft=perl6
