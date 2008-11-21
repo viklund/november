@@ -7,7 +7,7 @@
     <body>
         <div id="logo"></div>
         <ul id="toolbar">
-            <li><a href="?action=edit">Edit</a></li>
+            <li><a href="/edit/<TMPL_VAR NAME=PAGE>">Edit</a></li>
             <TMPL_IF NAME=LOGGED_IN>
                 <li><a href="/out">Log out</a></li>
             <TMPL_ELSE>

@@ -51,7 +51,7 @@ class November does Session {
     method view_page($page='Main_Page') {
 
         unless $.storage.wiki_page_exists($page) {
-            self.not_found;
+            self.not_found($page);
             return;
         }
 
@@ -100,7 +100,8 @@ class November does Session {
             my $t = Tags.new();
             $t.update_tags($page, $tags);
 
-            return self.view_page();
+            $.cgi.redirect('/view/' ~ $page );
+            return;
         }
 
         my $template = HTML::Template.new(
@@ -149,11 +150,11 @@ class November does Session {
         return eval( slurp( $.userfile_path ) );
     }
 
-    method not_found {
+    method not_found($page?) {
         my $template = HTML::Template.new(
             filename => $.template_path ~ 'not_found.tmpl');
 
-        $template.param('PAGE'      => 'Action Not found');
+        $template.param('PAGE'      => $page || 'Action Not found');
         $template.param('LOGGED_IN' => self.logged_in());
 
         $.cgi.send_response(
