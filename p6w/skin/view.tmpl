@@ -16,9 +16,22 @@
         </ul>
 
         <TMPL_IF NAME=TAGS>
-        <div class="cloud">
+        <div class="block-left cloud">
             <h3>All tags</h3>
             <TMPL_VAR NAME=TAGS>
+        </div>
+        </TMPL_IF>
+
+        <TMPL_IF NAME=RECENTLY>
+        <div class="block-left">
+            <h3>All tags</h3>
+            <ul>
+                <TMPL_LOOP NAME=RECENTLY>
+                    <li>
+                        <a href="/view/<TMPL_VAR NAME=PAGE>"><TMPL_VAR NAME=PAGE></a>
+                    </li>
+                </TMPL_LOOP>
+            </ul>
         </div>
         </TMPL_IF>
 
