@@ -298,23 +298,24 @@ class November does Session {
             my $tags_index = $t.read_tags_index;
             $index = $tags_index{$tag};
     
-            $template.param('TAG' => $tag ) if $index;
+            $template.param('TAG' => $tag );
         } 
         else {
             $index = $.storage.read_index;
         }
 
+        if $index {
+            # HTML::Template eat only Arrey of Hashes and Hash keys should 
+            # be in low case. HTML::Template in new-html-template brunch 
+            # will be much clever.
 
-        # HTML::Template eat only Arrey of Hashes and Hash keys should 
-        # be in low case. HTML::Template in new-html-template brunch 
-        # will be much clever.
+            # RAKUDO: @($arrayref) not implemented yet, so:
+            # my @list = map { { page => $_ } }, @($index); 
+            # do not work. Workaround:
+            my @list = map { { page => $_ } }, $index.list; 
+            $template.param('LIST' => @list);
+        }
 
-        # RAKUDO: @($arrayref) not implemented yet, so:
-        # my @list = map { { page => $_ } }, @($index); 
-        # do not work. Workaround:
-        my @list = map { { page => $_ } }, $index.list; 
-
-        $template.param('LIST' => @list);
         $template.param('LOGGED_IN' => self.logged_in);
 
         $.cgi.send_response(
