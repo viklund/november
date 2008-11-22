@@ -298,7 +298,7 @@ class November does Session {
             my $modification = $.storage.read_modification($modification_id);
             my $count = push @changes, {
                 'page' => self.make_link($modification[0]),
-                'time' => $modification_id,
+                'time' => $modification[3] || $modification_id,
                 'author' => $modification[2] || 'somebody' 
                 };
             # RAKUDO: last not implemented yet :(

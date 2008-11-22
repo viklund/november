@@ -45,7 +45,9 @@ class November::Storage::File is November::Storage {
     }
 
     method write_modification ($modification) {
-        my $data = $modification.perl;
+        my $modif = $modification;
+        $modif.push(int time);
+        my $data = $modif.perl;
         r_remove($data);
 
         my $modification_id = get_unique_id;
