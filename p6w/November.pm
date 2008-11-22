@@ -72,11 +72,8 @@ class November does Session {
         $template.param( 'PAGETAGS' => $t.page_tags: $page );
         $template.param( 'TAGS'     => $t.cloud_tags );
        
-        # I think we should give only ten; all pages on the root, 
-        # current pages in other cases 
-        my @changes = self.get_all_pages_changes;
-
-        $template.param('RECENTLY' => @changes);
+        $template.param('RECENTLY' => self.get_changes: page => $page, 
+                                                        limit => 8 );
 
         $template.param('LOGGED_IN' => self.logged_in);
 
@@ -267,7 +264,7 @@ class November does Session {
     }
 
     method list_recent_changes {
-        my @changes = self.get_all_pages_changes;
+        my @changes = self.get_changes(limit => 50);
         my $template = HTML::Template.new(
                 filename => $.template_path ~ 'recent_changes.tmpl');
 
@@ -281,19 +278,31 @@ class November does Session {
         return;
     }
 
-    method get_all_pages_changes {
+    method get_changes (:$page, :$limit) {
+
         # RAKUDO: Seemingly impossible to get the right number of list
         # containers using an array variable @recent_changes here.
-        my $recent_changes = $.storage.read_recent_changes();
+        my $recent_changes;
 
+        if $page {
+            $recent_changes = $.storage.read_page_history($page);
+        }
+        else {
+            $recent_changes = $.storage.read_recent_changes;
+        }
+
+        # @recent_changes = @recent_changes[0..$limit] if $limit;
+        # RAKUDO: array slices do not implemented yet, so:
         my @changes;
         for $recent_changes.list -> $modification_id {
             my $modification = $.storage.read_modification($modification_id);
-            push @changes, {
+            my $count = push @changes, {
                 'page' => self.make_link($modification[0]),
                 'time' => $modification_id,
                 'author' => $modification[2] || 'somebody' 
                 };
+            # RAKUDO: last not implemented yet :(
+            return @changes if $limit && $count == $limit;
         }
         return @changes;
     }

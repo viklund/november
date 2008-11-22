@@ -27,3 +27,4 @@ tests:
 	@for i in t/markup/mediawiki/*.t; do echo $$i; $(RAKUDO) $$i; done;
 	@for i in t/uri/*.t; do echo $$i; $(RAKUDO) $$i; done;
 	@for i in t/dispatcher/*.t; do echo $$i; $(RAKUDO) $$i; done;
+	@for i in t/utils/*.t; do echo $$i; $(RAKUDO) $$i; done;
