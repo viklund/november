@@ -7,6 +7,7 @@ use Text::Markup::Wiki::Minimal;
 use November::Storage::File;  
 use Session;
 use Dispatcher;
+use Utils;
 
 class November does Session {
 
@@ -298,13 +299,22 @@ class November does Session {
             my $modification = $.storage.read_modification($modification_id);
             my $count = push @changes, {
                 'page' => self.make_link($modification[0]),
-                'time' => $modification[3] || $modification_id,
+                'time' => time_to_period_str($modification[3]) || $modification_id,
                 'author' => $modification[2] || 'somebody' 
                 };
             # RAKUDO: last not implemented yet :(
             return @changes if $limit && $count == $limit;
         }
         return @changes;
+    }
+
+    sub time_to_period_str ($time) {
+        return False unless $time;
+        my $t = get_period($time);
+        my $str =  '~'; 
+        $str ~= $t[0] ~ 'h ' if $t[0];
+        $str ~= $t[1] ~ 'm ago';
+        return $str;
     }
 
     method list_all_pages {
