@@ -6,7 +6,7 @@ has $.default is rw;
 
 #multi method add ($rule) {
 method add ($rule) {
-    die "Only complite rules accepteable there." unless $rule.?is_complite;
+    die "Only complete rules allowed" unless $rule.?is_complete;
     @!rules.push($rule);
 }
 
@@ -17,10 +17,11 @@ method add_rule (@tokens, $way) {
     @!rules.push($rule);
 }
 
-# I think Hash better there, but Rakudo make string from all keys
+# I think a Hash might be better here, but Rakudo converts all hash keys
+# into Str
 method add_rules(@rules) {
     use Dispatcher::Rule;
-    # RAKUDO: this method return Iterator, workaround:
+    # RAKUDO: this method returns an Iterator, workaround:
     my $r;
     for @rules.list -> $tokens, $way {
         $r = self.add_rule([$tokens.list], $way);
@@ -37,7 +38,7 @@ method dispatch (@chunks) {
     for @!rules -> $r {
         @matched.push($r) if $r.match(@chunks);
     }
-    #say "Applyable:" ~ @applyable;
+    #say "Applicable:" ~ @applyable;
 
     if @matched {
         my $result = @matched[-1].apply;

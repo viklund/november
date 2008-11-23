@@ -2,7 +2,7 @@ use v6;
 
 class URI;
 
-# RAKUDO: Match object does not assigning properly :(
+# RAKUDO: Match object does not do assignment properly :(
 #my Match $.parts; dies in init with 'Type mismatch in assignment';
 # workaround:
 has $.uri;

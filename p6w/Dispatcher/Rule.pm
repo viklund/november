@@ -25,12 +25,12 @@ method match (@chunks) {
 method apply {
     #say "args: { @.args.elems }";
     # RAKUDO: | do not implemented yet :( so... only two args now
-    # RAKUDO: strange bug here, assign 0 there if I nested ifs
+    # RAKUDO: strange bug here, it assigns 0 when ifs are nested
     #if @.args {
     if @.args == 1 {
         $.way(@.args[0]);
 
-        # RAKUDO: strange bug here, assign 0 there if I nested ifs
+        # RAKUDO: strange bug here, it assigns 0 when ifs are nested
         #$.way(@.args[0]) if @.args == 1;
         #$.way(@.args[0], @.args[1]) if @.args == 2;
         #$.way(@.args[0], @.args[1], @.args[2]) if @.args == 3;

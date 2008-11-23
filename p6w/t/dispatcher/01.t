@@ -12,7 +12,7 @@ ok(1,'We use Dispatcher::Rule and we are still alive');
 my $d = Dispatcher.new;
 
 dies_ok( { $d.add: Dispatcher::Rule.new }, 
-         'Dispatch .add add only complite Rule object' );
+         'Dispatch .add adds only complete Rule objects' );
 
 $d.add: Dispatcher::Rule.new( :tokens(''), way => { "Krevedko" } );
 
@@ -35,7 +35,7 @@ is( $d.dispatch(['foo', 'bar']),
 
 $d.default = { "Woow" };
 
-is( $d.dispatch(['foo', 'bar', 'her']), 
+is( $d.dispatch(['foo', 'bar', 'baz']), 
     "Woow", 
     'Dispatch to default, when have no matched Rule'  
 );
@@ -75,14 +75,14 @@ is( $d.dispatch(['foo', '50']),
 
 is( $d.dispatch(['foo', 'a50z']), 
     '60', 
-    'Rule catch right arg'  
+    'Rule that catches the right arg'  
 );
 
 $d.add_rule: ['foo', / \d+ /, 'bar' ], { $^d + 1 };
 
 is( $d.dispatch(['foo', 'item4', 'bar']), 
     '5', 
-    'Rule with regexp in center (foo/\d+/bar)'
+    'Rule with regexp in the middle (foo/\d+/bar)'
 );
 
 $d.add_rule: ['summ', / \d+ /, / \d+ / ], { $^a + $^b };
@@ -90,19 +90,19 @@ $d.add_rule: ['summ', / \d+ /, / \d+ / ], { $^a + $^b };
 
 is( $d.dispatch(['summ', '2', '3']), 
     '5', 
-    'Dispatch to Rule with two regexp'
+    'Dispatch to Rule with two regexps'
 );
 
 $d.add_rule: ['summ', / \w+ /, 1|2 ], { $^a ~ "oo" };
 
 is( $d.dispatch(['summ', 'Z', 2]), 
     'Zoo', 
-    'Rule with regexp and junction'
+    'Rule with a regexp and a junction'
 );
 
 is( $d.dispatch(['foo', 'bar']), 
     "Yay", 
-    'Dispatch to simple Rule, test after add so many Rules' 
+    'Dispatch to simple Rule, test after adding so many Rules' 
 );
 
 # vim:ft=perl6
