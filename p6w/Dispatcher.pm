@@ -45,11 +45,11 @@ method dispatch (@chunks) {
         .clear for @!rules; 
         return $result;
     }
-    elsif $.default {
+    elsif defined $.default {
         $.default();
     }
     else {
-        return False;
+        return Failure;
     }
 }
 

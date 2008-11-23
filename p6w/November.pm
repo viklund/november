@@ -22,7 +22,6 @@ class November does Session {
         $!template_path = 'skin/';
         $!userfile_path = 'data/users';
 
-        # RAKUDO: :: in module names doesn't fully work
         $!storage = November::Storage::File.new();
         Session::init(self);
     }
@@ -34,16 +33,15 @@ class November does Session {
 
         my $d = Dispatcher.new( default => { self.not_found } );
 
-        my @rules = 
+        $d.add_rules(
             [''],                { self.view_page },
             ['view', /^ \w+ $/], { self.view_page(~$^page) },
             ['edit', /^ \w+ $/], { self.edit_page(~$^page) },
             ['in'],              { self.log_in },
             ['out'],             { self.log_out },
             ['recent'],          { self.list_recent_changes },
-            ['all'],             { self.list_all_pages };
-
-        $d.add_rules(@rules);
+            ['all'],             { self.list_all_pages },
+        );
 
         my @chunks =  $cgi.uri.chunks.list;
         $d.dispatch(@chunks);

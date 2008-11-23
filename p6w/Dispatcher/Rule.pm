@@ -6,11 +6,9 @@ has @.args;
 has $.way;
 
 method match (@chunks) {
-    #say 'match chunks:'~ @chunks.elems ~ ' tokens:' ~ @.tokens.elems;
     return False if @chunks != @.tokens;
 
     for @.tokens Z @chunks -> $token, $chunk {
-        #say "t: $token, c:$chunk";
         if ~$chunk ~~ $token {
             @!args.push($/) if $/;
         }
@@ -23,7 +21,6 @@ method match (@chunks) {
 }
 
 method apply {
-    #say "args: { @.args.elems }";
     # RAKUDO: | do not implemented yet :( so... only two args now
     # RAKUDO: strange bug here, it assigns 0 when ifs are nested
     #if @.args {
@@ -43,9 +40,8 @@ method apply {
     }
 }
 
-method is_complite {
-    if @.tokens && $.way { return True  }
-    else                 { return False }
+method is_complete {
+    return ?( @.tokens && $.way );
 }
 
 method clear {
