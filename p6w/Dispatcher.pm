@@ -38,7 +38,6 @@ method dispatch (@chunks) {
     for @!rules -> $r {
         @matched.push($r) if $r.match(@chunks);
     }
-    #say "Applicable:" ~ @applyable;
 
     if @matched {
         my $result = @matched[-1].apply;
