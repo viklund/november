@@ -6,9 +6,10 @@
     </head>
     <body>
         <div id="page">
-            <div id="headerimg">&nbsp;</div>
-            <div id="pagebar">&nbsp;</div>
+            <div id="headerimg">
             <TMPL_INCLUDE NAME="toolbar.tmpl">
+            </div>
+            <div id="pagebar">&nbsp;</div>
             <div id="content">
                 <h1><TMPL_VAR NAME=TITLE></h1>
                 <TMPL_IF NAME=PAGETAGS>
@@ -22,59 +23,33 @@
                 </div>
                 </TMPL_IF>
                 
-                <TMPL_VAR NAME=CONTENT>
+                <div class="articlecontent">
+                    <TMPL_VAR NAME=CONTENT>
+                </div>
             </div>
     <div id="sidebar">
         <ul>
-        
-
-
-
-
-            <li>
-                        </li>
-                    
-            
-
-            <li><h2>Archives</h2>
+            <li><h2>Navigation</h2>
                 <ul>
-                    <li><a href='http://brushingupmyknuth.wordpress.com/2008/06/' title='June 2008'>June 2008</a></li>
-    <li><a href='http://brushingupmyknuth.wordpress.com/2008/01/' title='January 2008'>January 2008</a></li>
-    <li><a href='http://brushingupmyknuth.wordpress.com/2007/12/' title='December 2007'>December 2007</a></li>
-    <li><a href='http://brushingupmyknuth.wordpress.com/2007/11/' title='November 2007'>November 2007</a></li>
+                    <li><a href='/'>Main Page</a></li>
+                    <li><a href='/?page=About'>About this site</a></li>
+                    <li><a href='/?action=recent_changes'>Recent Changes</a></li>
                 </ul>
             </li>
 
-            <li><h2>Categories</h2>
+            <li><h2>This page</h2>
                 <ul>
-                    <li class="cat-item cat-item-18744"><a href="http://brushingupmyknuth.wordpress.com/category/exercises/" title="View all posts filed under Exercises">Exercises</a> (2)
-</li>
-    <li class="cat-item cat-item-13550"><a href="http://brushingupmyknuth.wordpress.com/category/procrastination/" title="View all posts filed under Procrastination">Procrastination</a> (1)
-</li>
-    <li class="cat-item cat-item-4262"><a href="http://brushingupmyknuth.wordpress.com/category/theme/" title="View all posts filed under Theme">Theme</a> (1)
-</li>
+                    <li><a href='/?page=<TMPL_VAR NAME=PAGE>&action=edit'>Edit</a>
+                    <li><a href='/?page=<TMPL_VAR NAME=PAGE>&action=view_history'>View history</a>
                 </ul>
             </li>
-
-                            
-                                
-                <li><h2>Meta</h2>
-                <ul>
-                                        <li><a href="http://brushingupmyknuth.wordpress.com/wp-login.php">Log in</a></li>
-                    <li><a href="http://validator.w3.org/check/referer" title="This page validates as XHTML 1.0 Transitional">Valid <abbr title="eXtensible HyperText Markup Language">XHTML</abbr></a></li>
-                    <li><a href="http://gmpg.org/xfn/"><abbr title="XHTML Friends Network">XFN</abbr></a></li>
-                    <li><a href="http://wordpress.com/" title="Powered by WordPress, state-of-the-art semantic personal publishing platform.">WordPress.com</a></li>
-                                    </ul>
-                </li>
-                        
         </ul>
     </div>
 
 
 <div id="footer">
     <p>
-    Theme: Contempt by <a href="http://www.vault9.net" rel="designer">Vault9</a>.<br />
-    <a href='http://wordpress.com/' rel='generator'>Blog at WordPress.com</a>.      
+        November. Powered by Rakudo Perl 6.
     </p>
 </div>
 
