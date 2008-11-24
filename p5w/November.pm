@@ -492,19 +492,20 @@ sub view_page {
 
     $template->param('PAGETAGS' => $page_tags);
 
-    my $cloud_tags;
-    my @all_tags = keys %tags;
-
-    if (@all_tags) {
-        for (@all_tags) {
-            $cloud_tags .= '<a class="t' 
-                . tag_count_normalize( get_tag_count($_), $min, $max ) 
-                . '" href="?action=all_pages&tag=' . $_ .'">' 
-                . $_ . '</a>'
-        }
-    }
-
-    $template->param('TAGS' => $cloud_tags);
+    # Disable this for now.
+#    my $cloud_tags;
+#    my @all_tags = keys %tags;
+#
+#    if (@all_tags) {
+#        for (@all_tags) {
+#            $cloud_tags .= '<a class="t' 
+#                . tag_count_normalize( get_tag_count($_), $min, $max ) 
+#                . '" href="?action=all_pages&tag=' . $_ .'">' 
+#                . $_ . '</a>'
+#        }
+#    }
+#
+    $template->param('TAGS' => undef);
     
     $template->param(LOGGED_IN => logged_in($cgi));
 
