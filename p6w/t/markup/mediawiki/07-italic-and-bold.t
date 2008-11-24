@@ -128,3 +128,5 @@ my $converter = Text::Markup::Wiki::MediaWiki.new;
 
     is( $actual_output, $expected_output, 'mis-nested italic/bold III' );
 }
+
+# vim:ft=perl6

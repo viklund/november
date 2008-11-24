@@ -46,7 +46,8 @@ RUNNING NOVEMBER
 ----------------
 
  $ perl Makefile.PL
- $ make # not required, and doesn't currently work
+ $ make # not required, but ~x10 speed up
+ $ make tests # not required 
 
 * Running November on the command line
   

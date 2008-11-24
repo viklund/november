@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 4;
+plan 8;
 
 use Tags;
 
@@ -22,6 +22,16 @@ $t.update_tags('Test_Page', 'Bar, Her');
 is( $t.read_tags_count.perl, '{"bar" => 1, "her" => 1}', 'Tags counting after add and remove');
 is( $t.read_tags_index.perl, '{"foo" => [], "bar" => ["Test_Page"], "her" => ["Test_Page"]}', 'Tags indexing after add and remove' );
 
+$t.update_tags('Another_Page', 'Bar, Her');
+
+is( $t.read_tags_count.perl, '{"bar" => 2, "her" => 2}', 'Tags count after add another page');
+is( $t.read_tags_index.perl, '{"foo" => [], "bar" => ["Test_Page", "Another_Page"], "her" => ["Test_Page", "Another_Page"]}', 'Tags index after add another page' );
+
+$t.update_tags('Test_Page', 'Bar, Her');
+
+is( $t.read_tags_count.perl, '{"bar" => 2, "her" => 2}', 'Tags count after save page without changes');
+is( $t.read_tags_index.perl, '{"foo" => [], "bar" => ["Test_Page", "Another_Page"], "her" => ["Test_Page", "Another_Page"]}', 'Tags index after save page without changes' );
+
 $t.clear;
 
 role Testing {
@@ -30,5 +40,8 @@ role Testing {
         .write_tags_count($c);
         .write_tags_index($c);
         .write_page_tags('Test_Page', '');
+        .write_page_tags('Another_Page', '');
     }
 }
+
+# vim:ft=perl6

@@ -1,8 +1,10 @@
 PARROT_DIR=<PARROT_DIR>
+RAKUDO=$(PARROT_DIR)/parrot $(PARROT_DIR)/languages/perl6/perl6.pbc
 
 SOURCES=HTML/Template.pm CGI.pm Text/Markup/Wiki/Minimal.pm \
         Text/Markup/Wiki/MediaWiki.pm November.pm Test.pm \
-        November__Storage.pm November/Storage/File.pm
+        November/Storage.pm November/Storage/File.pm Tags.pm \
+		Impatience.pm
 
 PIRS=$(SOURCES:.pm=.pir)
 
@@ -14,3 +16,11 @@ all: $(PIRS)
 clean:
 	rm $(PIRS)
 
+test: tests
+
+tests:
+	@for i in t/*.t; do echo $$i; $(RAKUDO) $$i; done;
+	@for i in t/tags/*.t; do echo $$i; $(RAKUDO) $$i; done;
+	@for i in t/storage/*.t; do echo $$i; $(RAKUDO) $$i; done;
+	@for i in t/markup/minimal/*.t; do echo $$i;$(RAKUDO)6 $$i; done;
+	@for i in t/markup/mediawiki/*.t; do echo $$i; $(RAKUDO) $$i; done;

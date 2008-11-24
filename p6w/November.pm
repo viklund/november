@@ -56,7 +56,7 @@ class November does Session {
     has $.template_path;
     has $.userfile_path;
 
-    has November__Storage $.storage;
+    has November::Storage $.storage;
     has CGI     $.cgi;
 
     method init {
@@ -72,7 +72,7 @@ class November does Session {
     method handle_request(CGI $cgi) {
         $!cgi = $cgi;
 
-        my $action = $cgi.param<action> // 'view';
+        my $action = $cgi.params<action> // 'view';
 
         # Maybe we should consider turning this given into a lookup hash.
         # RAKUDO: 'when' doesn't break out by default yet, #57652
@@ -89,7 +89,7 @@ class November does Session {
     }
 
     method view_page() {
-        my $page = $.cgi.param<page> // 'Main_Page';
+        my $page = $.cgi.params<page> // 'Main_Page';
 
         unless $.storage.wiki_page_exists($page) {
             self.not_found;
@@ -125,7 +125,7 @@ class November does Session {
     }
 
     method edit_page() {
-        my $page = $.cgi.param<page> // 'Main_Page';
+        my $page = $.cgi.params<page> // 'Main_Page';
 
         my $sessions = self.read_sessions();
 
@@ -140,9 +140,9 @@ class November does Session {
         # The 'edit' action handles both showing the form and accepting the
         # POST data. The difference is the presence of the 'articletext'
         # parameter -- if there is one, the action is considered a save.
-        if $.cgi.param<articletext> || $.cgi.param<tags> {
-            my $new_text   = $.cgi.param<articletext>;
-            my $tags       = $.cgi.param<tags>;
+        if $.cgi.params<articletext> || $.cgi.params<tags> {
+            my $new_text   = $.cgi.params<articletext>;
+            my $tags       = $.cgi.params<tags>;
             my $session_id = $.cgi.cookie<session_id>;
             my $author     = $sessions{$session_id}<user_name>;
             $.storage.save_page($page, $new_text, $author);
@@ -206,9 +206,9 @@ class November does Session {
     }
 
     method log_in {
-        if my $user_name = $.cgi.param<user_name> {
+        if my $user_name = $.cgi.params<user_name> {
 
-            my $password = $.cgi.param<password>;
+            my $password = $.cgi.params<password>;
 
             my %users = self.read_users();
 
@@ -331,34 +331,36 @@ class November does Session {
                 filename => $.template_path ~ 'list_all_pages.tmpl');
 
         my $t = Tags.new();
-        $template.param('TAGS' => $t.cloud_tags() ) if $t;
+        $template.param('TAGS' => $t.cloud_tags) if $t;
 
         my $index;
 
-        my $tag = $.cgi.param<tag>;
+        my $tag = $.cgi.params<tag>;
         if $tag and $t {
             # TODO: we need plugin system (see topics in mail-list)
             my $tags_index = $t.read_tags_index;
             $index = $tags_index{$tag};
     
-            $template.param('TAG' => $.cgi.param<tag> );
+            $template.param('TAG' => $tag );
         } 
         else {
             $index = $.storage.read_index;
         }
 
 
-        # HTML::Template eat only Arrey of Hashes and Hash keys should 
-        # be in low case. HTML::Template in new-html-template brunch 
-        # will be much clever.
+        if $index {
+            # HTML::Template eat only Arrey of Hashes and Hash keys should 
+            # be in low case. HTML::Template in new-html-template brunch 
+            # will be much clever.
 
-        # RAKUDO: @($arrayref) not implemented yet, so:
-        # my @list = map { { page => $_ } }, @($index); 
-        # do not work. Workaround:
-        my @list = map { { page => $_ } }, $index.values; 
+            # RAKUDO: @($arrayref) not implemented yet, so:
+            # my @list = map { { page => $_ } }, @($index); 
+            # do not work. Workaround:
+            my @list = map { { page => $_ } }, $index.list; 
+            $template.param('LIST' => @list);
+        }
 
-        $template.param('LIST'   => @list);
-        $template.param('LOGGED_IN' => self.logged_in());
+        $template.param('LOGGED_IN' => self.logged_in);
 
         $.cgi.send_response(
             $template.output()

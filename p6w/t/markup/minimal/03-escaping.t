@@ -3,7 +3,7 @@ use v6;
 use Test;
 plan 4;
 
-use Text__Markup__Wiki__Minimal;
+use Text::Markup::Wiki::Minimal;
 
 my %h =
     '<'  => 'lt',
@@ -11,7 +11,7 @@ my %h =
     '&'  => 'amp',
     '\'' => '#039';
 
-my $converter = Text__Markup__Wiki__Minimal.new;
+my $converter = Text::Markup::Wiki::Minimal.new;
 
 for %h.kv -> $input, $abbr {
     my $expected_escape = '&' ~ $abbr ~ ';';
@@ -20,3 +20,5 @@ for %h.kv -> $input, $abbr {
 
     is( $actual_output, $expected_output, "$input -> $expected_escape" );
 }
+
+# vim:ft=perl6

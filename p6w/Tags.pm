@@ -7,20 +7,35 @@ class Tags {
     my $.tags_count_path     = 'data/tags_count';
     my $.tags_index_path     = 'data/tags_index';
 
-    method update_tags ($_: Str $page, Str $tags) {
-        .remove_tags($page, .read_page_tags: $page);
-        .add_tags($page, $tags);
-        .write_page_tags($page, $tags);
+    method update_tags ($_: Str $page, Str $new_tags) {
+        my $old_tags = .read_page_tags($page).chomp;
+        return 1 if $new_tags eq $old_tags;
+
+        my @old_tags = .tags_parse: $old_tags;
+        my @new_tags = .tags_parse: $new_tags;
+
+        # RAKUDO: do not see @old_tags in that grep 
+        #my $to_add    = @new_tags.grep: { $_ eq none(@old_tags) };
+        # workaround:
+        my @to_add;
+        for @new_tags { @to_add.push($_) if $_ eq none(@old_tags) }
+
+        # I think $_ ne any(@new_tags) more readable, 
+        # but it do not work as I expected
+        my @to_remove = @old_tags.grep: { $_ eq none(@new_tags) };
+
+        .remove_tags($page, @to_remove);
+        .add_tags($page, @to_add);
+        .write_page_tags($page, $new_tags);
     }
 
-    method add_tags (Str $page, Str $tags) {
+    method add_tags (Str $page, Array @tags) {
 
-        # RAKUDO: return with modificaton parsed wrong
-        return 1 if $tags ~~ m/^ \s* $/;
         my $count = self.read_tags_count;
 
-        my @tags = self.tags_parse($tags);
-        for @tags -> $t {
+        # RAKUDO: Strigify arrays in method or sub calls
+        #for @tags -> $t {
+        for @tags.values -> $t {
             # RAKUDO: Increment not implemented in class 'Undef'
             if $count{$t} {
                 $count{$t}++;
@@ -34,11 +49,13 @@ class Tags {
 
         my $index = self.read_tags_index;
 
-        for @tags -> $t {
+        # RAKUDO: Strigify arrays in method or sub calls
+        #for @tags -> $t {
+        for @tags.values -> $t {
             unless $index{$t} {
                 $index{$t} = [];
             }
-            unless any($index{$t}) eq $page {
+            unless any($index{$t}.values) eq $page {
                 $index{$t}.push($page);
                 $index{$t} = grep { $_ ne '' }, $index{$t}.values;
             }
@@ -48,15 +65,13 @@ class Tags {
         self.write_tags_index($index);
     }
 
-    method remove_tags(Str $page, Str $tags) {
+    method remove_tags(Str $page, Array @tags) {
         
-        # RAKUDO: return with modificaton parsed wrong
-        return 1 if $tags ~~ m/^ \s* $/;
-
         my $count = self.read_tags_count;
 
-        my @tags = self.tags_parse($tags);
-        for @tags -> $t {
+        # RAKUDO: Strigify arrays in method or sub calls
+        #for @tags -> $t {
+        for @tags.values -> $t {
             if $count{$t} && $count{$t} > 0 {
                 $count{$t}--;
             } 
@@ -72,8 +87,12 @@ class Tags {
 
         my $index = self.read_tags_index;
 
-        for @tags -> $t {
-            if $index{$t} && any($index{$t}) eq $page {
+        # RAKUDO: Strigify arrays in method or sub calls
+        #for @tags -> $t {
+        for @tags.values -> $t {
+            # RAKUDO: @ not implemented yet
+            #if $index{$t} && any(@ $index{$t}) eq $page {
+            if $index{$t} && any($index{$t}.values) eq $page {
                     $index{$t} = grep { $_ ne $page }, $index{$t}.values;
             }
         }
@@ -89,8 +108,8 @@ class Tags {
     method write_page_tags (Str $page, Str $tags) {
         my $file = $.page_tags_path ~ $page;
         my $fh = open( $file, :w );
-        $fh.say( $tags );
-        $fh.close();
+        $fh.say($tags);
+        $fh.close;
     }
    
     method read_tags_count {
@@ -103,7 +122,7 @@ class Tags {
         my $file = $.tags_count_path;
         my $fh = open( $file, :w );
         $fh.say( $counts.perl );
-        $fh.close();
+        $fh.close;
     }
 
     method read_tags_index {  
@@ -116,37 +135,33 @@ class Tags {
         my $file = $.tags_index_path;
         my $fh = open( $file, :w );
         $fh.say( $index.perl );
-        $fh.close();
+        $fh.close;
     }
 
     method tags_parse (Str $tags) {
-        my @tags = $tags.lc.split(/ \s* ( ',' | \n ) \s* /);
-        # split in p6 don`t trim
-        @tags = grep { $_ ne "" }, @tags;
-        return @tags;
+        return () if $tags ~~ m/^ \s* $/;
+        my @tags = $tags.lc.split(/ \s* ( ',' | \n | '.' ) \s* /);
+        grep { $_ ne "" }, @tags.uniq;
     }
 
     method norm_counts (@tags?) {
         my $counts = self.read_tags_count;
 
-        my $min = $counts.values.min; 
-        my $max = $counts.values.max;
+        my $min = +($counts.values).min; 
+        my $max = +($counts.values).max;
 
         my $norm_counts = {};
         # RAKUDO: stringify Array here
         #for @tags || $counts.keys {
-         for @tags.?values || $counts.keys {
-            $norm_counts{$_} = self.norm( $counts{$_}, $min, $max ); 
+        for @tags.?values || $counts.keys {
+            $norm_counts{$_} = self.norm( +$counts{$_}, $min, $max ); 
         }
         return $norm_counts;
     }
 
-    
-    # method norm (Int $count, Int $min, Int $max) {
     method norm ($count, $min, $max) {
-        # debugging
         # say "norm IN c:$count, min:$min, max:$max";
-        # die "c:" ~$count.WHAT~", min:"~$min.WHAT~", max:"~$max.WHAT;
+        #die "c:" ~$count.WHAT~", min:"~$min.WHAT~", max:"~$max.WHAT;
         my $step = ($count - $min) / (($max - $min) || 1);
         return ceiling( ( log($step + 1 ) * 10 ) / log 2 ); 
     }
@@ -164,15 +179,13 @@ class Tags {
     }
 
     method cloud_tags {
-        # RAKUDO: can`t concatenate with undef. "Multiple Dispatch: No suitable 
-        # candidate found for 'i_concatenate', with signature 'PP'"
-        my $tags_str = '';
-
         my $norm_counts = self.norm_counts; 
+        my $tags_str;
 
         if $norm_counts {
             $tags_str ~= tag_html($_, $norm_counts) for $norm_counts.keys;
         }
+
         return $tags_str;
     }
 
