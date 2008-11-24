@@ -1,6 +1,8 @@
 use v6;
 class Dispatcher;
 
+use Dispatcher::Rule;
+
 has @.rules;
 has $.default is rw;
 
@@ -12,7 +14,6 @@ method add ($rule) {
 
 #multi method add (@tokens, $way){
 method add_rule (@tokens, $way) {
-    use Dispatcher::Rule;
     my $rule = Dispatcher::Rule.new( tokens => @tokens.list, way => $way );
     @!rules.push($rule);
 }
@@ -20,7 +21,6 @@ method add_rule (@tokens, $way) {
 # I think a Hash might be better here, but Rakudo converts all hash keys
 # into Str
 method add_rules(@rules) {
-    use Dispatcher::Rule;
     # RAKUDO: this method returns an Iterator, workaround:
     my $r;
     for @rules.list -> $tokens, $way {
