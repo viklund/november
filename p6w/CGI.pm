@@ -118,7 +118,8 @@ class CGI {
         if %.params.exists($key) {
             # RAKUDO: ~~ Scalar
             if %.params{$key} ~~ Str | Int {
-                %!params{$key} = [ %.params{$key}, $value ];
+                my $old_param = %.params{$key};
+                %!params{$key} = [ $old_param, $value ];
             } 
             elsif %.params{$key} ~~ Array {
                 %!params{$key}.push( $value );
