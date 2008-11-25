@@ -14,7 +14,7 @@ my $d = Dispatcher.new;
 dies_ok( { $d.add: Dispatcher::Rule.new }, 
          'Dispatch .add adds only complete Rule objects' );
 
-$d.add: Dispatcher::Rule.new( :tokens(''), way => { "Krevedko" } );
+$d.add: Dispatcher::Rule.new( :tokens(''), action => { "Krevedko" } );
 
 is( $d.dispatch(['']), 
     'Krevedko', 

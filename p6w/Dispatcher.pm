@@ -12,9 +12,9 @@ method add ($rule) {
     @!rules.push($rule);
 }
 
-#multi method add (@tokens, $way){
-method add_rule (@tokens, $way) {
-    my $rule = Dispatcher::Rule.new( tokens => @tokens.list, way => $way );
+#multi method add (@tokens, $action){
+method add_rule (@tokens, $action) {
+    my $rule = Dispatcher::Rule.new( tokens => @tokens.list, action => $action );
     @!rules.push($rule);
 }
 
@@ -23,8 +23,8 @@ method add_rule (@tokens, $way) {
 method add_rules(@rules) {
     # RAKUDO: this method returns an Iterator, workaround:
     my $r;
-    for @rules.list -> $tokens, $way {
-        $r = self.add_rule([$tokens.list], $way);
+    for @rules.list -> $tokens, $action {
+        $r = self.add_rule([$tokens.list], $action);
     }
     return $r;
 }
@@ -40,7 +40,7 @@ method dispatch (@chunks) {
     }
 
     if @matched {
-        my $result = @matched[-1].apply;
+        my $result = @matched.end.apply;
         .clear for @!rules; 
         return $result;
     }

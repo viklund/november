@@ -3,7 +3,7 @@ class Dispatcher::Rule;
 
 has @.tokens;
 has @.args;
-has $.way;
+has $.action;
 
 method match (@chunks) {
     return False if @chunks != @.tokens;
@@ -25,23 +25,23 @@ method apply {
     # RAKUDO: strange bug here, it assigns 0 when ifs are nested
     #if @.args {
     if @.args == 1 {
-        $.way(@.args[0]);
+        $.action(@.args[0]);
 
         # RAKUDO: strange bug here, it assigns 0 when ifs are nested
-        #$.way(@.args[0]) if @.args == 1;
-        #$.way(@.args[0], @.args[1]) if @.args == 2;
-        #$.way(@.args[0], @.args[1], @.args[2]) if @.args == 3;
+        #$.action(@.args[0]) if @.args == 1;
+        #$.action(@.args[0], @.args[1]) if @.args == 2;
+        #$.action(@.args[0], @.args[1], @.args[2]) if @.args == 3;
     }
     elsif @.args == 2 {
-            $.way(@.args[0], @.args[1]);
+            $.action(@.args[0], @.args[1]);
     }
     else {
-        $.way();
+        $.action();
     }
 }
 
 method is_complete {
-    return ?( @.tokens && $.way );
+    return ?( @.tokens && $.action );
 }
 
 method clear {
