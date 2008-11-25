@@ -14,7 +14,7 @@ all: $(PIRS)
 	$(PARROT_DIR)/parrot $(PARROT_DIR)/languages/perl6/perl6.pbc --target=pir $<  > $@
 
 clean:
-	rm $(PIRS)
+	rm -f $(PIRS)
 
 test: tests
 
