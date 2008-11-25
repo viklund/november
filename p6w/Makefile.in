@@ -19,8 +19,4 @@ clean:
 test: tests
 
 tests:
-	@for i in t/*.t; do echo $$i; $(RAKUDO) $$i; done;
-	@for i in t/tags/*.t; do echo $$i; $(RAKUDO) $$i; done;
-	@for i in t/storage/*.t; do echo $$i; $(RAKUDO) $$i; done;
-	@for i in t/markup/minimal/*.t; do echo $$i;$(RAKUDO)6 $$i; done;
-	@for i in t/markup/mediawiki/*.t; do echo $$i; $(RAKUDO) $$i; done;
+	prove -e $(PARROT_DIR)/languages/perl6/perl6 -r --nocolor t/
