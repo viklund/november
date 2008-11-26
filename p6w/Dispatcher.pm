@@ -21,7 +21,7 @@ method add_rule (@tokens, $action) {
 # I think a Hash might be better here, but Rakudo converts all hash keys
 # into Str
 method add_rules(@rules) {
-    # RAKUDO: this method returns an Iterator, workaround:
+    # RAKUDO: rakudo doesn't know return values in for loops yet
     my $r;
     for @rules.list -> $tokens, $action {
         $r = self.add_rule([$tokens.list], $action);
