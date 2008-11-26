@@ -53,12 +53,12 @@ method path {
 
 method absolute {
     my %p = $.uri<path>;
-    ? (%p<slash> // 0) || $.scheme;
+    return ?(%p<slash> // $.scheme);
 }
 
 method relative {
     my %p = $.uri<path>;
-    ! (%p<slash> // 0) && ! $.scheme;
+    return !(%p<slash> // $.scheme);
 }
 
 method query {
