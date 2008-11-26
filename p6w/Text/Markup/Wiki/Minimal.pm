@@ -43,7 +43,7 @@ class Text::Markup::Wiki::Minimal {
             if $par ~~ Text__Markup__Wiki__Minimal__Syntax::TOP {
 
                 if $/<heading> {
-                    my $heading = $/<heading><parchunk>[0];
+                    my $heading = ~$/<heading><parchunk>[0];
                     $heading .= subst( / ^ \s+ /, '' );
                     $heading .= subst( / \s+ $ /, '' );
                     $result = "<h1>$heading</h1>";
