@@ -30,14 +30,7 @@ method add_rules(@rules) {
 }
 
 method dispatch (@chunks) {
-    # RAKUDO: grep make closure
-    #my @matched =  @!rules.grep: { .match(@chunks) };    
-    # so workaround:
-
-    my @matched;
-    for @!rules -> $r {
-        @matched.push($r) if $r.match(@chunks);
-    }
+    my @matched =  @!rules.grep: { .match(@chunks) };    
 
     if @matched {
         my $result = @matched.end.apply;
