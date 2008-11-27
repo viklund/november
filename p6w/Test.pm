@@ -160,23 +160,19 @@ multi sub is_deeply($this, $that) {
 sub _is_deeply( $this, $that) {
 
     if $this ~~ Array && $that ~~ Array {
-        return "" if +$this.values != +$that.values;
-        for $this Z $that -> $a,$b {
-            if ! _is_deeply( $a, $b ) {
-                return "";
-            }
+        return if +$this.values != +$that.values;
+        for $this Z $that -> $a, $b {
+            return if ! _is_deeply( $a, $b );
         }
-        return 1;
+        return True;
     }
     elsif $this ~~ Hash && $that ~~ Hash {
-        return "" if +$this.keys != +$that.keys;
-        for $this.keys.sort Z $that.keys.sort -> $a,$b {
-            return "" if $a ne $b;
-            if ! _is_deeply( $this{$a}, $that{$b} ) {
-                return "";
-            }
+        return if +$this.keys != +$that.keys;
+        for $this.keys.sort Z $that.keys.sort -> $a, $b {
+            return if $a ne $b;
+            return if ! _is_deeply( $this{$a}, $that{$b} );
         }
-        return 1;
+        return True;
     }
     elsif $this ~~ Str | Num | Int && $that ~~ Str | Num | Int {
         return $this eq $that;
@@ -186,9 +182,10 @@ sub _is_deeply( $this, $that) {
                && _is_deeply( $this.value, $this.value );
     }
     elsif $this ~~ undef && $that ~~ undef && $this.WHAT eq $that.WHAT {
-        return 1;
+        return True;
     }
-    return '';
+
+    return;
 }
 
 ## 'private' subs
