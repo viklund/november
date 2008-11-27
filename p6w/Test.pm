@@ -158,10 +158,8 @@ multi sub is_deeply($this, $that) {
 }
 
 sub _is_deeply( $this, $that) {
-    # is_deeply needs these stringified subs to work around rakudo bug #58392
-    my $_is_array_deeply = 'sub { 
-        my $this = @_[0];
-        my $that = @_[1];
+
+    if $this ~~ Array && $that ~~ Array {
         return "" if +$this.values != +$that.values;
         for $this Z $that -> $a,$b {
             if ! _is_deeply( $a, $b ) {
@@ -169,10 +167,8 @@ sub _is_deeply( $this, $that) {
             }
         }
         return 1;
-    }';
-    my $_is_hash_deeply = 'sub {
-        my $this = @_[0];
-        my $that = @_[1];
+    }
+    elsif $this ~~ Hash && $that ~~ Hash {
         return "" if +$this.keys != +$that.keys;
         for $this.keys.sort Z $that.keys.sort -> $a,$b {
             return "" if $a ne $b;
@@ -181,15 +177,6 @@ sub _is_deeply( $this, $that) {
             }
         }
         return 1;
-    }';
-
-    if $this ~~ Array && $that ~~ Array {
-        my $s = eval $_is_array_deeply;
-        return $s( $this, $that );
-    }
-    elsif $this ~~ Hash && $that ~~ Hash {
-        my $s = eval $_is_hash_deeply;
-        return $s( $this, $that );
     }
     elsif $this ~~ Str | Num | Int && $that ~~ Str | Num | Int {
         return $this eq $that;
