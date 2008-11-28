@@ -33,7 +33,7 @@ my $converter = Text::Markup::Wiki::MediaWiki.new;
 }
 
 {
-    my $input = "Oh, how I ''embolden''.";
+    my $input = "Oh, how I '''embolden'''.";
     my $expected_output
         = '<p>Oh, how I <b>embolden</b>.</p>';
     my $actual_output = $converter.format($input);
