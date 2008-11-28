@@ -40,8 +40,23 @@ class Text::Markup::Wiki::MediaWiki {
 
         my $result = $xml_escaped;
 
+        # This method is far to simplistic, but will get us a few passing
+        # tests along the way.
+        my $italic_regex
+            = / <!after '&#039;'> '&#039;&#039;' <!before '&#039;'> (.*?)
+                <!after '&#039;'> '&#039;&#039;' <!before '&#039;'> /;
+        while $result ~~ $italic_regex {
+            $result .= subst( $italic_regex, { "<i>$0</i>" } );
+        }
+
+        my $bold_regex
+            = / '&#039;&#039;&#039;' (.*?) '&#039;&#039;&#039;' /;
+        while $result ~~ $bold_regex {
+            $result .= subst( $bold_regex, { "<b>$0</b>" } );
+        }
+
         if defined $link_maker {
-            my $link_regex = / \[\[ (<-[\]]>+) \]\] /; # /
+            my $link_regex = / '[[' (<-[\]]>+) ']]' /; # /
             while $result ~~ $link_regex {
                 $result .= subst( $link_regex, { $link_maker($0) } );
             }
