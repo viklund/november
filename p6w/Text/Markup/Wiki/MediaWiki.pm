@@ -58,18 +58,10 @@ class Text::Markup::Wiki::MediaWiki {
     }
 
     method format($text, :$link_maker, :$author) {
-        my @result_pars;
-
-        my @paragraphs = $text.split(/\n ** 2..*/);
-        while @paragraphs.shift -> $paragraph {
-            # RAKUDO: Needed right now due to HLL non-mapping.
-            my $paragraph_copy = $paragraph;
-
-            push @result_pars,
-                 format_paragraph($paragraph_copy, :$link_maker, :$author);
-        }
-
-        return join "\n\n", @result_pars;
+        my @result_pars
+            = join "\n\n",
+              map { format_paragraph($_, :$link_maker, :$author) },
+              $text.split(/\n ** 2..*/);
     }
 }
 
