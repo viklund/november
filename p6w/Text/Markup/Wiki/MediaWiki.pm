@@ -20,7 +20,7 @@ class Text::Markup::Wiki::MediaWiki {
         return @parlist.grep( { $_ } );
     }
 
-    sub format_line($line is rw, :$link_maker) {
+    sub format_line($line is rw, :$link_maker, :$author) {
         my $partype = 'p';
         if $line ~~ /^ '==' (.*) '==' $/ {
             $partype = 'h2';
@@ -50,14 +50,14 @@ class Text::Markup::Wiki::MediaWiki {
         return sprintf '<%s>%s</%s>', $partype, $result, $partype;
     }
 
-    sub format_paragraph($paragraph, :$link_maker) {
+    sub format_paragraph($paragraph, :$link_maker, :$author) {
         # RAKUDO: This could use some ==>
         return merge_consecutive_paragraphs
-               map { format_line($^line, :$link_maker) },
+               map { format_line($^line, :$link_maker, :$author) },
                $paragraph.split("\n");
     }
 
-    method format($text, :$link_maker) {
+    method format($text, :$link_maker, :$author) {
         my @result_pars;
 
         my @paragraphs = $text.split(/\n ** 2..*/);
@@ -65,7 +65,8 @@ class Text::Markup::Wiki::MediaWiki {
             # RAKUDO: Needed right now due to HLL non-mapping.
             my $paragraph_copy = $paragraph;
 
-            push @result_pars, format_paragraph($paragraph_copy, :$link_maker);
+            push @result_pars,
+                 format_paragraph($paragraph_copy, :$link_maker, :$author);
         }
 
         return join "\n\n", @result_pars;

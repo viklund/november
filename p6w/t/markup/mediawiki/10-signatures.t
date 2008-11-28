@@ -5,12 +5,12 @@ plan 3;
 
 use Text::Markup::Wiki::MediaWiki;
 
-my $converter = Text::Markup::Wiki::MediaWiki.new( author => 'TimToady' );
+my $converter = Text::Markup::Wiki::MediaWiki.new;
 
 {
     my $input           = '~~~';
     my $expected_output = '<p>TimToady</p>';
-    my $actual_output = $converter.format($input);
+    my $actual_output = $converter.format($input, :author<TimToady>);
 
     is( $actual_output, $expected_output, 'signatures work' );
 }
@@ -24,7 +24,7 @@ grammar NameAndDate {
 
 {
     my $input           = '~~~~';
-    my $actual_output = $converter.format($input);
+    my $actual_output = $converter.format($input, :author<TimToady>);
 
     ok( $actual_output ~~ NameAndDate::name_and_date,
         'signatures and dates work' );
