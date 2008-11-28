@@ -30,6 +30,7 @@
             </div>
             </TMPL_IF>
 
+            <TMPL_IF NAME=LIST>
             <ul>
                 <TMPL_LOOP NAME=LIST>
                     <li>
@@ -37,6 +38,7 @@
                     </li>
                 </TMPL_LOOP>
             </ul>
+            </TMPL_IF>
 
             <TMPL_IF NAME=TAG>
             <p><a href="?action=all_pages">Return to all articles list</a></p> 

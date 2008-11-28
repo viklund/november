@@ -24,7 +24,9 @@ my %dispatch = (
     'all_pages'      => \&list_all_pages,
 );
 
-my $TEMPLATE_PATH = 'skin/';
+my $SKIN_USED = 'CleanAndSoft';
+
+my $TEMPLATE_PATH = "skins/$SKIN_USED/";
 my $CONTENT_PATH = 'data/articles/';
 my $RECENT_CHANGES_PATH = 'data/recent-changes';
 my $MODIFICATIONS_PATH = 'data/modifications/';
@@ -46,9 +48,9 @@ sub handle_request {
     my ($self, $cgi) = @_;
 
     my $path = $cgi->path_info();
-    if ( $path eq '/spartan.css' ) {
+    if ( $path =~ m{^/\w+\.(?:css|png)$} ) {
         print status_ok(),
-              read_file('skin/spartan.css');
+              read_file( $TEMPLATE_PATH . $path );
         return;
     }
 
@@ -490,19 +492,20 @@ sub view_page {
 
     $template->param('PAGETAGS' => $page_tags);
 
-    my $cloud_tags;
-    my @all_tags = keys %tags;
-
-    if (@all_tags) {
-        for (@all_tags) {
-            $cloud_tags .= '<a class="t' 
-                . tag_count_normalize( get_tag_count($_), $min, $max ) 
-                . '" href="?action=all_pages&tag=' . $_ .'">' 
-                . $_ . '</a>'
-        }
-    }
-
-    $template->param('TAGS' => $cloud_tags);
+    # Disable this for now.
+#    my $cloud_tags;
+#    my @all_tags = keys %tags;
+#
+#    if (@all_tags) {
+#        for (@all_tags) {
+#            $cloud_tags .= '<a class="t' 
+#                . tag_count_normalize( get_tag_count($_), $min, $max ) 
+#                . '" href="?action=all_pages&tag=' . $_ .'">' 
+#                . $_ . '</a>'
+#        }
+#    }
+#
+    $template->param('TAGS' => undef);
     
     $template->param(LOGGED_IN => logged_in($cgi));
 

@@ -335,7 +335,7 @@ class November does Session {
                 filename => $.template_path ~ 'list_all_pages.tmpl');
 
         my $t = Tags.new();
-        $template.param('TAGS' => $t.cloud_tags() ) if $t;
+        $template.param('TAGS' => $t.cloud_tags) if $t;
 
         my $index;
 
@@ -345,24 +345,26 @@ class November does Session {
             my $tags_index = $t.read_tags_index;
             $index = $tags_index{$tag};
     
-            $template.param('TAG' => $.cgi.params<tag> );
+            $template.param('TAG' => $tag );
         } 
         else {
             $index = $.storage.read_index;
         }
 
 
-        # HTML::Template eat only Arrey of Hashes and Hash keys should 
-        # be in low case. HTML::Template in new-html-template brunch 
-        # will be much clever.
+        if $index {
+            # HTML::Template eat only Arrey of Hashes and Hash keys should 
+            # be in low case. HTML::Template in new-html-template brunch 
+            # will be much clever.
 
-        # RAKUDO: @($arrayref) not implemented yet, so:
-        # my @list = map { { page => $_ } }, @($index); 
-        # do not work. Workaround:
-        my @list = map { { page => $_ } }, $index.values; 
+            # RAKUDO: @($arrayref) not implemented yet, so:
+            # my @list = map { { page => $_ } }, @($index); 
+            # do not work. Workaround:
+            my @list = map { { page => $_ } }, $index.list; 
+            $template.param('LIST' => @list);
+        }
 
-        $template.param('LIST'   => @list);
-        $template.param('LOGGED_IN' => self.logged_in());
+        $template.param('LOGGED_IN' => self.logged_in);
 
         $.cgi.send_response(
             $template.output()
