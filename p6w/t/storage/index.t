@@ -6,7 +6,7 @@ plan 4;
 use November::Storage::File;
 
 my $s = November::Storage::File.new does Testing;
-$s.index_path = 't/storage/data/index';
+$s.index_path = 't/storage/index_data';
 
 $s.clear;
 
