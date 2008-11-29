@@ -8,7 +8,7 @@ use November::Storage::File;
 my $s = November::Storage::File.new does Testing;
 $s.index_path = 't/storage/index_data';
 
-$s.clear;
+$s.beforeTest;
 
 is($s.read_index.perl, '[]', 'Read clear index');
 $s.add_to_index('Foo');
@@ -18,13 +18,18 @@ is($s.read_index.perl, '["Foo", "Bar"]', 'Add to index another page');
 $s.add_to_index('Foo');
 is($s.read_index.perl, '["Foo", "Bar"]', 'Do not add to index page doubble');
 
-$s.clear;
+$s.afterTest;
 
 role Testing {
-    method clear {
+    method beforeTest {
         my $fh = open($.index_path, :w);
         $fh.say('[]');
         $fh.close;
+    }
+
+    method afterTest {
+        # TODO: Make more platform-independent, somehow.
+        run("rm $.index_path");
     }
 }
 
