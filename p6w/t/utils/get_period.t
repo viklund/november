@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 2;
+plan 4;
 
 use Utils;
 
