@@ -27,6 +27,8 @@ follow instructions there. See instructions on the parrot site:
 
  <http://www.parrotcode.org/>
 
+We use developers version from svn, now.
+
 REPOSITORY LAYOUT
 -----------------
 
@@ -55,22 +57,24 @@ RUNNING NOVEMBER
 
     $ ./test_wiki.sh
 
-  To specify which page to view you need to specify the GET paramters on the
-  command line, as follows:
+  To specify which page to view you need to specify the path, as follows:
 
     $ ./test_wiki.sh
-    $ ./test_wiki.sh 'action=view&page=Main_Page'
+    $ ./test_wiki.sh /view/Another_Page
+    $ ./test_wiki.sh /all
+    $ ./test_wiki.sh /recent
+    $ ./test_wiki.sh /view/Main_Page
 
-  The above two commands are equivalent, since 'view' is the default action,
-  and 'Main_Page' is the default page for the 'view' action.
+  The above first and last commands are equivalent, since 'view' is the 
+  default action, and 'Main_Page' is the default page for the 'view' action.
 
-  The other actions we have so far are 'edit', 'log_in', 'log_out' and
-  'recent_changes'.
+  The other actions we have so far are 'edit', 'log_in', 'log_out'.
 
 * Running November through a web server
 
   We have only tested the following on the Apache web server. You need to put
-  these files and directories in the 'cgi-bin' directory of Apache:
+  these files and directories in the some directory where Apache can execute 
+  it:
 
     wiki.sh
     wiki
@@ -91,10 +95,20 @@ RUNNING NOVEMBER
 
   Seriously. (This will change, though.)
 
+  For set up Apache to handle all request by November you can use mod_rewrite:
+  RewriteRule ^/([^\.]*)$ /cgi-bin/wiki.sh [PT]
+
+  Of course you can use another version of set up, especialy if you use
+  server for another propuse too. 
+
+  Right now we do not have fast-cgi or mod_parrot engine, but we will 
+  implement it soon.
+
   After this, you can direct your browser to the wiki. The URL will
   look something like this:
 
-    http://localhost/cgi-bin/wiki.sh
+    http://localhost/
+
 
 CONTACT
 -------
