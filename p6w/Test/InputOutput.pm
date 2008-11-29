@@ -10,9 +10,9 @@ class Test::InputOutput {
 
     method test(@tests) {
         for @tests -> $test {
-            my $input       = $test[0];
-            my $expected    = $test[1];
-            my $description = $test[2];
+            my $input       = $test[0].key;
+            my $expected    = $test[0].value;
+            my $description = $test[1];
 
             my $actual = &.filter($input);
 
