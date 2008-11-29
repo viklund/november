@@ -1,0 +1,22 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <title>Log in</title>
+        <link rel="stylesheet" type="text/css" href="main.css" />
+    </head>
+    <body onload="document.login.user_name.focus()">
+        <TMPL_INCLUDE NAME="toolbar.tmpl">
+        <div id="content">
+            <h1>Log in</h1>
+            <p>Everything you say can, and will, be used against you. Please
+              put on your own mask first, then help others.</p>
+
+            <form method="POST" name="login">
+              <input type="hidden" name="action" value="log_in" />
+              <p>Username: <input name="user_name" /></p>
+              <p>Password: <input name="password" type="password" /></p>
+              <input type="submit" value="Log in" />
+            </form>
+        </div>
+    </body>
+</html>

@@ -147,8 +147,12 @@ class Tags {
     method norm_counts (@tags?) {
         my $counts = self.read_tags_count;
 
-        my $min = +($counts.values).min; 
-        my $max = +($counts.values).max;
+        my $min = 0;
+        my $max = 0;
+        if ?$counts.keys {
+            $min = +($counts.values).min;
+            $max = +($counts.values).max;
+        }
 
         my $norm_counts = {};
         # RAKUDO: stringify Array here
