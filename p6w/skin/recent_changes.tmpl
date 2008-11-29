@@ -7,9 +7,9 @@
     <body>
         <ul id="toolbar">
             <TMPL_IF NAME=LOGGED_IN>
-                <li><a href="?action=log_out">Log out</a></li>
+                <li><a href="/out">Log out</a></li>
             <TMPL_ELSE>
-                <li><a href="?action=log_in">Log in</a></li>
+                <li><a href="/in">Log in</a></li>
             </TMPL_IF>
         </ul>
         <div id="content">

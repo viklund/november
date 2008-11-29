@@ -2,6 +2,7 @@ body {
     background: white;
     margin: 0;
     padding: 0;
+    line-height:1.5em;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -9,7 +10,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
+    font-size:2em; /* 32px */
+    line-height:1.25em; /* 45px */    
     border-bottom: solid 3px #888;
+}
+
+h3 {
+    font-size:1.125em; /* 18px */
+    margin:1em 0 0.5625em 0;
+    color:#330;
 }
 
 #toolbar {
@@ -47,7 +56,8 @@ h1 {
 }
 
 #content {
-    padding: 20px 40px 0;
+    padding: 1.4em 40px 0;
+    margin-right:284px;
 }
 
 .diff .insertion {
@@ -64,7 +74,30 @@ a.nonexistent {
     color: #F00;
 }
 
+.block-right {
+    float:right;
+    clear:both;
+    margin: 1.5625em 40px 0px 20px;
+    border: 2px solid #863;
 
+    width: 200px;
+    padding:0 20px 20px 20px;
+}
+.space-top-h1 {
+    margin-top:5.1875em /* 83px */
+}
+
+.list-simple {
+    margin:0; padding:0;
+    list-style:none;
+}
+
+.list-simple li {
+    margin-bottom:0.3em;
+}
+
+/* Tags
+----------------------------------------------*/
 .pagetags a, .cloud a {
     color: #333;
 }
@@ -73,16 +106,13 @@ a.nonexistent {
     color: #00c;
 }
 
+.cloud {
+    line-height:1.8em;
+}
+
+
 .cloud a {
     margin-right:12px;
-}
-.cloud {
-    float:right;
-    clear:both;
-    line-height:1.9em;
-    width: 200px;
-    padding: 0 0 30px 30px;
-    background:#ccc;
 }
 
 .pagetags {
@@ -106,3 +136,4 @@ a.nonexistent {
 .t8 { font-size:1.6em;}
 .t9 { font-size:1.7em;}
 .t10 { font-size:1.8em;}
+

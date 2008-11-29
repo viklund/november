@@ -1,9 +1,11 @@
 use v6;
+use URI;
 
 class CGI {
     has %.params;
     has %.cookie;
     has @.keywords;
+    has URI $.uri;
 
     has $!crlf;
 
@@ -17,12 +19,18 @@ class CGI {
         # if %*ENV<REQUEST_METHOD> eq 'POST' && %*ENV{CONTENT_LENGTH} > 0 {
         if %*ENV<REQUEST_METHOD> eq 'POST' {
             # Maybe check content_length here and only take that many bytes?
-            my $input = $*IN.slurp();
+            my $input = $*IN.slurp;
             self.parse_params($input);
         }
 
         self.eat_cookie( %*ENV<HTTP_COOKIE> );
         $!crlf = "\x[0D]\x[0A]";
+        $!uri = URI.new;
+        my $uri_str = 'http://' ~ %*ENV<SERVER_NAME>;
+        $uri_str ~= ':' ~ %*ENV<SERVER_PORT> if %*ENV<SERVER_PORT>;  
+        $uri_str ~=  %*ENV<REQUEST_URI>;
+        $.uri.init($uri_str);
+
     }
 
     # For debugging
@@ -112,7 +120,7 @@ class CGI {
     }
 
     method add_param ( Str $key, $value ) {
-        # RAKUDO: синтаксис Hash :exists{key} еще не реализован 
+        # RAKUDO: синтаксис Hash :exists еще не реализован 
         #        (Hash :exists{key} not implemented yet)
         # if %.params :exists{$key} {
         if %.params.exists($key) {
