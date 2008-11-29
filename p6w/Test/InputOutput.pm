@@ -16,7 +16,7 @@ class Test::InputOutput {
 
             my $actual = &.filter($input);
 
-            is( $expected, $actual, $description );
+            is( $actual, $expected, $description );
         }
     }
 }
