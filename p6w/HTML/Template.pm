@@ -1,7 +1,7 @@
 use v6;
 
 use Text::Escape;
-use HTML__Template__Grammar;
+use HTML::Template::Grammar;
 
 class HTML::Template {
     has $.input;
@@ -31,7 +31,7 @@ class HTML::Template {
     sub parse( Str $in ) {
         # RAKUDO: when #58676 will be resolved use: 
         # $in ~~ HTML::Template::Grammar.new;
-        $in ~~ HTML__Template__Grammar::TOP;
+        $in ~~ HTML::Template::Grammar::TOP;
         die("No match") unless ~$/;
         return $/<contents>;
     }
