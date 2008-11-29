@@ -46,8 +46,8 @@ RUNNING NOVEMBER
 ----------------
 
  $ perl Makefile.PL
- $ make # not required, but ~x10 speed up
- $ make tests # not required 
+ $ make             # not required; speeds up startup times
+ $ make test        # not required 
 
 * Running November on the command line
   
