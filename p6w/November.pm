@@ -312,8 +312,9 @@ class November does Session {
         return False unless $time;
         my $t = get_period($time);
         my $str =  '~'; 
-        $str ~= $t[0] ~ 'h ' if $t[0];
-        $str ~= $t[1] ~ 'm ago';
+        $str ~= $t[0] ~ 'd ' if $t[0];
+        $str ~= $t[1] ~ 'h ' if $t[1];
+        $str ~= $t[2] ~ 'm ago';
         return $str;
     }
 

@@ -18,17 +18,27 @@ sub get_unique_id is export {
 sub get_period ($modif_time, $time_now?) is export {
     my $time = $time_now || int time;
     my $period = $time - $modif_time;
-    my $min = int($period / 60);
-    my $hour = int($period / 60 / 60);
 
-    if $hour >= 1 {
-        $min = $min - $hour * 60;
+    my $mins  = int($period / 60);
+    my $hours = int($period / 60 / 60);
+    my $days  = int($period / 60 / 60 / 24);
+
+    if $days >= 1 {
+        $hours = $hours - $days * 24;
+        $mins = $mins - $days * 60 * 24;
+    } else {
+        $days = 0;
+    }
+
+    if $hours >= 1 {
+        $mins = $mins - $hours * 60;
     }
     else {
-        $hour = 0;
+        $hours = 0;
     }
-    $min = 1 if $min < 1;
-    return ($hour, $min)
+
+    $mins = 1 if $mins < 1;
+    return ($days, $hours, $mins)
 }
 
 # vim:ft=perl6
