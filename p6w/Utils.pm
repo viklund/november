@@ -41,4 +41,23 @@ sub get_period ($modif_time, $time_now?) is export {
     return ($days, $hours, $mins)
 }
 
+sub time_to_period_str ($time) {
+    return False unless $time;
+    my $t = get_period($time);
+    my $str =  '~'; 
+
+    # return only days if period > day
+    if $t[0] -> $days {
+        $str ~= $days;
+        $str ~= (+$days == 1 ) ?? ' day' !! ' days';
+        $str ~= ' ago';
+        return $str;
+    }
+
+    $str ~= $t[1] ~ 'h ' if $t[1];
+    $str ~= $t[2] ~ 'm ago';
+    return $str;
+}
+
+
 # vim:ft=perl6

@@ -308,16 +308,6 @@ class November does Session {
         return @changes;
     }
 
-    sub time_to_period_str ($time) {
-        return False unless $time;
-        my $t = get_period($time);
-        my $str =  '~'; 
-        $str ~= $t[0] ~ 'd ' if $t[0];
-        $str ~= $t[1] ~ 'h ' if $t[1];
-        $str ~= $t[2] ~ 'm ago';
-        return $str;
-    }
-
     method list_all_pages {
         my $template = HTML::Template.new(
                 filename => $.template_path ~ 'list_all_pages.tmpl');
