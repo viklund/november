@@ -74,11 +74,22 @@ RUNNING NOVEMBER
 
     wiki.sh
     wiki
-    skin/
-    HTML/
     CGI.pm
+    Dispatcher.pm
+    Dispatcher/Rule.pm
+    HTML/Template.pm
     Impatience.pm
-    Wiki.pm
+    November.pm
+    November/Storage.pm
+    November/Storage/File.pm
+    Session.pm
+    Tags.pm
+    Text/Markup/Wiki/Minimal.pm
+    URI.pm
+    URI/Grammar.pm
+    Utils.pm
+
+    skin/
     data/
 
   If you have compiled November you can copy the .pir files instead of the .pm
