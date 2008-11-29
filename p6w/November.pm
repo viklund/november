@@ -5,51 +5,9 @@ use Tags;
 use HTML::Template;
 use Text::Markup::Wiki::Minimal;
 use November::Storage::File;  
-
-sub get_unique_id {
-    # hopefully pretty unique ID
-    return int(time%1000000/100) ~ time%100
-}
-
-role Session {
-    has $.sessionfile_path  is rw;
-
-    method init {
-        # RAKUDO: set the attributes when declaring them
-        $.sessionfile_path = 'data/sessions';
-    }
-
-    method add_session( $id, %stuff) {
-        my $sessions = self.read_sessions();
-        $sessions{$id} = %stuff;
-        self.write_sessions($sessions);
-    }
-
-    method remove_session($id) {
-        my $sessions = self.read_sessions();
-        $sessions.delete($id);
-        self.write_sessions($sessions);
-    }
-
-    method read_sessions {
-        return {} unless $.sessionfile_path ~~ :e;
-        my $string = slurp( $.sessionfile_path );
-        my $stuff = eval( $string );
-        return $stuff;
-    }
-
-    method write_sessions( $sessions ) {
-        my $fh = open( $.sessionfile_path, :w );
-        $fh.say( $sessions.perl );
-        $fh.close;
-    }
-
-    method new_session($user_name) {
-        my $session_id = get_unique_id();
-        self.add_session( $session_id, { user_name => $user_name } );
-        return $session_id;
-    }
-}
+use Session;
+use Dispatcher;
+use Utils;
 
 class November does Session {
 
@@ -64,7 +22,6 @@ class November does Session {
         $!template_path = 'skin/';
         $!userfile_path = 'data/users';
 
-        # RAKUDO: :: in module names doesn't fully work
         $!storage = November::Storage::File.new();
         Session::init(self);
     }
@@ -74,25 +31,28 @@ class November does Session {
 
         my $action = $cgi.params<action> // 'view';
 
-        # Maybe we should consider turning this given into a lookup hash.
-        # RAKUDO: 'when' doesn't break out by default yet, #57652
-        given $action {
-            when 'view'           { self.view_page();           return; }
-            when 'edit'           { self.edit_page();           return; }
-            when 'log_in'         { self.log_in();              return; }
-            when 'log_out'        { self.log_out();             return; }
-            when 'recent_changes' { self.list_recent_changes(); return; }
-            when 'all_pages'      { self.list_all_pages;        return; }
-        }
+        my $d = Dispatcher.new( default => { self.not_found } );
 
-        self.not_found();
+        $d.add_rules(
+            [
+            [''],                { self.view_page },
+            ['view', /^ \w+ $/], { self.view_page(~$^page) },
+            ['edit', /^ \w+ $/], { self.edit_page(~$^page) },
+            ['in'],              { self.log_in },
+            ['out'],             { self.log_out },
+            ['recent'],          { self.list_recent_changes },
+            ['all'],             { self.list_all_pages },
+            ]
+        );
+
+        my @chunks =  $cgi.uri.chunks.list;
+        $d.dispatch(@chunks);
     }
 
-    method view_page() {
-        my $page = $.cgi.params<page> // 'Main_Page';
+    method view_page($page='Main_Page') {
 
         unless $.storage.wiki_page_exists($page) {
-            self.not_found;
+            self.not_found($page);
             return;
         }
 
@@ -101,32 +61,29 @@ class November does Session {
 
         $template.param('TITLE' => $page);
 
-        my $minimal = Text::Markup::Wiki::Minimal.new( link_maker => { self.make_link($^p, $^t) } );
-        $template.param('CONTENT' => $minimal.format($.storage.read_page($page)) );
+        my $minimal = Text::Markup::Wiki::Minimal.new( 
+                        link_maker => { self.make_link($^p, $^t) } 
+                      );
+        $template.param(
+            'CONTENT' => $minimal.format($.storage.read_page: $page) 
+        );
 
         # TODO: we need plugin system (see topics in mail-list)
         my $t = Tags.new();
         $template.param( 'PAGETAGS' => $t.page_tags: $page );
         $template.param( 'TAGS'     => $t.cloud_tags );
-        
-        $template.param('LOGGED_IN' => self.logged_in());
+       
+        $template.param('RECENTLY' => self.get_changes: page => $page, 
+                                                        limit => 8 );
+
+        $template.param('LOGGED_IN' => self.logged_in);
 
         $.cgi.send_response(
             $template.output(),
         );
     }
 
-    method logged_in() {
-        my $sessions = self.read_sessions();
-        my $session_id = $.cgi.cookie<session_id>;
-        # RAKUDO: 'defined' should maybe be 'exists', although here it doesn't
-        # matter.
-        defined $session_id && defined $sessions{$session_id}
-    }
-
-    method edit_page() {
-        my $page = $.cgi.params<page> // 'Main_Page';
-
+    method edit_page($page) {
         my $sessions = self.read_sessions();
 
         return self.not_authorized() unless self.logged_in();
@@ -151,7 +108,8 @@ class November does Session {
             my $t = Tags.new();
             $t.update_tags($page, $tags);
 
-            return self.view_page();
+            $.cgi.redirect('/view/' ~ $page );
+            return;
         }
 
         my $template = HTML::Template.new(
@@ -163,7 +121,7 @@ class November does Session {
 
         # TODO: we need plugin system (see topics in mail-list)
         my $t = Tags.new;
-        $template.param('PAGETAGS' => $t.read_page_tags($page));
+        $template.param('PAGETAGS' => $t.read_page_tags: $page);
 
         $template.param('LOGGED_IN' => True);
 
@@ -172,7 +130,15 @@ class November does Session {
         );
     }
 
-    method not_authorized() {
+    method logged_in() {
+        my $sessions = self.read_sessions();
+        my $session_id = $.cgi.cookie<session_id>;
+        # RAKUDO: 'defined' should maybe be 'exists', although here it doesn't
+        # matter.
+        defined $session_id && defined $sessions{$session_id}
+    }
+
+    method not_authorized {
         my $template = HTML::Template.new(
             filename => $.template_path ~ 'action_not_authorized.tmpl');
 
@@ -192,11 +158,11 @@ class November does Session {
         return eval( slurp( $.userfile_path ) );
     }
 
-    method not_found() {
+    method not_found($page?) {
         my $template = HTML::Template.new(
             filename => $.template_path ~ 'not_found.tmpl');
 
-        $template.param('PAGE'      => 'Action Not found');
+        $template.param('PAGE'      => $page || 'Action Not found');
         $template.param('LOGGED_IN' => self.logged_in());
 
         $.cgi.send_response(
@@ -287,10 +253,10 @@ class November does Session {
             if $page ~~ m/':'/ {
                 return "<a href=\"$page\">$title</a>";
             } else {
-                return "<a href=\"?action=view&page=$page\">$title</a>";
+                return "<a href=\"/view/$page\">$title</a>";
             }
         } else {
-            return sprintf('<a href="?action=%s&page=%s"%s>%s</a>',
+            return sprintf('<a href="/%s/%s" %s >%s</a>',
                            $.storage.wiki_page_exists($page)
                              ?? ('view', $page, '')
                              !! ('edit', $page, ' class="nonexistent"'),
@@ -299,20 +265,7 @@ class November does Session {
     }
 
     method list_recent_changes {
-
-        # RAKUDO: Seemingly impossible to get the right number of list
-        # containers using an array variable @recent_changes here.
-        my $recent_changes = $.storage.read_recent_changes();
-
-        my @changes;
-        for $recent_changes.values -> $modification_id {
-            my $modification = $.storage.read_modification($modification_id);
-            push @changes, {
-                'page' => self.make_link($modification[0]),
-                'time' => $modification_id,
-                'author' => $modification[2] || 'somebody' };
-        }
-
+        my @changes = self.get_changes(limit => 50);
         my $template = HTML::Template.new(
                 filename => $.template_path ~ 'recent_changes.tmpl');
 
@@ -324,6 +277,35 @@ class November does Session {
         );
 
         return;
+    }
+
+    method get_changes (:$page, :$limit) {
+
+        # RAKUDO: Seemingly impossible to get the right number of list
+        # containers using an array variable @recent_changes here.
+        my $recent_changes;
+
+        if $page {
+            $recent_changes = $.storage.read_page_history($page);
+        }
+        else {
+            $recent_changes = $.storage.read_recent_changes;
+        }
+
+        # @recent_changes = @recent_changes[0..$limit] if $limit;
+        # RAKUDO: array slices do not implemented yet, so:
+        my @changes;
+        for $recent_changes.list -> $modification_id {
+            my $modification = $.storage.read_modification($modification_id);
+            my $count = push @changes, {
+                'page' => self.make_link($modification[0]),
+                'time' => time_to_period_str($modification[3]) || $modification_id,
+                'author' => $modification[2] || 'somebody' 
+                };
+            # RAKUDO: last not implemented yet :(
+            return @changes if $limit && $count == $limit;
+        }
+        return @changes;
     }
 
     method list_all_pages {
@@ -346,7 +328,6 @@ class November does Session {
         else {
             $index = $.storage.read_index;
         }
-
 
         if $index {
             # HTML::Template eat only Arrey of Hashes and Hash keys should 
