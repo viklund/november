@@ -42,21 +42,16 @@ class HTML::Template {
 
         for ($contents<chunk> // ()) -> $chunk {
 
-            # RAKUDO: The following blocks will be greatly de-cluttered by
-            # making use of the future ability in Rakudo to specify closure
-            # parameters in if statements. [perl #58396]
-            #if $chunk<directive><insertion> -> $_ { # and so on for the others
-            if $chunk<directive><insertion> {
-                my $key = ~$chunk<directive><insertion><attributes><name>;
+            if $chunk<directive><insertion> -> $i {
+                my $key = $i<attributes><name>;
                 my $value = %params{$key};
 
-                if $chunk<directive><insertion><attributes><escape> {
-                    # RAKUDO:
-                    # ~$chunk<directive><insertion><attributes><escape>.say; # HTML
-                    # my $et = ~$chunk<directive><insertion><attributes><escape>; # 1
-                    #$value = escape( $value, ~$chunk<directive><insertion><attributes><escape> );
+                if $i<attributes><escape> {
+                    my $et = ~$i<attributes><escape>[0];
+                    # RAKUDO: Segaful here :(
+                    #$value = escape($value, $et);
+                    $value = escape($value, 'HTML');
 
-                    $value = escape( $value, 'HTML' );
                 }
                 $output ~= ~$value;
             }

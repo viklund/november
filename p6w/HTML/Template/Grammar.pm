@@ -34,8 +34,8 @@ grammar HTML::Template::Grammar {
     };
 
     token tag_start  { '<TMPL_' };
+    token attributes { \s+ 'NAME='? <name> [\s+ 'ESCAPE=' <escape> ]? };
     token name       { $<val>=\w+ | <.qq> $<val>=[ <[ 0..9 '/._' \- // ] +alpha>* ] <.qq> };
     regex qq         { '"' };
     token escape     { 'NONE' | 'HTML' | 'URL' | 'URI' | 'JS' | 'JAVASCRIPT' };
-    token attributes { \s+ 'NAME='? <name> [\s+ 'ESCAPE=' <escape> ]? };
 };

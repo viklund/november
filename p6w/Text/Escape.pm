@@ -31,7 +31,7 @@ sub escape_uri_char($c) {
 sub escape_str($str, $callback) {
     my $result;
     for 0 .. ($str.chars -1 ) -> $index {
-        $result ~= $callback($str.substr($index, 1));
+        $result ~= $callback( $str.substr: $index, 1 );
     }
     $result;
 }
