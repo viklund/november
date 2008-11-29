@@ -1,24 +1,19 @@
 use v6;
 
 use Test;
-plan 4;
+use Test::InputOutput;
 
 use Text::Markup::Wiki::MediaWiki;
 
-my %h =
-    '<'  => 'lt',
-    '>'  => 'gt',
-    '&'  => 'amp',
-    '\'' => '#039';
+my @tests =
+    [ '<'  => '<p>&lt;</p>',   '&lt;'   ],
+    [ '>'  => '<p>&gt;</p>',   '&gt;'   ],
+    [ '&'  => '<p>&amp;</p>',  '&amp;'  ],
+    [ '\'' => '<p>&#039;</p>', '&#039;' ];
+
+plan +@tests;
 
 my $converter = Text::Markup::Wiki::MediaWiki.new;
-
-for %h.kv -> $input, $abbr {
-    my $expected_escape = '&' ~ $abbr ~ ';';
-    my $expected_output = "<p>$expected_escape</p>";
-    my $actual_output = $converter.format($input);
-
-    is( $actual_output, $expected_output, "$input -> $expected_escape" );
-}
+Test::InputOutput.using( { $converter.format($^input) } ).test(@tests);
 
 # vim:ft=perl6
