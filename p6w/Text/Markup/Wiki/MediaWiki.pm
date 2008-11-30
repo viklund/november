@@ -32,15 +32,14 @@ class Text::Markup::Wiki::MediaWiki {
     }
 
     sub toggle(@style_stack is rw, @promises is rw, $marker) {
-        my $r;
         # RAKUDO: $elem ~~ @array
         if contains(@style_stack, $marker) {
             while @style_stack.end ne $marker {
                 my $t = @style_stack.pop();
                 @promises.push($t);
-                $r ~= "</$t>";
+                take "</$t>";
             }
-            $r ~= '</' ~ @style_stack.pop() ~ '>';
+            take '</' ~ @style_stack.pop() ~ '>';
         }
         else {
             if contains(@promises, $marker) {
@@ -48,10 +47,9 @@ class Text::Markup::Wiki::MediaWiki {
             }
             else {
                 @style_stack.push($marker);
-                $r ~= "<$marker>";
+                take "<$marker>";
             }
         }
-        return $r;
     }
 
     sub format_line($line is rw, :$link_maker, :$author) {
@@ -76,23 +74,25 @@ class Text::Markup::Wiki::MediaWiki {
         my @style_stack;
         my @promises;
 
-        $xml_escaped ~~ Tokenizer;
-        for $/<token>.values -> $token {
-            if $token<bold_marker> {
-                $result ~= toggle(@style_stack, @promises, 'b');
+        my $result = join '', gather {
+            $xml_escaped ~~ Tokenizer;
+            for $/<token>.values -> $token {
+                if $token<bold_marker> {
+                    toggle(@style_stack, @promises, 'b');
+                }
+                elsif $token<italic_marker> {
+                    toggle(@style_stack, @promises, 'i');
+                }
+                else {
+                    push @style_stack, @promises;
+                    take join '', map { "<$_>" }, @promises;
+                    @promises = ();
+                    take ~$token;
+                }
             }
-            elsif $token<italic_marker> {
-                $result ~= toggle(@style_stack, @promises, 'i');
-            }
-            else {
-                push @style_stack, @promises;
-                $result ~= join '', map { "<$_>" }, @promises;
-                @promises = ();
-                $result ~= ~$token;
-            }
-        }
 
-        $result ~= join '', map { "</$_>" }, reverse @style_stack;
+            take join '', map { "</$_>" }, reverse @style_stack;
+        }
 
         return sprintf '<%s>%s</%s>', $partype, $result, $partype;
     }
