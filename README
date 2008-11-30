@@ -27,8 +27,6 @@ follow instructions there. See instructions on the parrot site:
 
  <http://www.parrotcode.org/>
 
-We use developers version from svn, now.
-
 REPOSITORY LAYOUT
 -----------------
 
@@ -100,23 +98,20 @@ RUNNING NOVEMBER
   files. Make sure that the files and directories below data/ are readable
   and writable by the web server. Also, if you want a styled wiki you need to
   copy the following files into the root of your web server:
-  
+
     skin/spartan.css
     skin/november-logo.png
 
   Seriously. (This will change, though.)
 
-  For set up Apache to handle all request by November you can use mod_rewrite:
-  RewriteRule ^/([^\.]*)$ /cgi-bin/wiki.sh [PT]
+  To set up Apache to handle all request by November, you can use mod_rewrite:
 
-  Of course you can use another version of set up, especialy if you use
-  server for another propuse too. 
+    RewriteRule ^/([^\.]*)$ /cgi-bin/wiki.sh [PT]
 
-  Right now we do not have fast-cgi or mod_parrot engine, but we will 
-  implement it soon.
+  If you are using Apache for other purposes as well, you might want to do
+  the rewriting differently.
 
-  After this, you can direct your browser to the wiki. The URL will
-  look something like this:
+  After this, you can direct your browser to the wiki:
 
     http://localhost/
 
