@@ -1,5 +1,13 @@
 use v6;
 
+grammar Tokenizer {
+    regex TOP { ^ <token>* $ }
+    regex token { <bold_marker> | <italic_marker> | <plain> }
+    regex bold_marker { '&#039;&#039;&#039;' }
+    regex italic_marker { '&#039;&#039;' }
+    regex plain { [<!before '&#039;&#039;'> .]+ }
+}
+
 class Text::Markup::Wiki::MediaWiki {
 
     sub entities(*@words) {
@@ -37,28 +45,28 @@ class Text::Markup::Wiki::MediaWiki {
             [ entities < lt   gt  amp  #039 > ]
         );
 
-        my $result = $xml_escaped;
+        my $result;
+        my $italic_flag = False;
+        my $bold_flag   = False;
 
-        # This method is far to simplistic, but will get us a few passing
-        # tests along the way.
-        my $italic_regex
-            = / <!after '&#039;'> '&#039;&#039;' <!before '&#039;'> (.*?)
-                <!after '&#039;'> '&#039;&#039;' <!before '&#039;'> /;
-        while $result ~~ $italic_regex {
-            $result .= subst( $italic_regex, { "<i>$0</i>" } );
-        }
-
-        my $bold_regex
-            = / '&#039;&#039;&#039;' (.*?) '&#039;&#039;&#039;' /;
-        while $result ~~ $bold_regex {
-            $result .= subst( $bold_regex, { "<b>$0</b>" } );
-        }
-
-        if defined $link_maker {
-            my $link_regex = / '[[' (<-[\]]>+) ']]' /; # /
-            while $result ~~ $link_regex {
-                $result .= subst( $link_regex, { $link_maker($0) } );
+        $xml_escaped ~~ Tokenizer;
+        for $/<token>.values -> $token {
+            if $token<bold_marker> {
+                $result ~= ($bold_flag = !$bold_flag) ??  '<b>' !! '</b>';
             }
+            elsif $token<italic_marker> {
+                $result ~= ($italic_flag = !$italic_flag) ?? '<i>' !! '</i>';
+            }
+            else {
+                $result ~= ~$token;
+            }
+        }
+
+        if $italic_flag {
+            $result ~= '</i>';
+        }
+        if $bold_flag {
+            $result ~= '</b>';
         }
 
         return sprintf '<%s>%s</%s>', $partype, $result, $partype;
