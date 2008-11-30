@@ -27,13 +27,8 @@ class Text::Markup::Wiki::MediaWiki {
         return @parlist.grep( { $_ } );
     }
 
-    sub contains(@array, $thing) {
-        return ?( first { $_ === $thing }, @array );
-    }
-
     sub toggle(@style_stack is rw, @promises is rw, $marker) {
-        # RAKUDO: $elem ~~ @array
-        if contains(@style_stack, $marker) {
+        if $marker ~~ any(@style_stack) {
             while @style_stack.end ne $marker {
                 my $t = @style_stack.pop();
                 @promises.push($t);
@@ -42,7 +37,7 @@ class Text::Markup::Wiki::MediaWiki {
             take '</' ~ @style_stack.pop() ~ '>';
         }
         else {
-            if contains(@promises, $marker) {
+            if $marker ~~ any(@promises) {
                 @promises = grep { $_ !=== $marker }, @promises;
             }
             else {
