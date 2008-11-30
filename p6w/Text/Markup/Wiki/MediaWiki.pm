@@ -27,6 +27,33 @@ class Text::Markup::Wiki::MediaWiki {
         return @parlist.grep( { $_ } );
     }
 
+    sub contains(@array, $thing) {
+        return ?( first { $_ === $thing }, @array );
+    }
+
+    sub toggle(@style_stack is rw, @promises is rw, $marker) {
+        my $r;
+        # RAKUDO: $elem ~~ @array
+        if contains(@style_stack, $marker) {
+            while @style_stack.end ne $marker {
+                my $t = @style_stack.pop();
+                @promises.push($t);
+                $r ~= "</$t>";
+            }
+            $r ~= '</' ~ @style_stack.pop() ~ '>';
+        }
+        else {
+            if contains(@promises, $marker) {
+                @promises = grep { $_ !=== $marker }, @promises;
+            }
+            else {
+                @style_stack.push($marker);
+                $r ~= "<$marker>";
+            }
+        }
+        return $r;
+    }
+
     sub format_line($line is rw, :$link_maker, :$author) {
         my $partype = 'p';
         if $line ~~ /^ '==' (.*) '==' $/ {
@@ -46,28 +73,26 @@ class Text::Markup::Wiki::MediaWiki {
         );
 
         my $result;
-        my $italic_flag = False;
-        my $bold_flag   = False;
+        my @style_stack;
+        my @promises;
 
         $xml_escaped ~~ Tokenizer;
         for $/<token>.values -> $token {
             if $token<bold_marker> {
-                $result ~= ($bold_flag = !$bold_flag) ??  '<b>' !! '</b>';
+                $result ~= toggle(@style_stack, @promises, 'b');
             }
             elsif $token<italic_marker> {
-                $result ~= ($italic_flag = !$italic_flag) ?? '<i>' !! '</i>';
+                $result ~= toggle(@style_stack, @promises, 'i');
             }
             else {
+                push @style_stack, @promises;
+                $result ~= join '', map { "<$_>" }, @promises;
+                @promises = ();
                 $result ~= ~$token;
             }
         }
 
-        if $italic_flag {
-            $result ~= '</i>';
-        }
-        if $bold_flag {
-            $result ~= '</b>';
-        }
+        $result ~= join '', map { "</$_>" }, reverse @style_stack;
 
         return sprintf '<%s>%s</%s>', $partype, $result, $partype;
     }
