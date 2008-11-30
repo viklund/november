@@ -39,7 +39,7 @@ my @tests =
 
 [
     "Oh, how I '''''embolden and italizice'''''." =>
-    '<p>Oh, how I <i><b>embolden and italizice</b></i>.</p>',
+    '<p>Oh, how I <b><i>embolden and italizice</i></b>.</p>',
     'italic/bold text works',
 ],
 
@@ -57,13 +57,13 @@ my @tests =
 
 [
     "Doing it '''''once still produces results." =>
-    "<p>Doing it <i><b>once still produces results.</b></i></p>",
+    "<p>Doing it <b><i>once still produces results.</i></b></p>",
     'malformed italic/bold I',
 ],
 
 [
     "But '''''only until\nthe next line break." =>
-    "<p>But <i><b>only until</b></i> the next line break.</p>",
+    "<p>But <b><i>only until</i></b> the next line break.</p>",
     'malformed italic/bold II',
 ],
 
