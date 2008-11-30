@@ -66,16 +66,18 @@ class Text::Markup::Wiki::MediaWiki {
 
     sub format_paragraph($paragraph, :$link_maker, :$author) {
         # RAKUDO: This could use some ==>
-        return merge_consecutive_paragraphs
-               map { format_line($^line, :$link_maker, :$author) },
-               $paragraph.split("\n");
+        return
+          merge_consecutive_paragraphs
+          map { format_line($^line, :$link_maker, :$author) },
+          $paragraph.split("\n");
     }
 
     method format($text, :$link_maker, :$author) {
-        my @result_pars
-            = join "\n\n",
-              map { format_paragraph($_, :$link_maker, :$author) },
-              $text.split(/\n ** 2..*/);
+        # RAKUDO: This could use some ==>
+        return
+          join "\n\n",
+          map { format_paragraph($_, :$link_maker, :$author) },
+          $text.split(/\n ** 2..*/);
     }
 }
 
