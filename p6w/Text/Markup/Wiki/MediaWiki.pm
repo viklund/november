@@ -10,8 +10,7 @@ class Text::Markup::Wiki::MediaWiki {
         for 0 ..^ @parlist.elems-1 -> $ix {
             if @parlist[$ix] ~~ /^'<p>'/ && @parlist[$ix+1] ~~ /^'<p>'/ {
                 @parlist[$ix+1] = @parlist[$ix] ~ @parlist[$ix+1];
-                # RAKUDO: `@a[$i] .=` is broken [perl #60620]
-                @parlist[$ix+1] = @parlist[$ix+1].subst( '</p><p>', ' ' );
+                @parlist[$ix+1] .= subst( '</p><p>', ' ' );
 
                 @parlist[$ix] = undef;
             }
