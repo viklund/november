@@ -105,15 +105,13 @@ class CGI {
     }
 
     sub unescape($string is rw) {
-        # RAKUDO: :g plz
-        while $string ~~ /\+/ {
-            $string .= subst('+', ' ');
-        }
+        $string .= subst('+', ' ', :g);
         # RAKUDO: This could also be rewritten as a single .subst :g call.
+        #         ...when the semantics of .subst is revised to change $/,
+        #         that is.
         while $string ~~ /\%(<[0..9A..F]>**2)/ {
             my $match = $0;
             my $character = chr(:16($match));
-            # RAKUDO: DOTTY
             $string .= subst('%' ~ $match, $character);
         }
         return $string;
