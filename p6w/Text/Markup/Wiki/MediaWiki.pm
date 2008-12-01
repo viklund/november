@@ -51,7 +51,7 @@ class Text::Markup::Wiki::MediaWiki {
         }
     }
 
-    sub format_line($line is rw, :$link_maker, :$author) {
+    sub format_line($line is rw, :$link_maker, :$extlink_maker, :$author) {
         my $partype = 'p';
         if $line ~~ /^ '==' (.*) '==' $/ {
             $partype = 'h2';
@@ -99,19 +99,19 @@ class Text::Markup::Wiki::MediaWiki {
         return sprintf '<%s>%s</%s>', $partype, $result, $partype;
     }
 
-    sub format_paragraph($paragraph, :$link_maker, :$author) {
+    sub format_paragraph($paragraph, :$link_maker, :$extlink_maker, :$author) {
         # RAKUDO: This could use some ==>
         return
           merge_consecutive_paragraphs
-          map { format_line($^line, :$link_maker, :$author) },
+          map { format_line($^line, :$link_maker, :$extlink_maker, :$author) },
           $paragraph.split("\n");
     }
 
-    method format($text, :$link_maker, :$author) {
+    method format($text, :$link_maker, :$extlink_maker, :$author) {
         # RAKUDO: This could use some ==>
         return
           join "\n\n",
-          map { format_paragraph($_, :$link_maker, :$author) },
+          map { format_paragraph($_, :$link_maker, :$extlink_maker, :$author) },
           $text.split(/\n ** 2..*/);
     }
 }

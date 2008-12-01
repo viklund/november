@@ -1,12 +1,13 @@
 use v6;
 
 use Test;
-plan 6;
+plan 8;
 
 use Text::Markup::Wiki::MediaWiki;
 
 my $converter = Text::Markup::Wiki::MediaWiki.new;
 my $link_maker = { my $l = $^page.ucfirst; "<a href=\"/?page=$l\">$^page</a>" }
+my $extlink_maker = { "<a href=\"$^href\">$^title</a>" }
 
 {
     my $input = 'An example of a [[link]]';
@@ -53,10 +54,29 @@ my $link_maker = { my $l = $^page.ucfirst; "<a href=\"/?page=$l\">$^page</a>" }
 {
     my $input = 'This is an [http://example.com] external link';
     my $expected_output
-        = '<p>This is an <a href="http://example.com" external link</p>';
-    my $actual_output = $converter.format($input, :$link_maker);
+        = '<p>This is an <a href="http://example.com">http://example.com</a> '
+          ~ 'external link</p>';
+    my $actual_output = $converter.format($input, :$extlink_maker);
 
-    is( $actual_output, $expected_output, 'external link' );
+    is( $actual_output, $expected_output, 'external link I' );
+}
+
+{
+    my $input = 'This is an [http://example.com external link with a title]';
+    my $expected_output
+        = '<p>This is an <a href="http://example.com">external link with a '
+          ~ 'title</a></p>';
+    my $actual_output = $converter.format($input, :$extlink_maker);
+
+    is( $actual_output, $expected_output, 'external link II' );
+}
+
+{
+    my $input = 'This is an [http://example.com] external link';
+    my $expected_output = "<p>$input</p>";
+    my $actual_output = $converter.format($input);
+
+    is( $actual_output, $expected_output, 'no extlink maker, no conversion' );
 }
 
 # vim:ft=perl6
