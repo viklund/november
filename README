@@ -22,8 +22,12 @@ docs/COMMITTERS if these thoughts intrigue you.
 PREREQUISITES
 -------------
 
-You need Parrot and Rakudo. Check it out from the Parrot svn repository and
-follow instructions there. See instructions on the parrot site:
+You'll need Parrot and Rakudo. Check them out from the Parrot svn repository
+and follow the instructions in the checkout. Note that the latest 'stable
+release' of Parrot/Rakudo often isn't new enough, since we tend to use features
+developed after the latest release.
+
+See instructions on the parrot site:
 
  <http://www.parrotcode.org/>
 
