@@ -96,7 +96,22 @@ class Text::Markup::Wiki::MediaWiki {
                             !! ~$token<wikilink>;
                 }
                 elsif $token<extlink> {
-                    take 'EXTLINK!';
+                    my $contents = substr( ~$token<extlink>, 1, -1 );
+                    my $url;
+                    my $title;
+
+                    my $ix = index( $contents, ' ' );
+                    if defined $ix {
+                        $url = substr( $contents, 0, $ix );
+                        $title = substr( $contents, $ix + 1 );
+                    }
+                    else {
+                        $url = $title = $contents;
+                    }
+                    
+                    take defined $extlink_maker
+                            ?? $extlink_maker($url, $title)
+                            !! ~$token<extlink>;
                 }
                 else {
                     push @style_stack, @promises;
