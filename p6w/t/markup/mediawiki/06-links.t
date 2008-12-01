@@ -22,7 +22,6 @@ my $extlink_maker = { "<a href=\"$^href\">$^title</a>" }
     my $input = 'An example of a [[link]]';
     my $expected_output = '<p>An example of a [[link]]</p>';
     my $actual_output = $converter.format($input);
-    say $actual_output, "|", $expected_output;
 
     is( $actual_output, $expected_output, 'no link maker, no conversion' );
 }
