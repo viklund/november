@@ -2,10 +2,14 @@ use v6;
 
 grammar Tokenizer {
     regex TOP { ^ <token>* $ }
-    regex token { <bold_marker> | <italic_marker> | <plain> }
+    regex token { <bold_marker> | <italic_marker> | <wikilink> | <extlink> |
+                  <plain> | <malformed> }
     regex bold_marker { '&#039;&#039;&#039;' }
     regex italic_marker { '&#039;&#039;' }
-    regex plain { [<!before '&#039;&#039;'> .]+ }
+    regex wikilink { '[[' [<!before ']]'> .]+ ']]' }
+    regex extlink { '[' [<!before ']'> .]+ ']' }
+    regex plain { [<!before '&#039;&#039;'> <!before '['> .]+ }
+    regex malformed { '[[' | '[' }
 }
 
 class Text::Markup::Wiki::MediaWiki {
@@ -77,13 +81,22 @@ class Text::Markup::Wiki::MediaWiki {
         my @promises;
 
         my $result = join '', gather {
-            $xml_escaped ~~ Tokenizer;
+            $xml_escaped ~~ Tokenizer or return "Couldn't parse '$line'";
             for $/<token>.values -> $token {
                 if $token<bold_marker> {
                     toggle(@style_stack, @promises, 'b');
                 }
                 elsif $token<italic_marker> {
                     toggle(@style_stack, @promises, 'i');
+                }
+                elsif $token<wikilink> {
+                    my $title = substr( ~$token<wikilink>, 2, -2 );
+                    take defined $link_maker
+                            ?? $link_maker($title)
+                            !! ~$token<wikilink>;
+                }
+                elsif $token<extlink> {
+                    take 'EXTLINK!';
                 }
                 else {
                     push @style_stack, @promises;
