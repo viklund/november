@@ -27,6 +27,10 @@ class Text::Markup::Wiki::MediaWiki {
         return @parlist.grep( { $_ } );
     }
 
+    # Turns a style on of it was off, and vice versa. Outputs the result.
+    # In case it was on, also turns off all styles pushed after that style.
+    # In case it was off and the style was found in @promises, this token
+    # cancels the one in @promises, and nothing is output.
     sub toggle(@style_stack is rw, @promises is rw, $marker) {
         if $marker ~~ any(@style_stack) {
             while @style_stack.end ne $marker {
@@ -65,8 +69,11 @@ class Text::Markup::Wiki::MediaWiki {
             [ entities < lt   gt  amp  #039 > ]
         );
 
-        my $result;
+        # A stack of all the active styles, in order of activation
         my @style_stack;
+
+        # The styles that were just closed because of mis-nesting, and which
+        # might have to be opened again
         my @promises;
 
         my $result = join '', gather {
