@@ -9,8 +9,6 @@ Things to investigate further with p6w:
 
 * Server-side caching.
 
-* Support of ";" as well as "&" in URIs.
-
 * Markups.
 ** MediaWiki
 ** Creole (file://feather/home/juerd/creole)
