@@ -1,5 +1,7 @@
 Things to investigate further with p6w:
 
+* Using {*} for call actions from grammar (trying in asterisk branch).
+
 * Using Parrot NCI to wrap SQLite.
   (<http://svn.perl.org/parrot/trunk/examples/nci/mysqltest.p6>)
 
