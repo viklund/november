@@ -19,11 +19,10 @@ class November::Storage {
 
 
     method save_page($_: $page, $new_text, $author) {
+        .add_to_index($page) unless .wiki_page_exists($page); 
         my $modif_id = .write_modification([$page, $new_text, $author]);
-
         .add_page_history($page, $modif_id);
         .add_recent_change($modif_id); 
-        .add_to_index($page) unless .wiki_page_exists($page); 
     }
 
     method add_page_history ($page, $modification_id) {
