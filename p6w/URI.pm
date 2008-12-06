@@ -35,21 +35,15 @@ method authority {
 }
 
 method host {
-    #RAKUDO: $.uri<authority> return 1, and than we try 1<port> and die :( 
-    #$.uri<authority><host>;
-    # workaround:
-    my %p = $.uri<authority>;
-    my $h =  %p<host> // '';
-    return $h.lc;
+    #RAKUDO: $.uri<authority>[0]<host> return full <authority> now
+    my $h = $.uri<authority>[0]<host>;
+    return $h.lc // '';
 }
 
 method port {
-    #RAKUDO: $.uri<authority> return 1, and than try 1<port> and die :( 
-    #$.uri<authority><port>;
+    #RAKUDO: $.uri<authority><port> return full <authority> now
     # workaround:
-    my %p = $.uri<authority>;
-    my $p = %p<port> // '';
-    return $p;
+    item $.uri<authority>[0]<port> // '';
 }
 
 method path {
@@ -89,11 +83,11 @@ method Str() {
 
 =begin pod
 
-=haed NAME
+=head NAME
 
 URI — Uniform Resource Identifiers (absolute and relative) 
 
-=haed SYNOPSYS
+=head SYNOPSYS
 
     use URI;
     my $u = URI.new;
