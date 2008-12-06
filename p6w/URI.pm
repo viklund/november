@@ -10,7 +10,13 @@ has @.chunks;
 
 method init ($str) {
     use URI::Grammar;
-    $str ~~ URI::Grammar::TOP;
+
+    # clear string before parsing
+    my $c_str = $str;
+    $c_str .= subst(/^ \s* ['<' | '"'] /, '');
+    $c_str .= subst(/ ['>' | '"'] \s* $/, '');
+
+    $c_str ~~ URI::Grammar::TOP;
     unless $/ { die "Could not parse URI: $str" }
 
     $!uri = $/;
