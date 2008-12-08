@@ -26,17 +26,19 @@ method init ($str) {
 
 method scheme {
     my $s = $.uri<scheme> // '';
-    return $s.lc;
+    # RAKUDO: return 1 if use ~ below die because can`t do lc on Math after
+    return ~$s.lc;
 }
 
 method authority {
     my $a = $.uri<authority> // '';
-    return $a.lc;
+    # RAKUDO: return 1 if use ~ below die because can`t do lc on Math after
+    return ~$a.lc;
 }
 
 method host {
     #RAKUDO: $.uri<authority>[0]<host> return full <authority> now
-    my $h = $.uri<authority>[0]<host>;
+    my $h = ~$.uri<authority>[0]<host>;
     return $h.lc // '';
 }
 
@@ -47,7 +49,7 @@ method port {
 }
 
 method path {
-    my $p = $.uri<path> // '';
+    my $p = ~$.uri<path> // '';
     return $p.lc;
 }
 
@@ -66,7 +68,7 @@ method query {
 }
 method frag {
     my $f = $.uri<fragment> // '';
-    return $f.lc;
+    return ~$f.lc;
 }
 
 method fragment { $.frag }

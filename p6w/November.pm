@@ -8,6 +8,7 @@ use November::Storage::File;
 use Session;
 use Dispatcher;
 use Utils;
+use Config;
 
 class November does Session {
 
@@ -19,8 +20,8 @@ class November does Session {
 
     method init {
         # RAKUDO: set the attributes when declaring them
-        $!template_path = 'skin/';
-        $!userfile_path = 'data/users';
+        $!template_path = Config.server_root ~ 'skin/';
+        $!userfile_path = Config.server_root ~ 'data/users';
 
         $!storage = November::Storage::File.new();
         Session::init(self);
@@ -56,31 +57,23 @@ class November does Session {
             return;
         }
 
-        my $template = HTML::Template.new(
-            filename => $.template_path ~ 'view.tmpl');
-
-        $template.param('TITLE' => $page);
-
         my $minimal = Text::Markup::Wiki::Minimal.new( 
                         link_maker => { self.make_link($^p, $^t) } 
                       );
-        $template.param(
-            'CONTENT' => $minimal.format($.storage.read_page: $page) 
-        );
 
         # TODO: we need plugin system (see topics in mail-list)
-        my $t = Tags.new();
-        $template.param( 'PAGETAGS' => $t.page_tags: $page );
-        $template.param( 'TAGS'     => $t.cloud_tags );
-       
-        $template.param('RECENTLY' => self.get_changes: page => $page, 
-                                                        limit => 8 );
+        my $t = Tags.new;
 
-        $template.param('LOGGED_IN' => self.logged_in);
-
-        $.cgi.send_response(
-            $template.output(),
+        self.response( 'view.tmpl', 
+            { 
+            'TITLE'    => $page,
+            'CONTENT'  => $minimal.format($.storage.read_page: $page), 
+            'PAGETAGS' => $t.page_tags($page), 
+            'TAGS'     => $t.cloud_tags,
+            'RECENTLY' => self.get_changes( page => $page, :limit(8) ),
+            }
         );
+
     }
 
     method edit_page($page) {
@@ -112,21 +105,16 @@ class November does Session {
             return;
         }
 
-        my $template = HTML::Template.new(
-            filename => $.template_path ~ 'edit.tmpl');
-
-        $template.param('PAGE'      => $page);
-        $template.param('TITLE'     => $title);
-        $template.param('CONTENT'   => $old_content);
-
         # TODO: we need plugin system (see topics in mail-list)
         my $t = Tags.new;
-        $template.param('PAGETAGS' => $t.read_page_tags: $page);
 
-        $template.param('LOGGED_IN' => True);
-
-        $.cgi.send_response(
-            $template.output(),
+        self.response( 'edit.tmpl', 
+            { 
+            'PAGE'      => $page,
+            'TITLE'     => $title,
+            'CONTENT'   => $old_content,
+            'PAGETAGS' => $t.read_page_tags($page),
+            }
         );
     }
 
@@ -139,18 +127,13 @@ class November does Session {
     }
 
     method not_authorized {
-        my $template = HTML::Template.new(
-            filename => $.template_path ~ 'action_not_authorized.tmpl');
-
-        # TODO: file bug, without "'" it is interpreted as named args and not
-        #       as Pair
-        $template.param('DISALLOWED_ACTION' => 'edit pages');
-
-        $.cgi.send_response(
-            $template.output(),
+        self.response( 'action_not_authorized.tmpl', 
+            { 
+            # TODO: file bug, without "'" it is interpreted as named 
+            # args and not as Pair
+            'DISALLOWED_ACTION' => 'edit pages'
+            }
         );
-
-        return;
     }
 
     method read_users {
@@ -159,16 +142,12 @@ class November does Session {
     }
 
     method not_found($page?) {
-        my $template = HTML::Template.new(
-            filename => $.template_path ~ 'not_found.tmpl');
-
-        $template.param('PAGE'      => $page || 'Action Not found');
-        $template.param('LOGGED_IN' => self.logged_in());
-
-        $.cgi.send_response(
-            $template.output(),
+        #TODO: that should by 404 when no $page 
+        self.response('not_found.tmpl', 
+            { 
+            'PAGE' => $page || 'Action Not found'
+            }
         );
-        return;
     }
 
     method log_in {
@@ -188,95 +167,43 @@ class November does Session {
                 my $session_id = self.new_session($user_name);
                 my $session_cookie = "session_id=$session_id";
 
-                my $template = HTML::Template.new(
-                    filename => $.template_path ~ 'login_succeeded.tmpl');
-
-                $.cgi.send_response(
-                    $template.output(),
+                self.response('login_succeeded.tmpl', 
+                    {},
                     { cookie => $session_cookie }
                 );
-
-                return;
             }
 
-            my $template = HTML::Template.new(
-                filename => $.template_path ~ 'login_failed.tmpl');
-
-            $.cgi.send_response(
-                $template.output(),
-            );
-
-            return;
+            self.response('login_failed.tmpl'); 
         }
 
-        my $template = HTML::Template.new(
-            filename => $.template_path ~ 'log_in.tmpl');
-
-        $.cgi.send_response(
-            $template.output(),
-        );
-
-        return;
+        self.response('log_in.tmpl');
     }
 
     method log_out {
         if defined $.cgi.cookie<session_id> {
-
             my $session_id = $.cgi.cookie<session_id>;
             self.remove_session( $session_id );
 
             my $session_cookie = "session_id=";
 
-            my $template = HTML::Template.new(
-                filename => $.template_path ~ 'logout_succeeded.tmpl');
-
-            $.cgi.send_response(
-                $template.output(),
+            self.response('logout_succeeded.tmpl',
+                undef,
                 { :cookie($session_cookie) }
             );
-
-            return;
         }
 
-        my $template = HTML::Template.new(
-            filename => $.template_path ~ 'logout_succeeded.tmpl');
-
-        $.cgi.send_response(
-            $template.output(),
-        );
-
-        return;
+        self.response('logout_succeeded.tmpl');
     }
 
-    method make_link($page, $title?) {
-        if $title {
-            if $page ~~ m/':'/ {
-                return "<a href=\"$page\">$title</a>";
-            } else {
-                return "<a href=\"/view/$page\">$title</a>";
-            }
-        } else {
-            return sprintf('<a href="/%s/%s" %s >%s</a>',
-                           $.storage.wiki_page_exists($page)
-                             ?? ('view', $page, '')
-                             !! ('edit', $page, ' class="nonexistent"'),
-                           $page);
-        }
-    }
 
     method list_recent_changes {
         my @changes = self.get_changes(limit => 50);
-        my $template = HTML::Template.new(
-                filename => $.template_path ~ 'recent_changes.tmpl');
-
-        $template.param('CHANGES'   => @changes);
-        $template.param('LOGGED_IN' => self.logged_in());
-
-        $.cgi.send_response(
-            $template.output()
+        self.response('recent_changes.tmpl',
+            {
+            'CHANGES'   => @changes,
+            'LOGGED_IN' => self.logged_in
+            }
         );
-
-        return;
     }
 
     method get_changes (:$page, :$limit) {
@@ -309,11 +236,10 @@ class November does Session {
     }
 
     method list_all_pages {
-        my $template = HTML::Template.new(
-                filename => $.template_path ~ 'list_all_pages.tmpl');
 
         my $t = Tags.new();
-        $template.param('TAGS' => $t.cloud_tags) if $t;
+        my %params;
+        %params<TAGS> = $t.cloud_tags if $t;
 
         my $index;
 
@@ -322,8 +248,7 @@ class November does Session {
             # TODO: we need plugin system (see topics in mail-list)
             my $tags_index = $t.read_tags_index;
             $index = $tags_index{$tag};
-    
-            $template.param('TAG' => $tag );
+            %params<TAGS> = $tag;
         } 
         else {
             $index = $.storage.read_index;
@@ -338,15 +263,43 @@ class November does Session {
             # my @list = map { { page => $_ } }, @($index); 
             # do not work. Workaround:
             my @list = map { { page => $_ } }, $index.list; 
-            $template.param('LIST' => @list);
+            %params<LIST> = @list;
         }
 
-        $template.param('LOGGED_IN' => self.logged_in);
-
-        $.cgi.send_response(
-            $template.output()
-        );
+        self.response('list_all_pages.tmpl', %params);
     }
+
+    method response ($tmpl, %params?, %opts?) {
+        my $template = HTML::Template.new(
+            filename => $.template_path ~ $tmpl);
+
+        $template.params =
+            'WEBROOT' => Config.web_root,
+            'LOGGED_IN' => self.logged_in,
+            %params.kv;
+
+        $.cgi.send_response($template.output, %opts);
+    }
+
+    method make_link($page, $title?) {
+        my $root = Config.server_root;
+        if $title {
+            if $page ~~ m/':'/ {
+                return qq|<a href="{ $root ~ $page }">$title</a>|;
+            } else {
+                return qq|<a href="$root/view/$page">$title</a>|;
+            }
+        } else {
+            # TODO: do that more readable
+            return sprintf('<a href="%s/%s/%s" %s >%s</a>',
+                           $root,
+                           $.storage.wiki_page_exists($page)
+                             ?? ('view', $page, '')
+                             !! ('edit', $page, ' class="nonexistent"'),
+                           $page);
+        }
+    }
+
 }
 
 # vim:ft=perl6

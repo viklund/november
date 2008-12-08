@@ -18,8 +18,15 @@ class CGI {
         # little gains. It would look like this:
         # if %*ENV<REQUEST_METHOD> eq 'POST' && %*ENV{CONTENT_LENGTH} > 0 {
         if %*ENV<REQUEST_METHOD> eq 'POST' {
-            # Maybe check content_length here and only take that many bytes?
-            my $input = $*IN.slurp;
+            my $input;
+            if %*ENV<MODPERL6> {
+                my $r = Apache::RequestRec.new();
+                my $len = $r.read($input, %*ENV<CONTENT_LENGTH>);
+            }
+            else {
+                # Maybe check content_length here and only take that many bytes?
+                $input = $*IN.slurp;
+            }
             self.parse_params($input);
         }
 
@@ -28,7 +35,7 @@ class CGI {
         $!uri = URI.new;
         my $uri_str = 'http://' ~ %*ENV<SERVER_NAME>;
         $uri_str ~= ':' ~ %*ENV<SERVER_PORT> if %*ENV<SERVER_PORT>;  
-        $uri_str ~=  %*ENV<REQUEST_URI>;
+        $uri_str ~=  %*ENV<MODPERL6> ?? %*ENV<PATH_INFO> !! %*ENV<REQUEST_URI>;
         $.uri.init($uri_str);
 
     }
@@ -45,8 +52,8 @@ class CGI {
 # From `perldoc perlop`:
 #
 #      All systems use the virtual "\n" to represent a line terminator, called
-#      a "newline".  There is no such thing as an unvarying, physical newline
-#      character.  It is only an illusion that the operating system, device
+#      a "newline".  There is no such thing as an ine
+#      character.  It is only an illusion that the operating system, devic
 #      drivers, C libraries, and Perl all conspire to preserve.  Not all
 #      systems read "\r" as ASCII CR and "\n" as ASCII LF.  For example, on a
 #      Mac, these are reversed, and on systems without line terminator,

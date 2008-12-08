@@ -1,11 +1,13 @@
 use v6;
 
+use Config;
+
 class Tags {
     # RAKUDO: default value do not implement with has keyword
     # has $.page_tags_path is rw = 'data/page_tags/'; 
-    my $.page_tags_path      = 'data/page_tags/';
-    my $.tags_count_path     = 'data/tags_count';
-    my $.tags_index_path     = 'data/tags_index';
+    my $.page_tags_path      = Config.server_root ~ 'data/page_tags/';
+    my $.tags_count_path     = Config.server_root ~ 'data/tags_count';
+    my $.tags_index_path     = Config.server_root ~ 'data/tags_index';
 
     method update_tags ($_: Str $page, Str $new_tags) {
         my $old_tags = .read_page_tags($page).chomp;
@@ -203,7 +205,8 @@ class Tags {
     sub tag_html ($tag, $norm_counts?) {
         my $html =  '<a';
         $html ~= ' class="t' ~ $norm_counts{$tag} ~ '"' if $norm_counts;
-        $html ~= ' href="/all?tag=' ~ $tag ~ '">' ~ $tag ~ '</a>'
+        $html ~= ' href="' ~ Config.web_root ~ '/all?tag=' ~ $tag ~ '">' ~
+	    $tag ~ '</a>';
     }
 }
 

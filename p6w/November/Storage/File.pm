@@ -2,13 +2,14 @@ use v6;
 use November::Storage;
 use Impatience;
 use Utils;
+use Config;
 
 class November::Storage::File is November::Storage;
 
-my $.content_path        = 'data/articles/';
-my $.modifications_path  = 'data/modifications/';
-my $.recent_changes_path = 'data/recent-changes';
-my $.index_path          = 'data/index';
+my $.content_path        = Config.server_root ~ 'data/articles/';
+my $.modifications_path  = Config.server_root ~ 'data/modifications/';
+my $.recent_changes_path = Config.server_root ~ 'data/recent-changes';
+my $.index_path          = Config.server_root ~ 'data/index';
 
 method wiki_page_exists($page) {
     return ($.content_path ~ $page) ~~ :e;

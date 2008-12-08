@@ -3,7 +3,7 @@ use v6;
 class HTML::Template {
 
     has $.filename;
-    has %!params;
+    has %.params is rw;
 
     method param( Pair $param ) {
         %!params{$param.key} = $param.value;
@@ -114,9 +114,11 @@ class HTML::Template {
             die "Unrecognized directive: TMPL_$directive"
               if !($directive eq 'VAR' | 'LOOP');
 
+            say %hash.perl;
+
             # TODO: Converting it to lowercase here is definitely wrong.
             # But it works for now.
-            my $value = %hash{$name.lc}
+            my $value = %hash{$name.lc} // %!params{$name}
               // die "$name is defined in the template but undefined in source";
 
             if $directive eq 'VAR' {
