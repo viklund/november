@@ -114,8 +114,6 @@ class HTML::Template {
             die "Unrecognized directive: TMPL_$directive"
               if !($directive eq 'VAR' | 'LOOP');
 
-            say %hash.perl;
-
             # TODO: Converting it to lowercase here is definitely wrong.
             # But it works for now.
             my $value = %hash{$name.lc} // %!params{$name}

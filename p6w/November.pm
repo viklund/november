@@ -113,7 +113,7 @@ class November does Session {
             'PAGE'      => $page,
             'TITLE'     => $title,
             'CONTENT'   => $old_content,
-            'PAGETAGS' => $t.read_page_tags($page),
+            'PAGETAGS'  => $t.read_page_tags($page),
             }
         );
     }
