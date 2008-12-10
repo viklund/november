@@ -1,1 +1,1 @@
-{ "rakudo" => [ "Main_Page" ]}
+{ "rakudo" => [ "Main_Page" ], "wiki" => [ "Main_Page" ], "november" => ["Main_Page"], "perl 6" => ["Main_Page", "Another_Page"], "fun!" => ["Main_Page", "Another_Page"] }

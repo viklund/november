@@ -5,5 +5,9 @@ use CGI;
 my $cgi = CGI.new();
 $cgi.init();
 
-print _is_deeply( $cgi.param, eval( %*ENV<TEST_RESULT> ) ) ?? "ok " !! "not ok \n" ~ "got: " ~ $cgi.param.perl ~ "\nexpected: " ~ %*ENV<TEST_RESULT> ~ "\n";
+print _is_deeply( $cgi.params, eval( %*ENV<TEST_RESULT> ) ) 
+      ?? "ok " 
+      !! "not ok \n" ~ "got: " ~ $cgi.param.perl ~ 
+         "\nexpected: " ~ %*ENV<TEST_RESULT> ~ "\n";
+
 say "- " ~ %*ENV<TEST_NAME>;

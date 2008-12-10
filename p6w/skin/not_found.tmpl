@@ -7,11 +7,11 @@
     <body>
         <div id="logo"></div>
         <ul id="toolbar">
-            <li><a href="?action=edit">Edit</a></li>
+            <li><a href="/edit/<TMPL_VAR NAME=PAGE>">Edit</a></li>
             <TMPL_IF NAME=LOGGED_IN>
-                <li><a href="?action=log_out">Log out</a></li>
+                <li><a href="<TMPL_VAR NAME=WEBROOT>/out">Log out</a></li>
             <TMPL_ELSE>
-                <li><a href="?action=log_in">Log in</a></li>
+                <li><a href="<TMPL_VAR NAME=WEBROOT>/in">Log in</a></li>
             </TMPL_IF>
         </ul>
         <div id="content">

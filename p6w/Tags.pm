@@ -1,11 +1,13 @@
 use v6;
 
+use Config;
+
 class Tags {
     # RAKUDO: default value do not implement with has keyword
     # has $.page_tags_path is rw = 'data/page_tags/'; 
-    my $.page_tags_path      = 'data/page_tags/';
-    my $.tags_count_path     = 'data/tags_count';
-    my $.tags_index_path     = 'data/tags_index';
+    my $.page_tags_path      = Config.server_root ~ 'data/page_tags/';
+    my $.tags_count_path     = Config.server_root ~ 'data/tags_count';
+    my $.tags_index_path     = Config.server_root ~ 'data/tags_index';
 
     method update_tags ($_: Str $page, Str $new_tags) {
         my $old_tags = .read_page_tags($page).chomp;
@@ -147,8 +149,12 @@ class Tags {
     method norm_counts (@tags?) {
         my $counts = self.read_tags_count;
 
-        my $min = +($counts.values).min; 
-        my $max = +($counts.values).max;
+        my $min = 0;
+        my $max = 0;
+        if ?$counts.keys {
+            $min = +($counts.values).min;
+            $max = +($counts.values).max;
+        }
 
         my $norm_counts = {};
         # RAKUDO: stringify Array here
@@ -167,12 +173,17 @@ class Tags {
     }
     
     method page_tags (Str $page) {
+        #my @tags = self.tags_parse( self.read_page_tags: $page ); 
+        #@tags.map: { { tag => $_ } }; 
+
+        # that`s ugly, we must use template instead, 
+        # when new-html-template give us ability to 
+        # know last element in the list 
         my @page_tags = self.tags_parse( self.read_page_tags: $page ); 
 
         my $tags_str;
         if @page_tags {
-            my $norm_counts = self.norm_counts(@page_tags); 
-            @page_tags = map { tag_html($_, $norm_counts) }, @page_tags;
+            @page_tags = @page_tags.map: { tag_html($_) };
             $tags_str = @page_tags.join(', ');
         }
         return $tags_str;
@@ -183,7 +194,7 @@ class Tags {
         my $tags_str;
 
         if $norm_counts {
-            $tags_str ~= tag_html($_, $norm_counts) for $norm_counts.keys;
+            $tags_str ~= tag_html($_, $norm_counts) ~ ' ' for $norm_counts.keys;
         }
 
         return $tags_str;
@@ -191,10 +202,11 @@ class Tags {
 
     # that`s ugly, we must use template instead, 
     # when new-html-template give us include 
-    sub tag_html ($tag, $norm_counts) {
-        return '<a class="t' ~ $norm_counts{$tag} 
-               ~ '" href="?action=all_pages&tag=' ~ $tag ~ '">' 
-               ~ $tag ~ '</a> '
+    sub tag_html ($tag, $norm_counts?) {
+        my $html =  '<a';
+        $html ~= ' class="t' ~ $norm_counts{$tag} ~ '"' if $norm_counts;
+        $html ~= ' href="' ~ Config.web_root ~ '/all?tag=' ~ $tag ~ '">' ~
+	    $tag ~ '</a>';
     }
 }
 

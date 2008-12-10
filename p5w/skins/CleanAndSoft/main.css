@@ -1,0 +1,374 @@
+/* Begin Typography & Colors */
+body {
+    font-size: 62.5%; /* Resets 1em to 10px */
+    font-family: 'Lucida Grande', Verdana, Arial, Sans-Serif;
+    text-align: center;
+    background-image:url(grey_stripes.png);
+    background-repeat:repeat;
+}
+
+#toolbar {
+    float: right;
+    border: none;
+    border-left: solid 1px black;
+    border-bottom: solid 1px black;
+    opacity: 0.5;
+    background-color: #ffc;
+    height: 2em;
+    line-height: 2em;
+    margin: 0;
+    padding: 0 0.5em 0 1em;
+    font-weight: bold;
+}
+
+#toolbar li {
+    display: inline;
+    margin: none;
+    padding: none;
+    border: none;
+}
+
+#toolbar li a {
+    color: black;
+}
+
+#toolbar li a:hover {
+    text-decoration: none;
+}
+
+#pagebar {
+    width: 700px;
+    background: transparent;
+}
+
+#page {
+    border: 1px solid #959596;
+    text-align: left;
+    width: 700px;
+    background-color: white;
+    margin: 0px auto;
+    padding: 0px;
+}
+
+#header {
+    border-bottom: 1px black solid;
+    }
+
+#content {
+    margin-top: -80px;
+    background: transparent;
+    float: left;
+    padding: 0 0 20px 45px;
+    width: 450px;   
+}
+
+.articlecontent {
+    margin-top: 3em;
+}
+
+#footer {
+    background-color: #eee;
+    }
+
+small {
+    font-family: Verdana, Helvetica, Sans-Serif;
+    font-size: 0.9em;
+    line-height: 1.5em;
+}
+
+h1, h2, h3 {
+    font-family: 'Trebuchet MS', 'Lucida Grande', Verdana, Arial, Sans-Serif;
+    font-weight: bold;
+}
+
+h1 {
+    font-size: 4em;
+}
+
+h2 {
+    font-size: 1.8em;
+}
+
+#sidebar h2 {
+    font-family: Verdana, Sans-Serif;
+    font-weight: normal;
+    text-indent: 10px;
+    background-color: #5581C0;
+    color: white;
+    text-transform: uppercase;
+    margin: 0;
+    padding: 3px 0;
+    font-size: 1em;
+}
+
+h3 {
+    font-size: 1.3em;
+}
+
+small, #sidebar ul ul li, #sidebar ul ol li, .nocomments, .postmetadata, blockquote, strike {
+    color: #777;
+    }
+    
+code {
+    font: 1.1em 'Courier New', Courier, Fixed;
+    }
+    
+acronym, abbr, span.caps
+{
+    font-size: 0.9em;
+    letter-spacing: .07em;
+    }
+
+a, h2 a:hover, h3 a:hover {
+    color: #a89087;
+    text-decoration: none;
+    }
+
+a:hover {
+    color: #147;
+    text-decoration: underline;
+    }
+    
+body {
+    margin: 0;
+    padding: 0; 
+}
+
+#header {
+    padding: 0;
+    margin: 0 auto;
+    height: 140px;
+    width: 100%;
+}
+
+#footer {
+    padding: 0;
+    margin: 0 auto;
+    width: 700px;
+    clear: both;
+    border-top: 1px black solid;
+    }
+
+#footer p {
+    margin: 0;
+    padding: 10px 0;
+    text-align: center;
+    }
+/* End Structure */
+
+
+
+/*  Begin Headers */
+h1 {
+    padding-top: 40px;
+    margin: 0;
+    }
+
+.description {
+    text-align: center;
+    margin-top: -5px;
+    }
+
+h2 {
+    margin: 30px 0 0;
+    }
+
+h2.pagetitle {
+    margin-top: 30px;
+    text-align: center;
+}
+
+h3 {
+    padding: 0;
+    margin: 30px 0 0;
+    }
+
+h3.comments {
+    padding: 0;
+    margin: 40px auto 20px ;
+    }
+/* End Headers */
+
+
+
+/* Begin Images */
+p img {
+    padding: 0;
+    margin: 0 5px;
+    }
+
+/*  Using 'class="alignright"' on an image will (who would've
+    thought?!) align the image to the right. And using 'class="centered',
+    will of course center the image. This is much better than using
+    align="center", being much more futureproof (and valid) */
+    
+img.centered, img.aligncenter {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    }
+    
+img.alignright {
+    padding: 4px;
+    margin: 0 0 2px 7px;
+    display: inline;
+    }
+
+img.alignleft {
+    padding: 4px;
+    margin: 0 7px 2px 0;
+    display: inline;
+    }
+
+.alignright {
+    float: right;
+    }
+    
+.alignleft {
+    float: left
+    }
+/* End Images */
+
+
+
+#sidebar ul, #sidebar ul ol {
+    margin: 0;
+    padding: 0;
+    }
+
+#sidebar ul li {
+    list-style-type: none;
+    list-style-image: none;
+    margin-bottom: 20px;
+    }
+
+#sidebar ul p, #sidebar ul select {
+    margin: 4px 0 8px;
+    }
+
+#sidebar ul ul, #sidebar ul ol, #sidebar ul div  {
+    background-color: #F8F8F8;
+    border: 1px #2E5D99 solid;
+    padding: 8px;
+}
+
+#sidebar ul div.textwidget ul {
+    border: 0;
+}
+
+
+#sidebar ul ul ul, #sidebar ul ol {
+    background: transparent;
+    margin: 0 0 0 10px;
+    border: none;
+    padding: 0;
+    }
+
+#sidebar ul div div {
+    background: transparent;
+    margin: 0;
+    border: none;
+    }
+
+ol li, #sidebar ul ol li {
+    list-style: decimal outside;
+    }
+
+#sidebar ul ul li, #sidebar ul ol li {
+    margin: 3px 0 0;
+    padding: 0;
+    }
+/* End Entry Lists */
+
+
+
+/* Begin Form Elements */
+#searchform {
+    margin: 10px auto;
+    text-align: center;
+    }
+
+/* Begin Sidebar */
+#sidebar {
+    font: 1em 'Lucida Grande', Verdana, Arial, Sans-Serif;
+    padding: 20px 0 10px 0;
+    margin: 0 0 0 530px;
+    width: 150px;
+}
+
+#sidebar form {
+    margin: 0;
+    }
+/* End Sidebar */
+
+
+/* Begin Various Tags & Classes */
+acronym, abbr, span.caps {
+    cursor: help;
+    }
+
+acronym, abbr {
+    border-bottom: 1px dashed #999;
+    }
+
+blockquote {
+    margin: 15px 30px 0 10px;
+    padding-left: 20px;
+    border-left: 5px solid #ddd;
+    }
+
+blockquote cite {
+    margin: 5px 0 0;
+    display: block;
+    }
+
+.center {
+    text-align: center;
+    }
+
+hr {
+    height: 1px;
+    color: #AAAAAA;
+    background-color: #AAAAAA;
+    border: 0;
+    }
+
+a img {
+    border: none;
+}
+
+/* End Various Tags & Classes*/
+
+#header {
+    border-bottom:none;
+    height:200px;
+}
+
+#sidebar h2 {
+    font-weight:normal;
+    text-indent:10px;
+    background-color:white;
+    color:#030;
+    text-transform:none;
+    border-bottom:solid 1px black;
+}
+
+#sidebar ul ul,#sidebar ul ol,#sidebar ul div {
+    background-color:white;
+    border:none;
+    padding:8px;
+}
+
+#headerimg {
+    height:300px;
+    width:700px;
+    background-color:white;
+    background-image:url('header.png');
+    background-repeat: no-repeat;
+    /*background-position: 50px 50px; */
+    margin:0;
+}
+
+#headerimg h1 {
+    display:none;
+}

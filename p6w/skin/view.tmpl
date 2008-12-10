@@ -7,20 +7,38 @@
     <body>
         <div id="logo"></div>
         <ul id="toolbar">
-            <li><a href="?page=<TMPL_VAR NAME=TITLE>&action=edit">Edit</a></li>
+            <li><a href="<TMPL_VAR NAME=WEBROOT>/edit/<TMPL_VAR NAME=TITLE>">Edit</a></li>
+            <TMPL_IF NAME=LOGGED_IN>
+                <li><a href="<TMPL_VAR NAME=WEBROOT>/out">Log out</a></li>
+            <TMPL_ELSE>
+                <li><a href="<TMPL_VAR NAME=WEBROOT>/in">Log in</a></li>
+            </TMPL_IF>
         </ul>
-        <div id="content">
 
+        <TMPL_IF NAME=TAGS>
+        <div class="block-right cloud space-top-h1">
+            <h3>All tags</h3>
+            <TMPL_VAR NAME=TAGS>
+        </div>
+        </TMPL_IF>
+
+        <TMPL_IF NAME=RECENTLY>
+        <div class="block-right">
+            <h3>Recently changed</h3>
+            <ul class="list-simple">
+                <TMPL_LOOP NAME=RECENTLY>
+                    <li>
+                        <TMPL_VAR NAME=TIME> by <TMPL_VAR NAME=AUTHOR>
+                    </li>
+                </TMPL_LOOP>
+            </ul>
+        </div>
+        </TMPL_IF>
+
+        <div id="content">
             <h1><TMPL_VAR NAME=TITLE></h1>
             <TMPL_IF NAME=PAGETAGS>
             <div class="pagetags"><TMPL_VAR NAME=PAGETAGS></div>
-            </TMPL_IF>
-
-            <TMPL_IF NAME=TAGS>
-            <div class="cloud">
-                <h3>All tags</h3>
-                <TMPL_VAR NAME=TAGS>
-            </div>
             </TMPL_IF>
             
             <TMPL_VAR NAME=CONTENT>
