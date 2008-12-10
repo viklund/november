@@ -268,9 +268,11 @@ method response ($tmpl, %params?, %opts?) {
     my $template = HTML::Template.from_file($.template_path ~ $tmpl);
 
     $template.with_params(
+        {
         'WEBROOT' => Config.web_root,
         'LOGGED_IN' => self.logged_in,
         %params.kv
+        }
     );
 
     $.cgi.send_response($template.output, %opts);
