@@ -24,8 +24,9 @@ sub escape_uri_char($c) {
                 ~ '0123456789'
                 ~ '-_.!~*\'()';
     return $c if defined $allowed.index($c);
-    return sprintf('%%%x', ord($c));
-
+    # I do not fully assured with thats '+' here, 
+    # mb that is not fully correct put it always on both side
+    return sprintf('+%%%x+', ord($c));
 }
 
 sub escape_str($str, $callback) {

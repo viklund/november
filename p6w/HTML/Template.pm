@@ -50,7 +50,12 @@ class HTML::Template {
                     my $et = ~$i<attributes><escape>[0];
                     # RAKUDO: Segaful here :(
                     #$value = escape($value, $et);
-                    $value = escape($value, 'HTML');
+                    if $et eq 'HTML' {
+                        $value = escape($value, 'HTML');
+                    } 
+                    elsif $et eq 'URL' | 'URI' {
+                        $value = escape($value, 'URL');
+                    }
 
                 }
                 $output ~= ~$value;

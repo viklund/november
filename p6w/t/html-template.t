@@ -20,10 +20,10 @@ my @inputs_that_should_parse = (
        'pre&lt;post', 'variable insertion with HTML escape' ],
 
     [ 'pre<TMPL_VAR BAR ESCAPE=URL>post', { 'BAR' => ' ' },
-       'pre+%41+post', 'variable insertion with URL escape' ],
+       'pre+%20+post', 'variable insertion with URL escape' ],
 
     [ 'pre<TMPL_VAR BAR ESCAPE=URI>post', { 'BAR' => ' ' },
-       'pre+%41+post', 'variable insertion with URI escape' ],
+       'pre+%20+post', 'variable insertion with URI escape' ],
 
     [ 'pre<TMPL_VAR NAME=BAR>between<TMPL_VAR NAME=BAZ>post',
       { 'BAR' => '!', 'BAZ' => '!!' },
@@ -80,7 +80,7 @@ my @inputs_that_should_parse = (
       'pre bcd post',
       'false (but defined) if/else followed by a variable insertion' ],
 
-    [ 'pre <tmpl_if a>a<tmpl_else>b</tmpl_if>c<tmpl_var d> post',
+    [ 'pre <TMPL_IF A>a<TMPL_ELSE>b</TMPL_IF>c<TMPL_VAR d> post',
       { 'd' => 'd' },
       'pre bcd post',
       'false (undefined) if/else followed by a variable insertion' ],
