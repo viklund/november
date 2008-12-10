@@ -18,7 +18,7 @@ my @tests = (
                                   "HTML escape of '$s'"    ],
     ['<<<',   'HTML',     '&lt;&lt;&lt;',
                                   "HTML escape of '<<<'"   ],
-    [' ',     'URI',      '%20', 'Can URI-escape a space'  ],
+    [' ',     'URI',      '+%20+', 'Can URI-escape a space'  ],
 
 );
 
