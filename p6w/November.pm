@@ -43,7 +43,7 @@ method handle_request(CGI $cgi) {
         ]
     );
 
-    my @chunks =  $cgi.uri.chunks.list;
+    my @chunks = $cgi.uri.chunks.list;
     $d.dispatch(@chunks);
 }
 
@@ -194,11 +194,9 @@ method log_out {
 
 
 method list_recent_changes {
-    my @changes = self.get_changes(limit => 50);
     self.response('recent_changes.tmpl',
         {
-        'CHANGES'   => @changes,
-        'LOGGED_IN' => self.logged_in
+        'CHANGES'   => self.get_changes(limit => 50),
         }
     );
 }
