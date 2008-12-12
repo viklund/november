@@ -3,8 +3,6 @@ use v6;
 use Config;
 
 class Tags {
-    # RAKUDO: default value do not implement with has keyword
-    # has $.page_tags_path is rw = 'data/page_tags/'; 
     my $.page_tags_path      = Config.server_root ~ 'data/page_tags/';
     my $.tags_count_path     = Config.server_root ~ 'data/tags_count';
     my $.tags_index_path     = Config.server_root ~ 'data/tags_index';
@@ -16,14 +14,7 @@ class Tags {
         my @old_tags = .tags_parse: $old_tags;
         my @new_tags = .tags_parse: $new_tags;
 
-        # RAKUDO: do not see @old_tags in that grep 
-        #my $to_add    = @new_tags.grep: { $_ eq none(@old_tags) };
-        # workaround:
-        my @to_add;
-        for @new_tags { @to_add.push($_) if $_ eq none(@old_tags) }
-
-        # I think $_ ne any(@new_tags) more readable, 
-        # but it do not work as I expected
+        my @to_add    = @new_tags.grep: { $_ eq none(@old_tags) };
         my @to_remove = @old_tags.grep: { $_ eq none(@new_tags) };
 
         .remove_tags($page, @to_remove);
@@ -35,9 +26,7 @@ class Tags {
 
         my $count = self.read_tags_count;
 
-        # RAKUDO: Strigify arrays in method or sub calls
-        #for @tags -> $t {
-        for @tags.values -> $t {
+        for @tags -> $t {
             # RAKUDO: Increment not implemented in class 'Undef'
             if $count{$t} {
                 $count{$t}++;
@@ -51,9 +40,7 @@ class Tags {
 
         my $index = self.read_tags_index;
 
-        # RAKUDO: Strigify arrays in method or sub calls
-        #for @tags -> $t {
-        for @tags.values -> $t {
+        for @tags -> $t {
             unless $index{$t} {
                 $index{$t} = [];
             }
@@ -61,7 +48,6 @@ class Tags {
                 $index{$t}.push($page);
                 $index{$t} = grep { $_ ne '' }, $index{$t}.values;
             }
-
         }
 
         self.write_tags_index($index);
@@ -71,9 +57,7 @@ class Tags {
         
         my $count = self.read_tags_count;
 
-        # RAKUDO: Strigify arrays in method or sub calls
-        #for @tags -> $t {
-        for @tags.values -> $t {
+        for @tags -> $t {
             if $count{$t} && $count{$t} > 0 {
                 $count{$t}--;
             } 
@@ -89,9 +73,7 @@ class Tags {
 
         my $index = self.read_tags_index;
 
-        # RAKUDO: Strigify arrays in method or sub calls
-        #for @tags -> $t {
-        for @tags.values -> $t {
+        for @tags -> $t {
             # RAKUDO: @ not implemented yet
             #if $index{$t} && any(@ $index{$t}) eq $page {
             if $index{$t} && any($index{$t}.values) eq $page {
@@ -166,16 +148,11 @@ class Tags {
     }
 
     method norm ($count, $min, $max) {
-        # say "norm IN c:$count, min:$min, max:$max";
-        #die "c:" ~$count.WHAT~", min:"~$min.WHAT~", max:"~$max.WHAT;
         my $step = ($count - $min) / (($max - $min) || 1);
         return ceiling( ( log($step + 1 ) * 10 ) / log 2 ); 
     }
     
     method page_tags (Str $page) {
-        #my @tags = self.tags_parse( self.read_page_tags: $page ); 
-        #@tags.map: { { tag => $_ } }; 
-
         # that`s ugly, we must use template instead, 
         # when new-html-template give us ability to 
         # know last element in the list 
