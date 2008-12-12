@@ -1,5 +1,7 @@
 Things to investigate further with p6w:
 
+* Using {*} for call actions from grammar (trying in asterisk branch).
+
 * Using Parrot NCI to wrap SQLite.
   (<http://svn.perl.org/parrot/trunk/examples/nci/mysqltest.p6>)
 
@@ -7,17 +9,13 @@ Things to investigate further with p6w:
 
 * Packaging for CPAN.
 
-* A tagging system.
-
 * Server-side caching.
-
-* Support of ";" as well as "&" in URIs.
 
 * Markups.
 ** MediaWiki
 ** Creole (file://feather/home/juerd/creole)
 ** Textile
-** Markdown
+** Markdown (http://blog.stackoverflow.com/2008/06/three-markdown-gotcha/)
 ** POD
 ** kwid
 ** Socialtext

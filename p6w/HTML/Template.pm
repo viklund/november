@@ -3,7 +3,7 @@ use v6;
 class HTML::Template {
 
     has $.filename;
-    has %!params;
+    has %.params is rw;
 
     method param( Pair $param ) {
         %!params{$param.key} = $param.value;
@@ -25,22 +25,11 @@ class HTML::Template {
         my @loops;
 
         while ( $text ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' / ) {
-            # RAKUDO: strange Hash-Match in $0, $1, $3 etc
             my $directive = ~$0;
             my $name = ~$1;
 
-            # RAKUDO: The below method with junctions stopped working somewhere
-            # between r31963 and r32280.
             die "Unrecognized directive: TMPL_$directive"
-              if $directive ne 'VAR'
-                 && $directive ne "LOOP"
-                 && $directive ne "IF";
-
-#            # `$s ne $a & $b` means `$s ne $a || $s ne $b`,
-#            # which is confusing, so we'll write it like this instead:
-#            die "Unrecognized directive: TMPL_$directive"
-#              if !($directive eq 'VAR' | 'LOOP' | 'IF');
-
+              if !($directive eq 'VAR' | 'LOOP' | 'IF');
             my $value = %!params{$name};
             if !defined($value) && $directive ne 'IF' {
                 die "$name is defined in the template but undefined in source";
@@ -95,7 +84,7 @@ class HTML::Template {
     method serialize_loop($text is rw, @hashes) {
         my $result = "";
 
-        for @hashes.values -> $hash {
+        for @hashes -> $hash {
             $result ~= self.serialize_iteration($text, $hash);
         }
         return $result;
@@ -116,7 +105,7 @@ class HTML::Template {
 
             # TODO: Converting it to lowercase here is definitely wrong.
             # But it works for now.
-            my $value = %hash{$name.lc}
+            my $value = %hash{$name.lc} // %!params{$name}
               // die "$name is defined in the template but undefined in source";
 
             if $directive eq 'VAR' {

@@ -8,9 +8,9 @@
         <div id="logo"></div>
         <ul id="toolbar">
             <TMPL_IF NAME=LOGGED_IN>
-                <li><a href="/out">Log out</a></li>
+                <li><a href="<TMPL_VAR NAME=WEBROOT>/out">Log out</a></li>
             <TMPL_ELSE>
-                <li><a href="/in">Log in</a></li>
+                <li><a href="<TMPL_VAR NAME=WEBROOT>/in">Log in</a></li>
             </TMPL_IF>
         </ul>
         <div id="content">
@@ -20,7 +20,7 @@
                 <p/>
                 Tags: <input type="text" name="tags" size="100" value="<TMPL_IF NAME=PAGETAGS><TMPL_VAR NAME=PAGETAGS></TMPL_IF>" />
                 <p/>
-                <input type="submit" value="Save" /> or <a href="?page=<TMPL_VAR NAME=PAGE>">cancel</a>
+                <input type="submit" value="Save" /> or <a href="<TMPL_VAR NAME=WEBROOT>/view/<TMPL_VAR NAME=PAGE>">cancel</a>
             </form>
         </div>
     </body>

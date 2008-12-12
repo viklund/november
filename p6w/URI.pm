@@ -10,7 +10,13 @@ has @.chunks;
 
 method init ($str) {
     use URI::Grammar;
-    $str ~~ URI::Grammar::TOP;
+
+    # clear string before parsing
+    my $c_str = $str;
+    $c_str .= subst(/^ \s* ['<' | '"'] /, '');
+    $c_str .= subst(/ ['>' | '"'] \s* $/, '');
+
+    $c_str ~~ URI::Grammar::TOP;
     unless $/ { die "Could not parse URI: $str" }
 
     $!uri = $/;
@@ -20,34 +26,30 @@ method init ($str) {
 
 method scheme {
     my $s = $.uri<scheme> // '';
-    return $s.lc;
+    # RAKUDO: return 1 if use ~ below die because can`t do lc on Math after
+    return ~$s.lc;
 }
 
 method authority {
     my $a = $.uri<authority> // '';
-    return $a.lc;
+    # RAKUDO: return 1 if use ~ below die because can`t do lc on Math after
+    return ~$a.lc;
 }
 
 method host {
-    #RAKUDO: $.uri<authority> return 1, and than we try 1<port> and die :( 
-    #$.uri<authority><host>;
-    # workaround:
-    my %p = $.uri<authority>;
-    my $h =  %p<host> // '';
-    return $h.lc;
+    #RAKUDO: $.uri<authority>[0]<host> return full <authority> now
+    my $h = ~$.uri<authority>[0]<host>;
+    return $h.lc // '';
 }
 
 method port {
-    #RAKUDO: $.uri<authority> return 1, and than try 1<port> and die :( 
-    #$.uri<authority><port>;
+    #RAKUDO: $.uri<authority><port> return full <authority> now
     # workaround:
-    my %p = $.uri<authority>;
-    my $p = %p<port> // '';
-    return $p;
+    item $.uri<authority>[0]<port> // '';
 }
 
 method path {
-    my $p = $.uri<path> // '';
+    my $p = ~$.uri<path> // '';
     return $p.lc;
 }
 
@@ -66,7 +68,7 @@ method query {
 }
 method frag {
     my $f = $.uri<fragment> // '';
-    return $f.lc;
+    return ~$f.lc;
 }
 
 method fragment { $.frag }
@@ -83,11 +85,11 @@ method Str() {
 
 =begin pod
 
-=haed NAME
+=head NAME
 
 URI — Uniform Resource Identifiers (absolute and relative) 
 
-=haed SYNOPSYS
+=head SYNOPSYS
 
     use URI;
     my $u = URI.new;

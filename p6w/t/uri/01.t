@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 26;
+plan 28;
 
 use URI;
 ok(1,'We use URI and we are still alive');
@@ -26,7 +26,7 @@ $u.init('https://eXAMplE.COM');
 is($u.scheme, 'https', 'scheme'); 
 is($u.host, 'example.com', 'host'); 
 is( "$u", 'https://example.com',
-    'https://eXAMplE.COM stringifies to https://her.com');
+    'https://eXAMplE.COM stringifies to https://example.com');
 
 $u.init('/foo/bar/baz');
 
@@ -49,5 +49,13 @@ $u.init('http://foo.com');
 ok($u.chunks.list.perl eq '[""]', ".chunks return [''] for empty path");
 ok($u.absolute, 'http://foo.com has an absolute path'); 
 nok($u.relative, 'http://foo.com does not have a relative path'); 
+
+# test URI parsing with <> or "" and spaces
+$u.init("<http://foo.com> ");
+is("$u", 'http://foo.com', '<> removed from str');
+
+$u.init(' "http://foo.com"');
+is("$u", 'http://foo.com', '"" removed from str');
+
 
 # vim:ft=perl6
