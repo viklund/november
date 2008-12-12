@@ -6,8 +6,14 @@ grammar Tokenizer {
                   <plain> | <malformed> }
     regex bold_marker { '&#039;&#039;&#039;' }
     regex italic_marker { '&#039;&#039;' }
-    regex wikilink { '[[' [<!before ']]'> .]+ ']]' }
-    regex extlink { '[' [<!before ']'> .]+ ']' }
+
+    regex wikilink { '[[' \s*  <page> \s* ']]' }
+    regex page { [<!before ']]'> \S]+ }
+
+    regex extlink { '[' \s* <url> [\s+ <title>]? \s* ']' }
+    regex url { [<!before ']'> \S]+ }
+    regex title { [<!before ']'> .]+ }
+
     regex plain { [<!before '&#039;&#039;'> <!before '['> .]+ }
     regex malformed { '[[' | '[' }
 }
@@ -90,23 +96,21 @@ class Text::Markup::Wiki::MediaWiki {
                     toggle(@style_stack, @promises, 'i');
                 }
                 elsif $token<wikilink> {
-                    my $title = substr( ~$token<wikilink>, 2, -2 );
                     take defined $link_maker
-                            ?? $link_maker($title)
+                            ?? $link_maker(~$token<wikilink><page>)
                             !! ~$token<wikilink>;
                 }
                 elsif $token<extlink> {
-                    my $contents = substr( ~$token<extlink>, 1, -1 );
-                    my $url;
+                    my $url = ~$token<extlink><url>;
                     my $title;
 
-                    my $ix = index( $contents, ' ' );
-                    if defined $ix {
-                        $url = substr( $contents, 0, $ix );
-                        $title = substr( $contents, $ix + 1 );
+                    if defined $token<extlink><title> {
+                        # RAKUDO: return 1 from ~$token<extlink><title> if title defined,
+                        # but thats works:
+                        $title = ~$token<extlink><title>[0];
                     }
-                    else {
-                        $url = $title = $contents;
+                    else { 
+                        $title = $url;
                     }
                     
                     take defined $extlink_maker

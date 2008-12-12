@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 8;
+plan 10;
 
 use Text::Markup::Wiki::MediaWiki;
 
@@ -15,7 +15,16 @@ my $extlink_maker = { "<a href=\"$^href\">$^title</a>" }
         = '<p>An example of a <a href="/?page=Link">link</a></p>';
     my $actual_output = $converter.format($input, :$link_maker);
 
-    is( $actual_output, $expected_output, 'link conversion works' );
+    is( $actual_output, $expected_output, '[[link]] conversion works' );
+}
+
+{
+    my $input = 'An example of a [[ link ]]';
+    my $expected_output
+        = '<p>An example of a <a href="/?page=Link">link</a></p>';
+    my $actual_output = $converter.format($input, :$link_maker);
+
+    is( $actual_output, $expected_output, '[[ link ]] conversion works' );
 }
 
 {
@@ -58,6 +67,16 @@ my $extlink_maker = { "<a href=\"$^href\">$^title</a>" }
     my $actual_output = $converter.format($input, :$extlink_maker);
 
     is( $actual_output, $expected_output, 'external link I' );
+}
+
+{
+    my $input = 'This is an [ http://example.com ] external link';
+    my $expected_output
+        = '<p>This is an <a href="http://example.com">http://example.com</a> '
+          ~ 'external link</p>';
+    my $actual_output = $converter.format($input, :$extlink_maker);
+
+    is( $actual_output, $expected_output, 'external link I with whatespaces' );
 }
 
 {
