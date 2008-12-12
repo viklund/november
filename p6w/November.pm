@@ -125,11 +125,7 @@ method logged_in() {
 
 method not_authorized {
     self.response( 'action_not_authorized.tmpl', 
-        { 
-        # TODO: file bug, without "'" it is interpreted as named 
-        # args and not as Pair
-        'DISALLOWED_ACTION' => 'edit pages'
-        }
+        { DISALLOWED_ACTION => 'edit pages' }
     );
 }
 
