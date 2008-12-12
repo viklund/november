@@ -31,7 +31,7 @@ method dispatch (@chunks) {
     my @matched =  @!rules.grep: { .match(@chunks) };    
 
     if @matched {
-        my $result = @matched.end.apply;
+        my $result = @matched[@matched.end].apply;
         .clear for @!rules; 
         return $result;
     }
