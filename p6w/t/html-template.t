@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 22;
+plan 27;
 
 use HTML::Template;
 
@@ -10,8 +10,14 @@ my @inputs_that_should_parse = (
     [ 'foo', {},
       'foo', 'plain text' ],
 
+    [ qq|<body>plain <a href="link">link</a>\n text</body>|, {},
+      qq|<body>plain <a href="link">link</a>\n text</body>|, 'simple HTML' ],
+
     [ 'pre<TMPL_VAR NAME=BAR>post', { 'BAR' => 50 },
       'pre50post', 'simple variable insertion' ],
+
+    [ 'pre<title><TMPL_VAR NAME=BAR></title>post', { 'BAR' => 50 },
+      'pre<title>50</title>post', 'simple variable insertion in html' ],
 
     [ 'pre<TMPL_VAR BAR ESCAPE=NONE>post', { 'BAR' => 'YaY' },
        'preYaYpost', 'variable insertion with NONE  escape' ],
@@ -29,19 +35,23 @@ my @inputs_that_should_parse = (
       { 'BAR' => '!', 'BAZ' => '!!' },
       'pre!between!!post', 'two variable insertions' ],
 
+    # 10
     [ 'pre<TMPL_IF NAME=FOO>bar</TMPL_IF>post', { 'FOO' => 1 },
        'prebarpost', 'true condition' ],
 
     [ 'pre<TMPL_IF NAME=FOO>bar</TMPL_IF>post', { 'FOO' => 0 },
       'prepost', 'false condition (because the parameter was false)' ],
 
-    # 10
     [ 'pre<TMPL_IF NAME=FOO>bar</TMPL_IF>post', {},
       'prepost', 'false condition (because the parameter was not declared)' ],
 
     [ 'pre<TMPL_FOR NAME=BLUBB>[<TMPL_VAR FOO>]</TMPL_FOR>post',
       { 'BLUBB' => [ { 'FOO' => 'a' }, { 'FOO' => 'b' }, { 'FOO' => 'c' } ] },
       'pre[a][b][c]post', 'a simple for loop' ],
+
+    [ 'pre<TMPL_IF NAME=BLUBB><TMPL_FOR NAME=BLUBB>[<TMPL_VAR FOO>]</TMPL_FOR></TMPL_IF>post',
+      { 'BLUBB' => [ { 'FOO' => 'a' }, { 'FOO' => 'b' }, { 'FOO' => 'c' } ] },
+      'pre[a][b][c]post', 'a simple for loop in if' ],
 
     [ 'pre<TMPL_FOR NAME=BLUBB>[<TMPL_VAR FOO>]</TMPL_FOR>post',
       { 'BLUBB' => [] },
@@ -55,7 +65,12 @@ my @inputs_that_should_parse = (
     [ '<TMPL_IF NAME=FOO>a<TMPL_IF NAME=BAR>b</TMPL_IF>c</TMPL_IF>',
       { 'FOO' => 1, BAR => 1 },
       'abc',
-      'nested if directives, inner one false' ],
+      'nested if directives, all true' ],
+
+    [ '<TMPL_IF NAME=FOO>a<TMPL_VAR NAME=FOO>c</TMPL_IF>',
+      { 'FOO' => 'YaY' },
+      'aYaYc',
+      'if derictives and insertion directive' ],
 
     [
       '<TMPL_FOR FOO><TMPL_IF BAR><TMPL_VAR BAR></TMPL_IF></TMPL_FOR>',
@@ -89,6 +104,12 @@ my @inputs_that_should_parse = (
       { 'FOO' => 'bar' },
       "pre<h1>bar</h1>\npost",
       'include template' ],
+
+    [ '<TMPL_LOOP NAME=FOO>:)</TMPL_LOOP>',
+      { 'FOO' => { :bar } },
+      ":)",
+      'we can use TMPL_LOOP as TMPL_FOR' ],
+
 );
 
 my @inputs_that_should_not_parse = (
@@ -124,6 +145,7 @@ for @inputs_that_should_not_parse -> $test {
 
 my $output = HTML::Template.from_file( 't/test-templates/1.tmpl' ).with_params(
                  { 'TITLE' => 'Mmm, pie' } ).output();
+
 is( $output, (join "\n",
                   '<html>',
                   '    <head>',

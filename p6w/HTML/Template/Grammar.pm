@@ -24,9 +24,9 @@ grammar HTML::Template::Grammar {
     };
 
     regex for_statement {
-        <.tag_start> 'FOR' <attributes> '>'
+        <.tag_start> [ 'FOR' | 'LOOP' ] <attributes> '>'
         <contents>
-        '</TMPL_FOR>'
+        '</TMPL_' [ 'FOR' | 'LOOP' ] '>'
     };
 
     regex include {

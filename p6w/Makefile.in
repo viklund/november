@@ -1,12 +1,12 @@
 PARROT_DIR=<PARROT_DIR>
 RAKUDO=$(PARROT_DIR)/parrot $(PARROT_DIR)/languages/perl6/perl6.pbc
 
-SOURCES=HTML/Template.pm CGI.pm Text/Markup/Wiki/Minimal.pm \
+SOURCES=CGI.pm Text/Markup/Wiki/Minimal.pm \
         Text/Markup/Wiki/MediaWiki.pm November.pm Test.pm \
         November/Storage.pm November/Storage/File.pm Tags.pm \
 		Impatience.pm URI.pm URI/Grammar.pm Dispatcher.pm \
 		Dispatcher/Rule.pm Session.pm Utils.pm Config.pm \
-		Text/Escape.pm
+		Text/Escape.pm HTML/Template/Grammar.pm HTML/Template.pm
 
 PIRS=$(SOURCES:.pm=.pir)
 
