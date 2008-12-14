@@ -76,15 +76,16 @@ method substitute( $contents, %params ) {
                             );
             }
         }
-        elsif $chunk<directive><for_statement> {
-            my $key = ~$chunk<directive><for_statement><attributes><name><val>;
+        elsif $chunk<directive><for_statement> -> $for {
+            my $key = ~$for<attributes><name><val>;
+
             my $iterations = %params{$key};
-            # RAKUDO: This should exhibit the correct behaviour, but due
-            # to a bug having to do with for loops and recursion, it
-            # doesn't. [perl #58392]
-            for $iterations.values -> $iteration {
+            #say "Iterations:" ~ $iterations.perl;
+
+            for $iterations.list -> $iteration {
+                #say "iteration" ~ $iteration;
                 $output ~= self.substitute(
-                                $chunk<directive><for_statement><contents>,
+                                $for<contents>,
                                 $iteration
                             );
             }

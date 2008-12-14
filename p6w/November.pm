@@ -61,14 +61,17 @@ method view_page($page='Main_Page') {
 
     # TODO: we need plugin system (see topics in mail-list)
     my $t = Tags.new;
-
+    
+    # RAKUDO: can`t put array in pair value here
+    # TODO: make small example and send rakudobag
+    my $recent = self.get_changes( page => $page, :limit(8) );
     self.response( 'view.tmpl', 
         { 
         'TITLE'    => $page,
         'CONTENT'  => $minimal.format($.storage.read_page: $page), 
         'PAGETAGS' => $t.page_tags($page), 
         'TAGS'     => $t.cloud_tags,
-        'RECENTLY' => self.get_changes( page => $page, :limit(8) ),
+        'RECENTLY' => $recent,
         }
     );
 
@@ -216,9 +219,9 @@ method get_changes (:$page, :$limit) {
     for $recent_changes.list -> $modification_id {
         my $modification = $.storage.read_modification($modification_id);
         my $count = push @changes, {
-            'page' => self.make_link($modification[0]),
-            'time' => time_to_period_str($modification[3]) || $modification_id,
-            'author' => $modification[2] || 'somebody' 
+            'PAGE' => self.make_link($modification[0]),
+            'TIME' => time_to_period_str($modification[3]) || $modification_id,
+            'AUTHOR' => $modification[2] || 'somebody' 
             };
         # RAKUDO: last not implemented yet :(
         return @changes if $limit && $count == $limit;
