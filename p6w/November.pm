@@ -62,16 +62,13 @@ method view_page($page='Main_Page') {
     # TODO: we need plugin system (see topics in mail-list)
     my $t = Tags.new;
     
-    # RAKUDO: can`t put array in pair value here
-    # TODO: make small example and send rakudobag
-    my $recent = self.get_changes( page => $page, :limit(8) );
     self.response( 'view.tmpl', 
         { 
         'TITLE'    => $page,
         'CONTENT'  => $minimal.format($.storage.read_page: $page), 
         'PAGETAGS' => $t.page_tags($page), 
         'TAGS'     => $t.cloud_tags,
-        'RECENTLY' => $recent,
+        'RECENTLY' => self.get_changes( page => $page, :limit(8) ),
         }
     );
 
@@ -249,15 +246,12 @@ method list_all_pages {
     }
 
     if $index {
-        # HTML::Template eat only Arrey of Hashes and Hash keys should 
-        # be in low case. HTML::Template in new-html-template brunch 
-        # will be much clever.
-
         # RAKUDO: @($arrayref) not implemented yet, so:
         # my @list = map { { page => $_ } }, @($index); 
         # do not work. Workaround:
-        my @list = map { { page => $_ } }, $index.list; 
+        my @list = map { { PAGE => $_ } }, $index.values; 
         %params<LIST> = @list;
+        say %params.perl;
     }
 
     self.response('list_all_pages.tmpl', %params);
@@ -270,7 +264,7 @@ method response ($tmpl, %params?, %opts?) {
         {
         'WEBROOT' => Config.web_root,
         'LOGGED_IN' => self.logged_in,
-        %params.kv
+        %params
         }
     );
 

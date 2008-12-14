@@ -79,14 +79,14 @@ method substitute( $contents, %params ) {
         elsif $chunk<directive><for_statement> -> $for {
             my $key = ~$for<attributes><name><val>;
 
-            my $iterations = %params{$key};
-            #say "Iterations:" ~ $iterations.perl;
+            my @iterations = %params{$key};
+            say "iterations:" ~ @iterations.perl;
 
-            for $iterations.list -> $iteration {
-                #say "iteration" ~ $iteration;
+            for @iterations -> %iteration {
+            say "iteration:" ~ %iteration.perl;
                 $output ~= self.substitute(
                                 $for<contents>,
-                                $iteration
+                                %iteration
                             );
             }
         }
