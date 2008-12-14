@@ -21,8 +21,8 @@ is( $d.dispatch(['']),
     "Dispatch to Rule ['']"
 );
 
-ok( $d.add_rule( ['foo', 'bar'], { "Yay" } ), 
-           'Dispatch .add_rule -- shortcut for fast add Rule object' );
+ok( $d.add( ['foo', 'bar'], { "Yay" } ), 
+           '.add fith @tokens and $action -- shortcut for fast add Rule object' );
 
 nok( $d.dispatch(['foo']), 
     'Dispatcher return False if can`t find match Rule and do not have default'  );
@@ -40,7 +40,7 @@ is( $d.dispatch(['foo', 'bar', 'baz']),
     'Dispatch to default, when have no matched Rule'  
 );
 
-$d.add_rule: ['foo', 'a'|'b'], { "Zzzz" };
+$d.add: ['foo', 'a'|'b'], { "Zzzz" };
 
 is( $d.dispatch(['foo', 'a']), 
     'Zzzz', 
@@ -52,21 +52,21 @@ is( $d.dispatch(['foo', 'b']),
     'Dispatch to Rule with Junction (foo/a|b) b'  
 );
 
-$d.add_rule: ['foo', /^ \d+ $/], { $^d };
+$d.add: ['foo', /^ \d+ $/], { $^d };
 
 is( $d.dispatch(['foo', '50']), 
     '50', 
-    "Dispatch to Rule with regexp ['foo', /^ \d+ $/])"  
+    "Dispatch to Rule with regexp ['foo', /^ \d+ \$/])"  
 );
 
-$d.add_rule( [/^ \w+ $/], { "Yep!" if $^w.WHAT eq 'Match' } );
+$d.add( [/^ \w+ $/], { "Yep!" if $^w.WHAT eq 'Match' } );
 
 is( $d.dispatch(['so']), 
     'Yep!', 
     "Argument is Match"
 );
 
-$d.add_rule: ['foo', / \d+ /], { $^d + 10 };
+$d.add: ['foo', / \d+ /], { $^d + 10 };
 
 is( $d.dispatch(['foo', '50']), 
     '60', 
@@ -78,14 +78,14 @@ is( $d.dispatch(['foo', 'a50z']),
     'Rule that catches the right arg'  
 );
 
-$d.add_rule: ['foo', / \d+ /, 'bar' ], { $^d + 1 };
+$d.add: ['foo', / \d+ /, 'bar' ], { $^d + 1 };
 
 is( $d.dispatch(['foo', 'item4', 'bar']), 
     '5', 
     'Rule with regexp in the middle (foo/\d+/bar)'
 );
 
-$d.add_rule: ['summ', / \d+ /, / \d+ / ], { $^a + $^b };
+$d.add: ['summ', / \d+ /, / \d+ / ], { $^a + $^b };
 
 
 is( $d.dispatch(['summ', '2', '3']), 
@@ -93,7 +93,7 @@ is( $d.dispatch(['summ', '2', '3']),
     'Dispatch to Rule with two regexps'
 );
 
-$d.add_rule: ['summ', / \w+ /, 1|2 ], { $^a ~ "oo" };
+$d.add: ['summ', / \w+ /, 1|2 ], { $^a ~ "oo" };
 
 is( $d.dispatch(['summ', 'Z', 2]), 
     'Zoo', 
