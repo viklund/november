@@ -31,7 +31,8 @@ method dispatch (@chunks) {
     my @matched =  @!rules.grep: { .match(@chunks) };    
 
     if @matched {
-        my $result = @matched.end.apply;
+        # RAKUDO: [*-1] not implemented yet, but [-1] works like in p5
+        my $result = @matched[-1].apply;
         .clear for @!rules; 
         return $result;
     }

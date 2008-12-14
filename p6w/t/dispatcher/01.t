@@ -56,7 +56,7 @@ $d.add: ['foo', /^ \d+ $/], { $^d };
 
 is( $d.dispatch(['foo', '50']), 
     '50', 
-    "Dispatch to Rule with regexp ['foo', /^ \d+ $/])"  
+    "Dispatch to Rule with regexp ['foo', /^ \d+ \$/])"  
 );
 
 $d.add( [/^ \w+ $/], { "Yep!" if $^w.WHAT eq 'Match' } );
