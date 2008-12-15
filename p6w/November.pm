@@ -251,7 +251,6 @@ method list_all_pages {
         # do not work. Workaround:
         my @list = map { { PAGE => $_ } }, $index.values; 
         %params<LIST> = @list;
-        say %params.perl;
     }
 
     self.response('list_all_pages.tmpl', %params);

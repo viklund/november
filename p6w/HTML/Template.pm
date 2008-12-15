@@ -44,7 +44,16 @@ method substitute( $contents, %params ) {
 
         if $chunk<directive><insertion> -> $i {
             my $key = ~$i<attributes><name>;
-            my $value = %params{$key};
+
+            my $value; 
+            if (defined %params{$key}) {
+                $value = %params{$key}; 
+            } else {
+                $value = %!params{$key};
+            }
+            
+            # RAKUDO: Scalar type not implemented yet
+            warn "Param $key is a { $value.WHAT }" unless $value ~~ Str | Int;
 
             if $i<attributes><escape> {
                 my $et = ~$i<attributes><escape>[0];
@@ -79,14 +88,14 @@ method substitute( $contents, %params ) {
         elsif $chunk<directive><for_statement> -> $for {
             my $key = ~$for<attributes><name><val>;
 
-            my @iterations = %params{$key};
-            say "iterations:" ~ @iterations.perl;
+            my $iterations = %params{$key};
+            #say "iterations:" ~ $iterations.perl;
 
-            for @iterations -> %iteration {
-            say "iteration:" ~ %iteration.perl;
+            for $iterations.values -> $iteration {
+            #say "iteration:" ~ $iteration.perl;
                 $output ~= self.substitute(
                                 $for<contents>,
-                                %iteration
+                                $iteration
                             );
             }
         }

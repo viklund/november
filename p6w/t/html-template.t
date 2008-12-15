@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 27;
+plan 28;
 
 use HTML::Template;
 
@@ -56,6 +56,11 @@ my @inputs_that_should_parse = (
     [ 'pre<TMPL_FOR NAME=BLUBB>[<TMPL_VAR FOO>]</TMPL_FOR>post',
       { 'BLUBB' => [] },
       'prepost', 'an empty for loop' ],
+
+    # that is not work in p5 version by default, but it useful for us and DWIM
+    [ 'pre<TMPL_FOR NAME=FOO>[<TMPL_VAR a><TMPL_VAR BAR>]</TMPL_FOR>post',
+      { FOO => [{a => 1}, {a => 2}], BAR => 'Y' },
+      'pre[1Y][2Y]post', 'an empty for loop' ],
 
     [ '<TMPL_IF NAME=FOO>a<TMPL_IF NAME=BAR>b</TMPL_IF>c</TMPL_IF>',
       { 'FOO' => 1 },
