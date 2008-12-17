@@ -16,6 +16,7 @@ method init ($str) {
     $c_str .= subst(/^ \s* ['<' | '"'] /, '');
     $c_str .= subst(/ ['>' | '"'] \s* $/, '');
 
+    # RAKUDO: that is wrong, but works now
     $c_str ~~ URI::Grammar::TOP;
     unless $/ { die "Could not parse URI: $str" }
 
@@ -43,7 +44,8 @@ method host {
 }
 
 method port {
-    #RAKUDO: $.uri<authority><port> return full <authority> now
+    # TODO: send rakudobug
+    # RAKUDO: $.uri<authority><port> return full <authority> now
     # workaround:
     item $.uri<authority>[0]<port> // '';
 }
@@ -54,13 +56,11 @@ method path {
 }
 
 method absolute {
-    my %p = $.uri<path>;
-    return ?(%p<slash> // $.scheme);
+    return ?($.uri<path><slash> // $.scheme);
 }
 
 method relative {
-    my %p = $.uri<path>;
-    return !(%p<slash> // $.scheme);
+    return !($.uri<path><slash> // $.scheme);
 }
 
 method query {
