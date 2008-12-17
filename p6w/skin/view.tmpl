@@ -6,20 +6,11 @@
     </head>
     <body>
         <div id="logo"></div>
-        <ul id="toolbar">
-            <li><a href="<TMPL_VAR NAME=WEBROOT>/edit/<TMPL_VAR NAME=TITLE>">Edit</a></li>
-            <TMPL_IF NAME=LOGGED_IN>
-                <li><a href="<TMPL_VAR NAME=WEBROOT>/out">Log out</a></li>
-            <TMPL_ELSE>
-                <li><a href="<TMPL_VAR NAME=WEBROOT>/in">Log in</a></li>
-            </TMPL_IF>
-        </ul>
+        
+        <TMPL_INCLUDE NAME="skin/nav/top.tmpl">        
 
         <TMPL_IF NAME=TAGS>
-        <div class="block-right cloud space-top-h1">
-            <h3>All tags</h3>
-            <TMPL_VAR NAME=TAGS>
-        </div>
+            <TMPL_INCLUDE NAME="skin/tags/all_rblock.tmpl">        
         </TMPL_IF>
 
         <TMPL_IF NAME=RECENTLY>
