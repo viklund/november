@@ -13,7 +13,7 @@ use Config;
 
 class November does Session;
 
-has $.template_path = Config.server_root ~ 'skin/';
+has $.template_path = Config.server_root ~ 'skins/' ~ Config.skin ~ '/';
 has $.userfile_path = Config.server_root ~ 'data/users';
 
 has November::Storage $.storage;
@@ -258,11 +258,13 @@ method list_all_pages {
 
 method response ($tmpl, %params?, %opts?) {
     my $template = HTML::Template.from_file($.template_path ~ $tmpl);
-
+    
     $template.with_params(
         {
-        'WEBROOT' => Config.web_root,
-        'LOGGED_IN' => self.logged_in,
+        WEBROOT   => Config.web_root,
+        LOGGED_IN => self.logged_in,
+        SKIN      => Config.skin,
+        TMPL_PATH => $.template_path,
         %params
         }
     );

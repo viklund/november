@@ -119,7 +119,8 @@ a.nonexistent {
     font-size:0.8em;
     margin-top:-12px;
     padding-left:22px;
-	background-image: url('/imgs/tag.png');
+    /* TODO: need WEBROOT here? */ 
+	background-image: url('/skins/Autumn/images/tag.png');
 	background-position: left bottom;
 	background-repeat: no-repeat;
 }

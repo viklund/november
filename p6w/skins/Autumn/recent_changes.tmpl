@@ -5,13 +5,10 @@
         <link rel="stylesheet" type="text/css" href="/spartan.css" />
     </head>
     <body>
-        <ul id="toolbar">
-            <TMPL_IF NAME=LOGGED_IN>
-                <li><a href="<TMPL_VAR NAME=WEBROOT>/out">Log out</a></li>
-            <TMPL_ELSE>
-                <li><a href="<TMPL_VAR NAME=WEBROOT>/in">Log in</a></li>
-            </TMPL_IF>
-        </ul>
+        <div id="logo"></div>
+
+        <TMPL_INCLUDE NAME="skins/Autumn/nav/top.tmpl">        
+
         <div id="content">
             <h1>Recent changes</h1>
 

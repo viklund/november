@@ -10,5 +10,9 @@ method web_root {
     return '';
 } 
 
+method skin {
+    return 'Autumn';
+} 
+
 # vim:ft=perl6
 
