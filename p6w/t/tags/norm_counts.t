@@ -11,9 +11,9 @@ $t.clear;
 is( $t.norm_counts.perl, '{}', 'With empty tags_count norm_counts produce empty Hash' );
 
 my $in = { foo => 5, bar => 5, baz => 2, her => 1 };
-$t.write_tags_count( $in );
+$t.write_tags_count($in);
 
-is( $t.norm_counts.perl, '{"foo" => 10, "bar" => 10, "baz" => 4, "her" => 0}', 'Normalize all from: ' ~ $in.perl );
+is_deeply( $t.norm_counts, {"foo" => 10, "bar" => 10, "baz" => 4, "her" => 0}, 'Normalize all from: ' ~ $in.perl );
 
 my @tags = <foo baz>;
 is( $t.norm_counts(@tags).perl, '{"foo" => 10, "baz" => 4}', 'Normalize foo and baz from: ' ~ $in.perl );
