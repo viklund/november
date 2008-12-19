@@ -1,0 +1,10 @@
+{
+    'skin' => 'Autumn',
+
+    # path to the p6w directory -- if populated, must end with a slash
+    'server_root' => '',
+ 
+    # prefix to use for local links
+    'web_root' => ''
+}
+

@@ -6,6 +6,9 @@ use Config;
 
 class November::Storage::File is November::Storage;
 
+# RAKUDO: initial attr value do not fully works 
+# given Config.server_root { # and use $_ inside. 
+# But we can`t do that now because "my".
 my $.content_path        = Config.server_root ~ 'data/articles/';
 my $.modifications_path  = Config.server_root ~ 'data/modifications/';
 my $.recent_changes_path = Config.server_root ~ 'data/recent-changes';
