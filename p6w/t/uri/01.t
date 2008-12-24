@@ -42,7 +42,7 @@ nok($u.absolute, 'not absolute path');
 
 is($u.chunks[0], 'foo', 'first chunk'); 
 is($u.chunks[1], 'bar', 'second chunk'); 
-is($u.chunks[-1], 'baz', 'last chunk'); 
+is($u.chunks[*-1], 'baz', 'last chunk'); 
 
 $u.init('http://foo.com');
 
