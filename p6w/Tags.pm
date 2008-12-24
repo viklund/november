@@ -99,7 +99,8 @@ class Tags {
     method read_tags_count {
         my $file = $.tags_count_path;
         return {} unless $file ~~ :e;
-        return eval( slurp($file) );
+        # RAKUDO: can return array here [perl #61642]
+        return hash eval slurp $file;
     }
 
     method write_tags_count (Hash $counts) {
@@ -112,7 +113,9 @@ class Tags {
     method read_tags_index {  
         my $file = $.tags_index_path;
         return {} unless $file ~~ :e;
-        return eval( slurp($file) );
+
+        # RAKUDO: can return array here [perl #61642]
+        return hash eval slurp $file;
     }
 
     method write_tags_index (Hash $index) {
@@ -129,20 +132,21 @@ class Tags {
     }
 
     method norm_counts (@tags?) {
-        my $counts = self.read_tags_count;
+        my %counts = self.read_tags_count;
 
         my $min = 0;
         my $max = 0;
-        if ?$counts.keys {
-            $min = +($counts.values).min;
-            $max = +($counts.values).max;
+        if ?%counts.keys {
+            $min = +(%counts.values).min;
+            $max = +(%counts.values).max;
         }
 
         my $norm_counts = {};
         # RAKUDO: stringify Array here
         #for @tags || $counts.keys {
-        for @tags.?values || $counts.keys {
-            $norm_counts{$_} = self.norm( +$counts{$_}, $min, $max ); 
+
+        for @tags || %counts.keys {
+            $norm_counts{$_} = self.norm( +%counts{$_}, $min, $max ); 
         }
         return $norm_counts;
     }
