@@ -1,6 +1,5 @@
 use v6;
 use November::Storage;
-use Impatience;
 use Utils;
 use Config;
 

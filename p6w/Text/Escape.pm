@@ -1,6 +1,8 @@
-use Impatience;
+use v6;
+# RAKUDO: do not export subs yet
+#module Text::Escape;
 
-sub escape($str, $how) {
+sub escape($str, $how) is export {
     my $m = $how.lc;
     return $str if $m eq 'none';
     return escape_str($str, &escape_html_char) if $m eq 'html';
@@ -37,3 +39,4 @@ sub escape_str($str, $callback) {
     $result;
 }
 
+# vim:ft=perl6

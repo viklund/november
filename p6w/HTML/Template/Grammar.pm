@@ -35,7 +35,10 @@ grammar HTML::Template::Grammar {
 
     token tag_start  { '<TMPL_' };
     token attributes { \s+ 'NAME='? <name> [\s+ 'ESCAPE=' <escape> ]? };
-    token name       { $<val>=\w+ | <.qq> $<val>=[ <[ 0..9 '/._' \- // ] +alpha>* ] <.qq> };
+    token name       { $<val>=\w+ | <lctrls> | [<.qq> $<val>=[ <[ 0..9 '/._' \- // ] +alpha>* ] <.qq>] };
     regex qq         { '"' };
+    token lctrls     { <lc_last> | <lc_first> };
+    regex lc_last    { '!LAST' };
+    regex lc_first   { '!FIRST' };
     token escape     { 'NONE' | 'HTML' | 'URL' | 'URI' | 'JS' | 'JAVASCRIPT' };
 };

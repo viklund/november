@@ -3,9 +3,9 @@ use v6;
 use Config;
 
 class Tags {
-    my $.page_tags_path      = Config.server_root ~ 'data/page_tags/';
-    my $.tags_count_path     = Config.server_root ~ 'data/tags_count';
-    my $.tags_index_path     = Config.server_root ~ 'data/tags_index';
+    my $.page_tags_path  = Config.server_root ~ 'data/page_tags/';
+    my $.tags_count_path = Config.server_root ~ 'data/tags_count';
+    my $.tags_index_path = Config.server_root ~ 'data/tags_index';
 
     method update_tags ($_: Str $page, Str $new_tags) {
         my $old_tags = .read_page_tags($page).chomp;
@@ -24,19 +24,9 @@ class Tags {
 
     method add_tags (Str $page, Array @tags) {
 
-        my $count = self.read_tags_count;
-
-        for @tags -> $t {
-            # RAKUDO: Increment not implemented in class 'Undef'
-            if $count{$t} {
-                $count{$t}++;
-            } 
-            else {
-                $count{$t} = 1;
-            }
-        }
-
-        self.write_tags_count($count);
+        my %count = self.read_tags_count;
+        %count{$_}++ for @tags;
+        self.write_tags_count(%count);
 
         my $index = self.read_tags_index;
 
@@ -58,15 +48,11 @@ class Tags {
         my $count = self.read_tags_count;
 
         for @tags -> $t {
-            if $count{$t} && $count{$t} > 0 {
-                $count{$t}--;
-            } 
+            $count{$t}--;
             
-            if $count{$t} == 0 {
-                # RAKUDO: :delete on Hash not implemented yet
-                # $count{$t} :delete;
-                $count.delete($t); 
-            }
+            # RAKUDO: :delete on Hash not implemented yet
+            # $count{$t} :delete;
+            $count.delete($t) if $count{$t} <= 0; 
         }
 
         self.write_tags_count($count);
@@ -99,8 +85,7 @@ class Tags {
     method read_tags_count {
         my $file = $.tags_count_path;
         return {} unless $file ~~ :e;
-        # RAKUDO: can return array here [perl #61642]
-        return hash eval slurp $file;
+        return eval slurp $file;
     }
 
     method write_tags_count (Hash $counts) {
@@ -113,9 +98,7 @@ class Tags {
     method read_tags_index {  
         my $file = $.tags_index_path;
         return {} unless $file ~~ :e;
-
-        # RAKUDO: can return array here [perl #61642]
-        return hash eval slurp $file;
+        return eval slurp $file;
     }
 
     method write_tags_index (Hash $index) {
@@ -134,16 +117,14 @@ class Tags {
     method norm_counts (@tags?) {
         my %counts = self.read_tags_count;
 
-        my $min = 0;
-        my $max = 0;
-        if ?%counts.keys {
+        my ($min, $max) = 0, 0;
+
+        if ? %counts.keys {
             $min = +(%counts.values).min;
             $max = +(%counts.values).max;
         }
 
         my $norm_counts = {};
-        # RAKUDO: stringify Array here
-        #for @tags || $counts.keys {
 
         for @tags || %counts.keys {
             $norm_counts{$_} = self.norm( +%counts{$_}, $min, $max ); 
