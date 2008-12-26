@@ -119,7 +119,7 @@ class Tags {
 
         my ($min, $max) = 0, 0;
 
-        if ? %counts.keys {
+        if %counts.keys {
             $min = +(%counts.values).min;
             $max = +(%counts.values).max;
         }
