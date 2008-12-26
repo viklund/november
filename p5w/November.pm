@@ -417,7 +417,7 @@ sub not_found {
     my $template = HTML::Template->new(
         filename => $TEMPLATE_PATH.'not_found.tmpl');
 
-    $template->param(PAGE => $page);
+    $template->param(TITLE     => pp($page));
     $template->param(LOGGED_IN => logged_in($cgi));
 
     print status_not_found(),
