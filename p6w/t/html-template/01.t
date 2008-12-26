@@ -162,3 +162,5 @@ is( $output, (join "\n",
                   '</html>',
                   ''),
     'reading from file' );
+
+# vim:ft=perl6
