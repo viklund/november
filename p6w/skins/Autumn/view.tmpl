@@ -28,8 +28,9 @@
 
         <div id="content">
             <h1><TMPL_VAR NAME=TITLE></h1>
+
             <TMPL_IF NAME=PAGETAGS>
-            <div class="pagetags"><TMPL_VAR NAME=PAGETAGS></div>
+                <TMPL_INCLUDE NAME="skins/Autumn/tags/page.tmpl">        
             </TMPL_IF>
             
             <TMPL_VAR NAME=CONTENT>
