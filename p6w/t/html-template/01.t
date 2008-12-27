@@ -77,6 +77,7 @@ my @inputs_that_should_parse = (
       'aYaYc',
       'if derictives and insertion directive' ],
 
+    # 20
     [
       '<TMPL_FOR FOO><TMPL_IF BAR><TMPL_VAR BAR></TMPL_IF></TMPL_FOR>',
       { FOO => [ { 'BAR' => '1' }, {}, { 'BAR' => '3' } ] },

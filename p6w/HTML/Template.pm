@@ -72,10 +72,14 @@ method substitute( $contents, %params ) {
         }
         elsif $chunk<directive><if_statement> -> $if {
             my $cond;
-
-            if $if<attributes><lctrls> -> $lc {
-                if $!meta<loops><current> -> $c {
-                    $cond = ?($lc<lc_last> and $c<elems> == $c<iteration>) or ?($lc<lc_first> and $c<iteration> == 1);
+            if $if<attributes><name><lctrls> -> $lc {
+                if %!meta<loops><current> -> $c {
+                    if $lc<lc_last> {
+                        $cond = ?(%!meta<loops>{$c}<elems> == %!meta<loops>{$c}<iteration>);
+                    } 
+                    elsif $lc<lc_first> {
+                        $cond = ?($lc<lc_first> and %!meta<loops>{$c}<iteration> == 1);
+                    }
                 }
                 
             }
@@ -104,8 +108,10 @@ method substitute( $contents, %params ) {
             
             # RAKUDO: Rakudo doesn't understand autovivification of multiple
             # hash indexes %!meta<loops><current> = $key; [perl #61740]
-            %!meta<loops> = {current => $key};
-            %!meta<loops> = {$key => {elems => $iterations.elems, iteration => 0} };
+            %!meta<loops> = {} unless defined %!meta<loops>;
+
+            %!meta<loops>{$key} = {elems => $iterations.elems, iteration => 0};
+            %!meta<loops><current> = $key;
             
             for $iterations.values -> $iteration {
             #say "iteration:" ~ $iteration.perl;
