@@ -138,17 +138,8 @@ class Tags {
     }
     
     method page_tags (Str $page) {
-        # that`s ugly, we must use template instead, 
-        # when new-html-template give us ability to 
-        # know last element in the list 
         my @page_tags = self.tags_parse( self.read_page_tags: $page ); 
-
-        my $tags_str;
-        if @page_tags {
-            @page_tags = @page_tags.map: { tag_html($_) };
-            $tags_str = @page_tags.join(', ');
-        }
-        return $tags_str;
+        return @page_tags.map: { {NAME => $_} };
     }
 
     method cloud_tags {
