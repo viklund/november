@@ -1,6 +1,5 @@
 use v6;
 
-use HTML::Template;
 
 my @tests = 
     (
@@ -21,7 +20,7 @@ use Test;
 plan +@tests;
 
 for @tests -> $tmpl, $data, $expected, $descr {
-    say $tmpl;
+    use HTML::Template;
     my $out = HTML::Template.from_string($tmpl).with_params(hash $data).output;
     is($out, $expected, $descr);
 }
