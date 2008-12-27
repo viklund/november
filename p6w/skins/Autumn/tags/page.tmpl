@@ -1,0 +1,5 @@
+<div class="pagetags">
+    <TMPL_LOOP NAME=PAGETAGS>
+    <a href="<TMPL_VAR NAME=WEBROOT>/all?tag=<TMPL_VAR NAME=NAME ESCAPE=URL>"><TMPL_VAR NAME=NAME></a><TMPL_IF NAME=!LAST>.<TMPL_ELSE>, </TMPL_IF>
+    </TMPL_LOOP>
+</div>
