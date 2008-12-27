@@ -75,13 +75,12 @@ method substitute( $contents, %params ) {
             if $if<attributes><name><lctrls> -> $lc {
                 if %!meta<loops><current> -> $c {
                     if $lc<lc_last> {
-                        $cond = ?(%!meta<loops>{$c}<elems> == %!meta<loops>{$c}<iteration>);
+                        $cond = ?($c<elems> == $c<iteration>);
                     } 
                     elsif $lc<lc_first> {
-                        $cond = ?($lc<lc_first> and %!meta<loops>{$c}<iteration> == 1);
+                        $cond = ?($c<iteration> == 1);
                     }
                 }
-                
             }
             else {
                 $cond = %params{~$if<attributes><name>};
@@ -104,17 +103,16 @@ method substitute( $contents, %params ) {
             my $key = ~$for<attributes><name><val>;
 
             my $iterations = %params{$key};
-            #say "iterations:" ~ $iterations.perl;
             
             # RAKUDO: Rakudo doesn't understand autovivification of multiple
             # hash indexes %!meta<loops><current> = $key; [perl #61740]
             %!meta<loops> = {} unless defined %!meta<loops>;
 
+            # that will fall on nested equal named loops... hm
             %!meta<loops>{$key} = {elems => $iterations.elems, iteration => 0};
-            %!meta<loops><current> = $key;
+            %!meta<loops><current> = %!meta<loops>{$key};
             
             for $iterations.values -> $iteration {
-            #say "iteration:" ~ $iteration.perl;
                 %!meta<loops>{$key}<iteration>++;
                 $output ~= self.substitute(
                                 $for<contents>,
