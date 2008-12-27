@@ -67,7 +67,7 @@ method view_page($page='Main_Page') {
         'TITLE'    => $page,
         'CONTENT'  => $minimal.format($.storage.read_page: $page), 
         'PAGETAGS' => $t.page_tags($page), 
-        'TAGS'     => $t.cloud_tags,
+        'TAGS'     => $t.all_tags,
         'RECENTLY' => self.get_changes( page => $page, :limit(8) ),
         }
     );

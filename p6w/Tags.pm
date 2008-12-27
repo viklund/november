@@ -142,24 +142,9 @@ class Tags {
         return @page_tags.map: { {NAME => $_} };
     }
 
-    method cloud_tags {
+    method all_tags {
         my $norm_counts = self.norm_counts; 
-        my $tags_str;
-
-        if $norm_counts {
-            $tags_str ~= tag_html($_, $norm_counts) ~ ' ' for $norm_counts.keys;
-        }
-
-        return $tags_str;
-    }
-
-    # that`s ugly, we must use template instead, 
-    # when new-html-template give us include 
-    sub tag_html ($tag, $norm_counts?) {
-        my $html =  '<a';
-        $html ~= ' class="t' ~ $norm_counts{$tag} ~ '"' if $norm_counts;
-        $html ~= ' href="' ~ Config.web_root ~ '/all?tag=' ~ $tag ~ '">' ~
-	    $tag ~ '</a>';
+        return $norm_counts.keys.map: { {NAME => $_, COUNT => $norm_counts{$_}} };
     }
 }
 
