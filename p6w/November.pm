@@ -105,13 +105,12 @@ method edit_page($page) {
 
     # TODO: we need plugin system (see topics in mail-list)
     my $t = Tags.new;
-
     self.response( 'edit.tmpl', 
         { 
-        'PAGE'      => $page,
-        'TITLE'     => $title,
-        'CONTENT'   => $old_content,
-        'PAGETAGS'  => $t.read_page_tags($page),
+        PAGE     => $page,
+        TITLE    => $title,
+        CONTENT  => $old_content,
+        PAGETAGS => $t.read_page_tags($page),
         }
     );
 }
@@ -146,7 +145,6 @@ method not_found($page?) {
 
 method log_in {
     if my $user_name = $.cgi.params<user_name> {
-
         my $password = $.cgi.params<password>;
 
         my %users = self.read_users();
@@ -165,11 +163,12 @@ method log_in {
                 {},
                 { cookie => $session_cookie }
             );
+            return;
         }
 
         self.response('login_failed.tmpl'); 
+        return;
     }
-
     self.response('log_in.tmpl');
 }
 
@@ -181,9 +180,10 @@ method log_out {
         my $session_cookie = "session_id=";
 
         self.response('logout_succeeded.tmpl',
-            undef,
+            {}, 
             { :cookie($session_cookie) }
         );
+        return;
     }
 
     self.response('logout_succeeded.tmpl');
@@ -256,7 +256,8 @@ method list_all_pages {
     self.response('list_all_pages.tmpl', %params);
 }
 
-method response ($tmpl, %params?, %opts?) {
+# RAKUDO: die at hash merge if %params undef, so I use default value
+method response ($tmpl, %params?={}, %opts?) {
     my $template = HTML::Template.from_file($.template_path ~ $tmpl);
     
     $template.with_params(
