@@ -31,8 +31,7 @@ method dispatch (@chunks) {
     my @matched =  @!rules.grep: { .match(@chunks) };    
 
     if @matched {
-        # TODO: found example for that bug
-        # RAKUDO: [*-1] not work properly here, die with Null PMC access in find_method()
+        # RAKUDO: [*-1] do not work in array-attribute [perl #61766] 
         my $result = @matched[@matched.end].apply;
         .clear for @!rules; 
         return $result;
