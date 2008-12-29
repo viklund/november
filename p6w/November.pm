@@ -64,11 +64,12 @@ method view_page($page='Main_Page') {
     
     self.response( 'view.tmpl', 
         { 
-        'TITLE'    => $page,
-        'CONTENT'  => $minimal.format($.storage.read_page: $page), 
-        'PAGETAGS' => $t.page_tags($page), 
-        'TAGS'     => $t.all_tags,
-        'RECENTLY' => self.get_changes( page => $page, :limit(8) ),
+        TITLE    => $page,
+        PAGE     => $page,
+        CONTENT  => $minimal.format($.storage.read_page: $page), 
+        PAGETAGS => $t.page_tags($page), 
+        TAGS     => $t.all_tags,
+        RECENTLY => self.get_changes( page => $page, :limit(8) ),
         }
     );
 
