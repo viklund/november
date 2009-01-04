@@ -51,7 +51,7 @@ RUNNING NOVEMBER
 
  $ perl Makefile.PL
  $ make             # not required; speeds up startup times
- $ make test        # not required 
+ $ make test        # not required; requires Test::Harness v3.00 or higher
 
 * Running November on the command line
   
