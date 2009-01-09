@@ -57,7 +57,8 @@ my @inputs_that_should_parse = (
       { 'BLUBB' => [] },
       'prepost', 'an empty for loop' ],
 
-    # that is not work in p5 version by default, but it useful for us and DWIM
+    # this doesn't work in p5 version by default, but it's useful for us,
+    # and it DWIMs
     [ 'pre<TMPL_FOR NAME=FOO>[<TMPL_VAR a><TMPL_VAR BAR>]</TMPL_FOR>post',
       { FOO => [{a => 1}, {a => 2}], BAR => 'Y' },
       'pre[1Y][2Y]post', 'an empty for loop' ],
