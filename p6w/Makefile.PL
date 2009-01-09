@@ -28,7 +28,7 @@ $ cd parrot
 $ perl Makefile.PL \
     && make        \
     && cd languages/perl6 \
-    && make
+    && make perl6
 
 --
 
