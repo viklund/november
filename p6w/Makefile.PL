@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use File::Spec;
+use File::HomeDir;
 
 # Really simple Makefile.PL
 
@@ -39,7 +40,7 @@ my $parrot_dir = $ENV{PARROT_DIR};
 if (   ! $parrot_dir 
     || ! -d $parrot_dir
     || ! -x File::Spec->catfile( $parrot_dir, 'parrot' )) {
-    $parrot_dir = '~/parrot';
+    $parrot_dir = File::HomeDir->my_home() . '/parrot';
 }
 
 print "Parrot checkout location: [$parrot_dir] ";
