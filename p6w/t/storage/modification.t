@@ -10,7 +10,7 @@ $s.modifications_path = 't/storage/data/modifications/';
 
 my $id = $s.write_modification([ 'Page', 'Text', 'Author' ]);
 
-ok($id, 'write_modificatin return some id');
+ok($id, 'write_modification returns an id');
 
 my $modif = $s.read_modification($id);
 
@@ -24,6 +24,7 @@ $s.clear;
 role Testing {
     method clear {
         run 'rm t/storage/data/modifications/*';
+        run 'touch t/storage/data/modifications/empty-file';
     }
 }
 
