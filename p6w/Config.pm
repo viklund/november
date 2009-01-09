@@ -6,5 +6,3 @@ class Config {
 }
 
 # vim:ft=perl6
-  
-
