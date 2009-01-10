@@ -9,10 +9,12 @@ class Dispatcher::Rule {
         return False if @chunks != @.tokens;
 
         for @.tokens Z @chunks -> $token, $chunk {
-            if ~$chunk ~~ $token {
+            if $token.values ~~ *,$chunk.values,* {
+                say 'X';
                 @!args.push($/) if $/;
             }
             else {
+                say 'Y';
                 self.clear;
                 return False;
             }
