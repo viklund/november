@@ -58,7 +58,7 @@ class HTML::Template {
 
                 if $i<attributes><escape> {
                     my $et = ~$i<attributes><escape>[0];
-                    # RAKUDO: Segaful here :(
+                    # RAKUDO: Segfault here :(
                     #$value = escape($value, $et);
                     if $et eq 'HTML' {
                         $value = escape($value, 'HTML');
@@ -105,10 +105,10 @@ class HTML::Template {
                 my $iterations = %params{$key};
                 
                 # RAKUDO: Rakudo doesn't understand autovivification of multiple
-                # hash indexes %!meta<loops><current> = $key; [perl #61740]
+                # hash indices %!meta<loops><current> = $key; [perl #61740]
                 %!meta<loops> = {} unless defined %!meta<loops>;
 
-                # that will fall on nested equal named loops... hm
+                # that will fail on nested same-named loops... hm
                 %!meta<loops>{$key} = {elems => $iterations.elems, iteration => 0};
                 %!meta<loops><current> = %!meta<loops>{$key};
                 
