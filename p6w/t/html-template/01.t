@@ -5,8 +5,7 @@ plan 28;
 
 use HTML::Template;
 
-my @inputs_that_should_parse = (
-
+my @inputs_that_should_parse =
     [ 'foo', {},
       'foo', 'plain text' ],
 
@@ -113,11 +112,10 @@ my @inputs_that_should_parse = (
       'include template' ],
 
     [ '<TMPL_LOOP NAME=FOO>:)</TMPL_LOOP>',
-      { 'FOO' => { :bar } },
+      { 'FOO' => [ { :BAR } ] },
       ":)",
       'we can use TMPL_LOOP as TMPL_FOR' ],
-
-);
+;
 
 my @inputs_that_should_not_parse = (
     [ 'pre<TMPL_IF NAME=YUCK>no tmpl_if',
