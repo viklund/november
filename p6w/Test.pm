@@ -216,7 +216,7 @@ sub proclaim($cond, $desc, $got?, $expected?) {
         print "\n# got: " ~ $got ~ "\n# expected: " ~ $expected if defined $expected; # if $got.exists;
     }
     
-    say;
+    say '';
 }
 
 END {
