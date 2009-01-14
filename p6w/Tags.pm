@@ -3,9 +3,11 @@ use v6;
 use Config;
 
 class Tags {
-    my $.page_tags_path  = Config.server_root ~ 'data/page_tags/';
-    my $.tags_count_path = Config.server_root ~ 'data/tags_count';
-    my $.tags_index_path = Config.server_root ~ 'data/tags_index';
+    my $r = Config.server_root;
+
+    my $.page_tags_path  is rw = $r ~ 'data/page_tags/';
+    my $.tags_count_path is rw = $r ~ 'data/tags_count';
+    my $.tags_index_path is rw = $r ~ 'data/tags_index';
 
     method update_tags ($_: Str $page, Str $new_tags) {
         my $old_tags = .read_page_tags($page).chomp;
