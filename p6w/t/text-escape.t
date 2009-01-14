@@ -22,8 +22,8 @@ my @tests = (
 
 );
 
-for @tests -> $t {
-    is escape($t[0], $t[1]), $t[2], $t[3];
+for @tests {
+    is escape(.[0], .[1]), .[2], .[3];
 }
 
 # vim: ft=perl6
