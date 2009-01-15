@@ -18,7 +18,7 @@ all: $(PIRS)
 clean:
 	rm -f $(PIRS)
 
-test: tests
+tests: test
 
-tests:
+test: all
 	prove -e $(PARROT_DIR)/languages/perl6/perl6 -r --nocolor t/
