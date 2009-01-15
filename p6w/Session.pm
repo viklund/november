@@ -1,5 +1,3 @@
-use v6;
-
 role Session;
 
 use Config;
