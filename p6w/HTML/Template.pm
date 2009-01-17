@@ -29,6 +29,7 @@ method output() {
 }
 
 method parse( $in? ) {
+    # TODO: If used .parse fall tests, fix it! 
     ($in || $!in) ~~ /<HTML::Template::Grammar::TOP>/;
     die("No match") unless $/;
     return $/<HTML::Template::Grammar::TOP><contents>;

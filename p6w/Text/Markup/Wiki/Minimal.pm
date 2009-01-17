@@ -11,12 +11,12 @@ method format($text ) {
 
         my $result;
         use Text::Markup::Wiki::Minimal::Grammar;
-        $par ~~ /<Text::Markup::Wiki::Minimal::Grammar::TOP>/;
+        Text::Markup::Wiki::Minimal::Grammar.parse($par);
 
-        if $/<Text::Markup::Wiki::Minimal::Grammar::TOP> -> $top {
+        if $/ {
 
-            if $top<heading> {
-                my $heading = ~$top<heading><parchunk>[0];
+            if $/<heading> {
+                my $heading = ~$/<heading><parchunk>[0];
                 $heading .= subst( / ^ \s+ /, '' );
                 $heading .= subst( / \s+ $ /, '' );
                 $result = "<h1>$heading</h1>";
@@ -24,7 +24,7 @@ method format($text ) {
             else {
                 $result = '<p>';
 
-                for $top<parchunk> {
+                for $/<parchunk> {
                     if $_<twext> { 
                         $result ~= $_<twext>;
                     }
