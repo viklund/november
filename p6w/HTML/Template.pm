@@ -29,11 +29,9 @@ method output() {
 }
 
 method parse( $in? ) {
-    # RAKUDO: when #58676 will be resolved use: 
-    # $in ~~ HTML::Template::Grammar.new;
-    ($in || $!in) ~~ HTML::Template::Grammar::TOP;
+    ($in || $!in) ~~ /<HTML::Template::Grammar::TOP>/;
     die("No match") unless $/;
-    return $/<contents>;
+    return $/<HTML::Template::Grammar::TOP><contents>;
 }
 
 method substitute( $contents, %params ) {
