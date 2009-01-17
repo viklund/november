@@ -14,12 +14,11 @@ method init ($str) {
     $c_str .= subst(/^ \s* ['<' | '"'] /, '');
     $c_str .= subst(/ ['>' | '"'] \s* $/, '');
 
-    $c_str ~~ /<URI::Grammar::TOP>/;
+    URI::Grammar.parse($c_str);
     unless $/ { die "Could not parse URI: $str" }
 
-    $!uri = $/<URI::Grammar::TOP>;
-
-    @!chunks = $/<URI::Grammar::TOP><path><chunk> // ('');
+    $!uri = $/;
+    @!chunks = $/<path><chunk> // ('');
 }
 
 method scheme {
