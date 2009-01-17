@@ -5,6 +5,16 @@ plan 8;
 
 use Tags;
 
+role Testing {
+    method clear ($_:) {
+        my $c = {};
+        .write_tags_count($c);
+        .write_tags_index($c);
+        .write_page_tags('Test_Page', '');
+        .write_page_tags('Another_Page', '');
+    }
+}
+
 my $t = Tags.new does Testing;
 $t.page_tags_path  = 't/tags/data/page_tags/';
 $t.tags_count_path = 't/tags/data/tags_count';
@@ -33,15 +43,5 @@ is_deeply( $t.read_tags_count, {"bar" => 2, "her" => 2}, 'Tags count after save 
 is_deeply( $t.read_tags_index, {"foo" => [], "bar" => ["Test_Page", "Another_Page"], "her" => ["Test_Page", "Another_Page"]}, 'Tags index after save page without changes' );
 
 $t.clear;
-
-role Testing {
-    method clear ($_:) {
-        my $c = {};
-        .write_tags_count($c);
-        .write_tags_index($c);
-        .write_page_tags('Test_Page', '');
-        .write_page_tags('Another_Page', '');
-    }
-}
 
 # vim:ft=perl6

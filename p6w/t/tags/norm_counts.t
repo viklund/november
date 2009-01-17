@@ -4,6 +4,14 @@ use Test;
 plan 3;
 
 use Tags;
+
+role Testing {
+    method clear {
+        my $c = {};
+        self.write_tags_count( $c );
+    }
+}
+
 my $t = Tags.new does Testing;
 $t.tags_count_path = 't/tags/data/tags_count';
 $t.clear;
@@ -20,12 +28,5 @@ is_deeply( $t.norm_counts(@tags), {"foo" => 10, "baz" => 4}, 'Normalize foo and 
 
 
 $t.clear;
-
-role Testing {
-    method clear {
-        my $c = {};
-        self.write_tags_count( $c );
-    }
-}
 
 # vim:ft=perl6
