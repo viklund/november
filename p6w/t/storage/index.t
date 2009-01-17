@@ -5,6 +5,19 @@ plan 4;
 
 use November::Storage::File;
 
+role Testing {
+    method beforeTest {
+        my $fh = open($.index_path, :w);
+        $fh.say('[]');
+        $fh.close;
+    }
+
+    method afterTest {
+        # TODO: Make more platform-independent, somehow.
+        run("rm $.index_path");
+    }
+}
+
 my $s = November::Storage::File.new does Testing;
 $s.index_path = 't/storage/index_data';
 
@@ -20,17 +33,5 @@ is($s.read_index.perl, '["Foo", "Bar"]', 'Do not add to index page doubble');
 
 $s.afterTest;
 
-role Testing {
-    method beforeTest {
-        my $fh = open($.index_path, :w);
-        $fh.say('[]');
-        $fh.close;
-    }
-
-    method afterTest {
-        # TODO: Make more platform-independent, somehow.
-        run("rm $.index_path");
-    }
-}
 
 # vim:ft=perl6

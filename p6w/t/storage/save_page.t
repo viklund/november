@@ -4,6 +4,20 @@ use Test;
 plan 1;
 
 use November::Storage::File;
+
+role Testing {
+    method beforeTest {
+        my $fh = open($.index_path, :w);
+        $fh.say('[]');
+        $fh.close;
+    }
+
+    method afterTest {
+        # TODO: Make more platform-independent, somehow.
+        run("rm $.index_path");
+    }
+}
+
 my $s = November::Storage::File.new does Testing;
 $s.content_path        = 't/storage/data/articles/';
 $s.modifications_path  = 't/storage/data/modifications/';
@@ -19,17 +33,4 @@ is($s.read_index.perl, '[]', 'Read clear index');
 $s.afterTest;
 
 
-role Testing {
-    method beforeTest {
-        my $fh = open($.index_path, :w);
-        $fh.say('[]');
-        $fh.close;
-    }
-
-    method afterTest {
-        # TODO: Make more platform-independent, somehow.
-        run("rm $.index_path");
-    }
-}
 # vim:ft=perl6
-

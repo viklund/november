@@ -5,6 +5,13 @@ plan 5;
 
 use November::Storage::File;
 
+role Testing {
+    method clear {
+        run 'rm t/storage/data/modifications/*';
+        run 'touch t/storage/data/modifications/empty-file';
+    }
+}
+
 my $s = November::Storage::File.new does Testing;
 $s.modifications_path = 't/storage/data/modifications/';
 
@@ -20,12 +27,5 @@ is($modif[2], 'Author', 'read modification data -- Author');
 ok($modif[3] <= (int time), 'read time, and it <= now ');
 
 $s.clear;
-
-role Testing {
-    method clear {
-        run 'rm t/storage/data/modifications/*';
-        run 'touch t/storage/data/modifications/empty-file';
-    }
-}
 
 # vim:ft=perl6
