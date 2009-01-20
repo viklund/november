@@ -5,7 +5,8 @@ SOURCES=CGI.pm Text/Markup/Wiki/Minimal.pm \
 	November/Storage.pm November/Storage/File.pm Tags.pm \
 	URI.pm URI/Grammar.pm Dispatcher.pm \
 	Dispatcher/Rule.pm Session.pm Utils.pm Config.pm \
-	Text/Escape.pm HTML/Template/Grammar.pm HTML/Template.pm
+	Test/InputOutput.pm Text/Escape.pm HTML/Template/Grammar.pm \
+	HTML/Template.pm
 
 PIRS=$(SOURCES:.pm=.pir)
 

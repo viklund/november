@@ -9,6 +9,6 @@ try {
   $used_successfully = True;
 }
 
-ok( $used_successfully, "use Text::Markup::Wiki::MediaWiki" );
+ok( $used_successfully, "Text::Markup::Wiki::MediaWiki can be use:d" );
 
 # vim:ft=perl6
