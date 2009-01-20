@@ -2,12 +2,7 @@ role Session;
 
 use Config;
 
-has $.sessionfile_path;
-
-# RAKUDO: default value not implemented with keyword has
-method init {
-    $!sessionfile_path = Config.server_root ~ 'data/sessions';
-}
+has $.sessionfile_path = Config.server_root ~ 'data/sessions';
 
 method add_session($id, %stuff) {
     my $sessions = self.read_sessions();

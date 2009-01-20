@@ -20,7 +20,6 @@ has CGI     $.cgi;
 # RAKUDO: BUILD do not implemented yet
 method init {
     $!storage = November::Storage::File.new();
-    Session::init(self);
 }
 
 method handle_request(CGI $cgi) {
