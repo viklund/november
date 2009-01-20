@@ -135,7 +135,9 @@ class Text::Markup::Wiki::MediaWiki {
         # RAKUDO: This could use some ==>
         return
           merge_consecutive_paragraphs
-          map { format_line($^line, :$link_maker, :$extlink_maker, :$author) },
+          map { format_line($^line, :link_maker($link_maker),
+                                    :extlink_maker($extlink_maker),
+                                    :author($author)) },
           $paragraph.split("\n");
     }
 
@@ -143,7 +145,9 @@ class Text::Markup::Wiki::MediaWiki {
         # RAKUDO: This could use some ==>
         return
           join "\n\n",
-          map { format_paragraph($_, :$link_maker, :$extlink_maker, :$author) },
+          map { format_paragraph($_, :link_maker($link_maker),
+                                     :extlink_maker($extlink_maker),
+                                     :author($author)) },
           $text.split(/\n ** 2..*/);
     }
 }
