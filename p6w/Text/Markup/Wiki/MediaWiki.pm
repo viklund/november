@@ -24,7 +24,7 @@ class Text::Markup::Wiki::MediaWiki {
         return map { "&$_;" }, @words.values;
     }
 
-    sub merge_consecutive_paragraphs(*@parlist) {
+    sub merge_consecutive_paragraphs(*@parlist is copy) {
         for 0 ..^ @parlist.elems-1 -> $ix {
             if @parlist[$ix] ~~ /^'<p>'/ && @parlist[$ix+1] ~~ /^'<p>'/ {
                 @parlist[$ix+1] = @parlist[$ix] ~ @parlist[$ix+1];
@@ -43,7 +43,7 @@ class Text::Markup::Wiki::MediaWiki {
     # cancels the one in @promises, and nothing is output.
     sub toggle(@style_stack is rw, @promises is rw, $marker) {
         if $marker ~~ any(@style_stack) {
-            while @style_stack.end ne $marker {
+            while @style_stack[@style_stack.end] ne $marker {
                 my $t = @style_stack.pop();
                 @promises.push($t);
                 take "</$t>";
@@ -61,14 +61,16 @@ class Text::Markup::Wiki::MediaWiki {
         }
     }
 
-    sub format_line($line is rw, :$link_maker, :$extlink_maker, :$author) {
+    sub format_line($line, :$link_maker, :$extlink_maker, :$author) {
+
+        my $line_rw = $line;
         my $partype = 'p';
         if $line ~~ /^ '==' (.*) '==' $/ {
             $partype = 'h2';
-            $line = ~$/[0];
+            $line_rw = ~$/[0];
         }
 
-        my $trimmed = $line;
+        my $trimmed = $line_rw;
         $trimmed .= subst( / ^ \s+ /, '' );
         $trimmed .= subst( / \s+ $ /, '' );
 
@@ -87,7 +89,8 @@ class Text::Markup::Wiki::MediaWiki {
         my @promises;
 
         my $result = join '', gather {
-            $xml_escaped ~~ Tokenizer or return "Couldn't parse '$line'";
+            Tokenizer.parse($xml_escaped) or return "Couldn't parse '$line'";
+
             for $/<token>.values -> $token {
                 if $token<bold_marker> {
                     toggle(@style_stack, @promises, 'b');

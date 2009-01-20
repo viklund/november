@@ -2,10 +2,10 @@ use v6;
 use Test;
 
 class Test::InputOutput {
-    has &.filter;
+    has $.filter;
 
-    method using(&filter) {
-        return Test::InputOutput.new( filter => &filter );
+    method using($filter) {
+        return Test::InputOutput.new( filter => $filter );
     }
 
     method test(@tests) {
@@ -14,7 +14,7 @@ class Test::InputOutput {
             my $expected    = $test[0].value;
             my $description = $test[1];
 
-            my $actual = &.filter($input);
+            my $actual = $.filter($input);
 
             is( $actual, $expected, $description );
         }
