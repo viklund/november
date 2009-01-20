@@ -1,5 +1,4 @@
 PARROT_DIR=<PARROT_DIR>
-RAKUDO=$(PARROT_DIR)/parrot $(PARROT_DIR)/languages/perl6/perl6.pbc
 
 SOURCES=CGI.pm Text/Markup/Wiki/Minimal.pm \
 	Text/Markup/Wiki/MediaWiki.pm November.pm Test.pm \
@@ -21,4 +20,5 @@ clean:
 tests: test
 
 test: all
-	prove -e $(PARROT_DIR)/languages/perl6/perl6 -r --nocolor t/
+	prove -e '$(PARROT_DIR)/parrot $(PARROT_DIR)/languages/perl6/perl6.pbc'\
+	      -r --nocolor t/
