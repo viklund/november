@@ -52,7 +52,8 @@ method view_page($page='Main_Page') {
     }
 
     my $minimal = Text::Markup::Wiki::MediaWiki.new( 
-                    link_maker => { self.make_link($^p, $^t) } 
+                    link_maker    => { self.make_link($^p, $^t) },
+                    extlink_maker => { self.make_extlink($^p, $^t) }
                     );
 
     # TODO: we need plugin system (see topics in mail-list)
@@ -292,6 +293,14 @@ method make_link($page, $title?) {
                             ?? ('view', $page, '')
                             !! ('edit', $page, ' class="nonexistent"'),
                         $page);
+    }
+}
+
+method make_extlink($url, $title?) {
+    if $title {
+        return qq|<a href="$url">$title</a>|;
+    } else {
+        return qq|<a href="$url">$url</a>|;
     }
 }
 
