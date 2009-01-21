@@ -1,6 +1,6 @@
-This is the FEATURES file, which lists the things p5w can do, along with the
-date the feature was implemented. The file is divided into three sections of
-decreasing feature importance.
+This is the FEATURES file, which lists the things the two implementations can
+do, along with the date the feature was implemented. The file is divided into
+three sections of decreasing feature importance.
 
 (There's also a JANITORS file, for desired smaller-than-feature changes and
 additions. Additionally, there's a LOOKINTO file, with possibly worthwhile
@@ -9,49 +9,60 @@ not-yet-features to be investigated.)
 == Essential features ========================================================
 (without which not even we would consider it a wiki)
 
-* Linking . . . . . . . . . . . . . . . . . . . . . . . . . . . . [2008-06-28]
-* Editing . . . . . . . . . . . . . . . . . . . . . . . . . . . . [2008-07-02]
+                                                         p5w     |    p6w
+-----------------------------------------------------------------+------------
+* Linking . . . . . . . . . . . . . . . . . . . . . [2008-06-28] |
+* Editing . . . . . . . . . . . . . . . . . . . . . [2008-07-02] |
+-----------------------------------------------------------------+------------
 
 == Important features ========================================================
 (without which other people might not consider it a wiki)
 
-* Creating new pages (without resorting to URL rewriting) . . . . [2008-07-02]
-
-* User authentication . . . . . . . . . . . . . . . . . . . . . . [2008-08-07]
-* Logging in logging out. . . . . . . . . . . . . . . . . . . . . [2008-08-07]
-
-* The concept of a user authoring an edit . . . . . . . . . . . . [2008-08-07]
-
-* Collision prevention -- warning people
-  who are editing at the same time
-
-* Article history . . . . . . . . . . . . . . . . . . . . . . . . [2008-08-10]
-** Ability to view old revisions of pages . . . . . . . . . . . . [2008-08-10]
-** Diffs between consequtive revisions. . . . . . . . . . . . . . [2008-08-11]
-** Diffs between arbritary revisions (a la Mediawiki)
-
-* Recent changes. . . . . . . . . . . . . . . . . . . . . . . . . [2008-07-02]
-
-* Images (and other files)
-
-* Text formatting . . . . . . . . . . . . . . . . . . . . . . . . [2008-08-23]
-
-* Unicode support
-
-* A decent default CSS layout . . . . . . . . . . . . . . . . . . [2008-07-31]
-** Pluggable layouts
+                                                         p5w     |    p6w
+-----------------------------------------------------------------+------------
+* Creating new pages (without resorting to URL                   |
+  rewriting). . . . . . . . . . . . . . . . . . . . [2008-07-02] |
+                                                                 |
+* User authentication . . . . . . . . . . . . . . . [2008-08-07] |
+* Logging in logging out. . . . . . . . . . . . . . [2008-08-07] |
+                                                                 |
+                                                                 |
+* The concept of a user authoring an edit . . . . . [2008-08-07] |
+                                                                 |
+* Collision prevention -- warning people                         |
+  who are editing at the same time                               |
+                                                                 |
+* Article history . . . . . . . . . . . . . . . . . [2008-08-10] |
+** Ability to view old revisions of pages . . . . . [2008-08-10] |
+** Diffs between consequtive revisions. . . . . . . [2008-08-11] |
+** Diffs between arbritary revisions (a la Mediawiki)            |
+                                                                 |
+* Recent changes. . . . . . . . . . . . . . . . . . [2008-07-02] |
+                                                                 |
+* Images (and other files)                                       |
+                                                                 |
+* Text formatting . . . . . . . . . . . . . . . . . [2008-08-23] |
+                                                                 |
+* Unicode support                                                |
+                                                                 |
+* A decent default CSS layout . . . . . . . . . . . [2008-07-31] |
+** Pluggable layouts                                             |
+-----------------------------------------------------------------+------------
 
 == Desirable features ========================================================
 (without which the wiki is still manageable, but maybe less enjoyable)
 
-* Contents (summarizing the headings in the article)
-
-* Good merging when conflicts occur
-
-* A plug-in system, so that formatting capabilities
-  can be extended by the wiki owner
-
-* RSS/Atom feeds
-** ...for site-wide recent changes
-** ...for individual pages
-** ...for a group of pages subscribed to by the user
+                                                         p5w     |    p6w
+-----------------------------------------------------------------+------------
+* Contents (summarizing the headings in the article)             |
+                                                                 |
+* Good merging when conflicts occur                              |
+                                                                 |
+* A plug-in system, so that formatting capabilities              |
+  can be extended by the wiki owner                              |
+                                                                 |
+* RSS/Atom feeds                                                 |
+** ...for site-wide recent changes                               |
+** ...for individual pages                                       |
+** ...for a group of pages subscribed to by the user             |
+-----------------------------------------------------------------+------------
