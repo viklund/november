@@ -66,9 +66,7 @@ method view_page($page='Main_Page') {
                              link_maker    => { self.make_link($^p, $^t) },
                              extlink_maker => { self.make_extlink($^p, $^t) }
         ),
-        PAGETAGS => join ', ', map { "<a href='all?tag=" ~ $_<NAME> 
-                                     ~ "'>" ~ $_<NAME> ~ '</a>' 
-                                   }, $t.page_tags($page), 
+        PAGETAGS => $t.page_tags($page), 
         RECENTLY => self.get_changes( page => $page, :limit(8) ),
 
         # Disable this for now.

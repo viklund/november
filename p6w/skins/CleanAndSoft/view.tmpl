@@ -10,7 +10,7 @@
             <div id="content">
                 <h1><TMPL_VAR NAME=TITLE></h1>
                 <TMPL_IF NAME=PAGETAGS>
-                <div class="pagetags"><TMPL_VAR NAME=PAGETAGS></div>
+                <TMPL_INCLUDE NAME="page_tags.tmpl">        
                 </TMPL_IF>
 
                 <TMPL_IF NAME=TAGS>
@@ -24,24 +24,7 @@
                     <TMPL_VAR NAME=CONTENT>
                 </div>
             </div>
-    <div id="sidebar">
-        <ul>
-            <li><h2>Navigation</h2>
-                <ul>
-                    <li><a href='/'>Main Page</a></li>
-                    <li><a href='/?page=About'>About this site</a></li>
-                    <li><a href='/?action=recent_changes'>Recent Changes</a></li>
-                </ul>
-            </li>
-
-            <li><h2>This page</h2>
-                <ul>
-                    <li><a href='/?page=<TMPL_VAR NAME=PAGE>&action=edit'>Edit</a>
-                    <li><a href='/?page=<TMPL_VAR NAME=PAGE>&action=view_history'>View history</a>
-                </ul>
-            </li>
-        </ul>
-    </div>
+    <TMPL_INCLUDE NAME="sidebar.tmpl">
 
 
 <div id="footer">
