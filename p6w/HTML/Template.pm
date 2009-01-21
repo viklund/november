@@ -119,6 +119,7 @@ method substitute( $contents, %params ) {
         }
         elsif $chunk<directive><include> {
             my $file = ~$chunk<directive><include><attributes><name><val>;
+            $file = %params<TMPL_PATH> ~ $file;
             if $file ~~ :e  {
                 $output ~= self.substitute(
                                 self.parse( slurp($file) ),

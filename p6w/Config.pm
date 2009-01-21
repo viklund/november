@@ -2,7 +2,7 @@ use v6;
 class Config {
     our $.server_root = '';
     our $.web_root = '';
-    our $.skin = 'Autumn';
+    our $.skin = 'CleanAndSoft';
 }
 
 # vim:ft=perl6

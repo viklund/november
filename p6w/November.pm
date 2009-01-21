@@ -64,9 +64,13 @@ method view_page($page='Main_Page') {
         TITLE    => $page,
         PAGE     => $page,
         CONTENT  => $minimal.format($.storage.read_page: $page), 
-        PAGETAGS => $t.page_tags($page), 
-        TAGS     => $t.all_tags,
+        PAGETAGS => join ', ', map { "<a href='all?tag=" ~ $_<NAME> 
+                                     ~ "'>" ~ $_<NAME> ~ '</a>' 
+                                   }, $t.page_tags($page), 
         RECENTLY => self.get_changes( page => $page, :limit(8) ),
+
+        # Disable this for now.
+        #TAGS     => $t.all_tags,
         }
     );
 
