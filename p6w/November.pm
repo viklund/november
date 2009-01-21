@@ -57,10 +57,12 @@ method view_page($page='Main_Page') {
 
     # TODO: we need plugin system (see topics in mail-list)
     my $t = Tags.new;
+
+    my $title = $page.trans( ['_'] => [' '] );
     
     self.response( 'view.tmpl', 
         { 
-        TITLE    => $page,
+        TITLE    => $title,
         PAGE     => $page,
         CONTENT  => $minimal.format($.storage.read_page: $page), 
         PAGETAGS => join ', ', map { "<a href='all?tag=" ~ $_<NAME> 
