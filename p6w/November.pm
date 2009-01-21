@@ -51,7 +51,7 @@ method view_page($page='Main_Page') {
         return;
     }
 
-    my $minimal = Text::Markup::Wiki::Minimal.new( 
+    my $minimal = Text::Markup::Wiki::MediaWiki.new( 
                     link_maker => { self.make_link($^p, $^t) } 
                     );
 
