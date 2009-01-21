@@ -100,7 +100,7 @@ class Text::Markup::Wiki::MediaWiki {
                 }
                 elsif $token<wikilink> {
                     take defined $link_maker
-                            ?? $link_maker(~$token<wikilink><page>)
+                            ?? $link_maker(~$token<wikilink><page>,~$token<wikilink><page>)
                             !! ~$token<wikilink>;
                 }
                 elsif $token<extlink> {
@@ -136,6 +136,7 @@ class Text::Markup::Wiki::MediaWiki {
 
     sub format_paragraph($paragraph, :$link_maker, :$extlink_maker, :$author) {
         # RAKUDO: This could use some ==>
+
         return
           merge_consecutive_paragraphs
           map { format_line($^line, :link_maker($link_maker),

@@ -51,10 +51,7 @@ method view_page($page='Main_Page') {
         return;
     }
 
-    my $minimal = Text::Markup::Wiki::MediaWiki.new( 
-                    link_maker    => { self.make_link($^p, $^t) },
-                    extlink_maker => { self.make_extlink($^p, $^t) }
-                    );
+    my $minimal = Text::Markup::Wiki::MediaWiki.new;
 
     # TODO: we need plugin system (see topics in mail-list)
     my $t = Tags.new;
@@ -65,7 +62,10 @@ method view_page($page='Main_Page') {
         { 
         TITLE    => $title,
         PAGE     => $page,
-        CONTENT  => $minimal.format($.storage.read_page: $page), 
+        CONTENT  => $minimal.format($.storage.read_page( $page ),
+                             link_maker    => { self.make_link($^p, $^t) },
+                             extlink_maker => { self.make_extlink($^p, $^t) }
+        ),
         PAGETAGS => join ', ', map { "<a href='all?tag=" ~ $_<NAME> 
                                      ~ "'>" ~ $_<NAME> ~ '</a>' 
                                    }, $t.page_tags($page), 
@@ -220,7 +220,7 @@ method get_changes (:$page, :$limit) {
     for $recent_changes.list -> $modification_id {
         my $modification = $.storage.read_modification($modification_id);
         my $count = push @changes, {
-            'PAGE' => self.make_link($modification[0]),
+            'PAGE' => self.make_link($modification[0],$modification[0]),
             'TIME' => time_to_period_str($modification[3]) || $modification_id,
             'AUTHOR' => $modification[2] || 'somebody' 
             };
@@ -277,7 +277,7 @@ method response ($tmpl, %params?={}, %opts?) {
     $.cgi.send_response($template.output, %opts);
 }
 
-method make_link($page, $title?) {
+method make_link($page, $title) {
     my $root = Config.server_root;
     if $title {
         if $page ~~ m/':'/ {
@@ -296,7 +296,7 @@ method make_link($page, $title?) {
     }
 }
 
-method make_extlink($url, $title?) {
+method make_extlink($url, $title) {
     if $title {
         return qq|<a href="$url">$title</a>|;
     } else {
