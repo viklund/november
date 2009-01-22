@@ -100,13 +100,7 @@ RUNNING NOVEMBER
 
   If you have compiled November you can copy the .pir files instead of the .pm
   files. Make sure that the files and directories below data/ are readable
-  and writable by the web server. Also, if you want a styled wiki you need to
-  copy the following files into the root of your web server:
-
-    skin/spartan.css
-    skin/november-logo.png
-
-  Seriously. (This will change, though.)
+  and writable by the web server.
 
   To set up Apache to handle all request by November, you can use mod_rewrite:
 
