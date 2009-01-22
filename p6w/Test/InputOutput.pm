@@ -10,9 +10,20 @@ class Test::InputOutput {
 
     method test(@tests) {
         for @tests -> $test {
-            my $input       = $test[0].key;
-            my $expected    = $test[0].value;
-            my $description = $test[1];
+            my ($input, $expected, $description);
+
+            if $test[0] ~~ Pair {
+                $input       = $test[0].key;
+                $expected    = $test[0].value;
+                $description = $test[1] // '';
+            }
+            else {
+                if $test.elems < 2 {
+                    ok(0);
+                    return;
+                }
+                $input, $expected, $description = $test.values;
+            }
 
             my $actual = $.filter($input);
 
