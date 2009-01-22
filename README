@@ -75,28 +75,43 @@ RUNNING NOVEMBER
 * Running November through a web server
 
   We have only tested the following on the Apache web server. You need to put
-  these files and directories in the some directory where Apache can execute 
-  it:
+  these files and directories in some directory where Apache can execute it
+  (your cgi-bin/ dir for example):
 
     wiki.sh
     wiki
+    Config.pm
     CGI.pm
     Dispatcher.pm
     Dispatcher/Rule.pm
     HTML/Template.pm
-    Impatience.pm
+    HTML/Template/Grammar.pm
     November.pm
     November/Storage.pm
     November/Storage/File.pm
     Session.pm
     Tags.pm
+    Text/Escape.pm
     Text/Markup/Wiki/Minimal.pm
+    Text/Markup/Wiki/Minimal/Grammar.pm
+    Text/Markup/Wiki/MediaWiki.pm
     URI.pm
     URI/Grammar.pm
     Utils.pm
 
     skin/
+
+  Then put these directories somewhere else. Preferably someplace where apache
+  can't serve them over the net. And yes, skin/ should be in both places we're
+  working on that.
+
     data/
+    skin/
+
+  Edit the Config.pm file and set the $.server_root variable to the directory
+  under which both skin/ and data/ is accessible (remember to include a
+  trailing slash). $.web_root has to be '' for the moment, we haven't yet
+  implemented the ability to have november anywhere else, but hang in there.
 
   If you have compiled November you can copy the .pir files instead of the .pm
   files. Make sure that the files and directories below data/ are readable
