@@ -69,8 +69,7 @@ method view_page($page='Main_Page') {
         PAGETAGS => $t.page_tags($page), 
         RECENTLY => self.get_changes( page => $page, :limit(8) ),
 
-        # Disable this for now.
-        #TAGS     => $t.all_tags,
+        TAGS     => $t.all_tags,
         }
     );
 
