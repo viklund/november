@@ -3,7 +3,7 @@ use v6;
 grammar Tokenizer {
     regex TOP { ^ <token>* $ }
     regex token { <bold_marker> | <italic_marker> | <wikilink> | <extlink> |
-                  <plain> | <malformed> }
+                  <entity> | <plain> | <malformed> }
     regex bold_marker { '&#039;&#039;&#039;' }
     regex italic_marker { '&#039;&#039;' }
 
@@ -14,7 +14,10 @@ grammar Tokenizer {
     regex url { [<!before ']'> \S]+ }
     regex title { [<!before ']'> .]+ }
 
-    regex plain { [<!before '&#039;&#039;'> <!before '['> .]+ }
+    regex entity { '&amp;mdash;' }
+
+    regex plain { [<!before '&#039;&#039;'> <!before '['>
+                   <!before '&amp;mdash;'> .]+ }
     regex malformed { '[[' | '[' }
 }
 
@@ -119,6 +122,10 @@ class Text::Markup::Wiki::MediaWiki {
                     take defined $extlink_maker
                             ?? $extlink_maker($url, $title)
                             !! ~$token<extlink>;
+                }
+                elsif $token<entity> {
+                    # TODO: Generalize.
+                    take '&mdash;';
                 }
                 else {
                     push @style_stack, @promises;
