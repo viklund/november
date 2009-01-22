@@ -6,7 +6,7 @@ plan 10;
 use Text::Markup::Wiki::MediaWiki;
 
 my $converter = Text::Markup::Wiki::MediaWiki.new;
-my $link_maker = { my $l = $^page.ucfirst; "<a href=\"/?page=$l\">$^page</a>" }
+my $link_maker = { my $l = $^page.ucfirst; "<a href=\"/?page=$l\">$^title</a>" }
 my $extlink_maker = { "<a href=\"$^href\">$^title</a>" }
 
 {
