@@ -276,7 +276,7 @@ method response ($tmpl, %params?={}, %opts?) {
 }
 
 method make_link($page, $title) {
-    my $root = Config.server_root;
+    my $root = Config.web_root;
     if $title {
         if $page ~~ m/':'/ {
             return qq|<a href="{ $root ~ $page }">$title</a>|;
