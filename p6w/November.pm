@@ -232,7 +232,7 @@ method list_all_pages {
 
     my $t = Tags.new();
     my %params;
-    %params<TAGS> = $t.cloud_tags if $t;
+    %params<TAGS> = $t.all_tags if $t;
 
     my $index;
 
@@ -241,7 +241,7 @@ method list_all_pages {
         # TODO: we need plugin system (see topics in mail-list)
         my $tags_index = $t.read_tags_index;
         $index = $tags_index{$tag};
-        %params<TAGS> = $tag;
+        %params<TAG> = $tag;
     } 
     else {
         $index = $.storage.read_index;
@@ -251,7 +251,7 @@ method list_all_pages {
         # RAKUDO: @($arrayref) not implemented yet, so:
         # my @list = map { { page => $_ } }, @($index); 
         # do not work. Workaround:
-        my @list = map { { PAGE => $_ } }, $index.values; 
+        my @list = map { { PAGE => $_, TITLE => $_.trans( ['_'] => [' '] ) } }, $index.values; 
         %params<LIST> = @list;
     }
 
