@@ -67,7 +67,7 @@ class CGI {
 
     method send_response($contents, %opts?) {
         # The header
-        print "Content-Type: text/html$!crlf";
+        print "Content-Type: text/html; charset=utf-8$!crlf";
         if %opts && %opts<cookie> {
             print "Set-Cookie: {%opts<cookie>}; path=/;$!crlf";
         }
