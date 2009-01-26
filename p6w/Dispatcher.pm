@@ -19,8 +19,8 @@ multi method add (@tokens, $action){
 method add_rules(@rules) {
     # RAKUDO: rakudo doesn't know return values in for loops yet
     my $r;
-    for @rules -> Object $tokens, $action {
-        $r = self.add([$tokens.list], $action);
+    for @rules -> Object @tokens, $action {
+        $r = self.add(@tokens, $action);
     }
     return $r;
 }
