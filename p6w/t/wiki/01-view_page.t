@@ -3,86 +3,31 @@ use v6;
 use Test;
 plan 8;
 
-my $outputfile = 'test.output';
-if $outputfile ~ :e {
-    run("rm $outputfile");
+my $output_file = 'test.output';
+run("rm -f $output_file");
+
+my $html_tag
+    = '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">'
+      ~ "\n";
+
+sub run_wiki_with_URL($url, $description = '') {
+    run("./test_wiki.sh $url | grep '<html' > $output_file");
+    my $expected_output = $html_tag;
+    my $acutal_output   = slurp( $output_file );
+
+    is( $acutal_output, $expected_output, $description );
 }
 
-{
-    run("./test_wiki.sh | grep '<html' > $outputfile");
+run_wiki_with_URL('',                  'View main page');
+run_wiki_with_URL('/view/Main_Page',   'View specific page');
+run_wiki_with_URL('/view/Snrsdfda',    'View unexisting page');
+run_wiki_with_URL('/in',               'Log in page');
+run_wiki_with_URL('/out',              'Log out page');
+run_wiki_with_URL('/recent',           'Recent changes');
+run_wiki_with_URL('/all',              'All pages');
+run_wiki_with_URL('/all?tag=november', 'All pages, specific tag');
 
-    my $expected_output = '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">' ~ "\n";
-    my $acutal_output   = slurp( $outputfile );
-
-    is( $acutal_output, $expected_output, 'View main page' );
-}
-
-{
-    run("./test_wiki.sh '/view/Main_Page' | grep '<html' > $outputfile");
-
-    my $expected_output = '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">' ~ "\n";
-    my $acutal_output   = slurp( $outputfile );
-
-    is( $acutal_output, $expected_output, 'View specific page' );
-}
-
-{
-    run("./test_wiki.sh '/view/Snrsdfda' | grep '<html' > $outputfile");
-
-    my $expected_output = '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">' ~ "\n";
-    my $acutal_output   = slurp( $outputfile );
-
-    is( $acutal_output, $expected_output, 'View unexisting page' );
-}
-
-{
-    run("./test_wiki.sh '/in' | grep '<html' > $outputfile");
-
-    my $expected_output = '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">' ~ "\n";
-    my $acutal_output   = slurp( $outputfile );
-
-    is( $acutal_output, $expected_output, 'Log in page' );
-}
-
-{
-    run("./test_wiki.sh '/out' | grep '<html' > $outputfile");
-
-    my $expected_output = '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">' ~ "\n";
-    my $acutal_output   = slurp( $outputfile );
-
-    is( $acutal_output, $expected_output, 'Log out page' );
-}
-
-{
-    run("./test_wiki.sh '/recent' | grep '<html' > $outputfile");
-
-    my $expected_output = '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">' ~ "\n";
-    my $acutal_output   = slurp( $outputfile );
-
-    is( $acutal_output, $expected_output, 'Recent changes' );
-}
-
-{
-    run("./test_wiki.sh '/all' | grep '<html' > $outputfile");
-
-    my $expected_output = '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">' ~ "\n";
-    my $acutal_output   = slurp( $outputfile );
-
-    is( $acutal_output, $expected_output, 'All pages' );
-}
-
-{
-    run("./test_wiki.sh '/all?tag=november' | grep '<html' > $outputfile");
-
-    my $expected_output = '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">' ~ "\n";
-    my $acutal_output   = slurp( $outputfile );
-
-    is( $acutal_output, $expected_output, 'All pages, specific tag' );
-}
-
-; # <- a parsing bug i think
-if $outputfile ~ :e {
-    run("rm $outputfile");
-}
+; # RAKUDO: [perl #57876]
+run("rm -r $output_file");
 
 # vim:ft=perl6
