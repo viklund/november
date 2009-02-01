@@ -84,7 +84,7 @@ class November does Session {
                         = $.storage.wiki_page_exists($page);
         my $action      = $already_exists ?? 'Editing' !! 'Creating';
         my $old_content = $already_exists ?? $.storage.read_page($page) !! '';
-        my $title = "$action $page";
+        my $title = $action ~ ' ' ~ $page.trans( ['_'] => [' '] );
 
         # The 'edit' action handles both showing the form and accepting the
         # POST data. The difference is the presence of the 'articletext'
