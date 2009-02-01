@@ -103,7 +103,7 @@ class Text::Markup::Wiki::MediaWiki {
                 }
                 elsif $token<wikilink> {
                     take defined $link_maker
-                            ?? $link_maker(~$token<wikilink><page>,~$token<wikilink><page>)
+                            ?? $link_maker(~$token<wikilink><page>, undef)
                             !! ~$token<wikilink>;
                 }
                 elsif $token<extlink> {
