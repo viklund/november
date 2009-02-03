@@ -7,4 +7,4 @@ REQUEST_METHOD=GET \
 SERVER_NAME='test.foo' \
 SERVER_PORT='80' \
 REQUEST_URI=$QS \
-exec $PARROT_DIR/parrot $PARROT_DIR/languages/perl6/perl6.pbc wiki
+exec $PARROT_DIR/parrot $PARROT_DIR/languages/rakudo/perl6.pbc wiki

@@ -13,7 +13,7 @@ PIRS=$(SOURCES:.pm=.pir)
 all: $(PIRS)
 
 %.pir: %.pm
-	$(PARROT_DIR)/parrot $(PARROT_DIR)/languages/perl6/perl6.pbc --target=pir --output=$@ $<
+	$(PARROT_DIR)/parrot $(PARROT_DIR)/languages/rakudo/perl6.pbc --target=pir --output=$@ $<
 
 clean:
 	rm -f $(PIRS)
@@ -21,5 +21,5 @@ clean:
 tests: test
 
 test: all
-	prove -e '$(PARROT_DIR)/parrot $(PARROT_DIR)/languages/perl6/perl6.pbc'\
+	prove -e '$(PARROT_DIR)/parrot $(PARROT_DIR)/languages/rakudo/perl6.pbc'\
 	      -r --nocolor t/
