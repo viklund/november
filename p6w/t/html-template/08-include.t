@@ -4,7 +4,7 @@ use Test;
 plan 3;
 
 use HTML::Template;
-
+our $*WARNINGS = 1;
 
 my @tests = 
     [ 't/test-templates/a.tmpl',
@@ -36,6 +36,11 @@ my @tests =
 #      {},
 #      "EEE",
 #      'missing include file'], # TODO needs warning or exception
+
+    [ 't/test-templates/page.tmpl',
+      { HEADER => "head", FOOTER => "foot"},
+      "head\n\nbody\nfoot\n\n",
+      'include two files'],
 ;
 
 for @tests -> $t {
