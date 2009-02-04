@@ -1,6 +1,6 @@
 PARROT_DIR=<PARROT_DIR>
 
-SOURCES=CGI.pm Text/Markup/Wiki/Minimal.pm \
+SOURCES=CGI.pm Text/Markup/Wiki/Minimal.pm Text/Markup/Wiki/Minimal/Grammar.pm \
 	Text/Markup/Wiki/MediaWiki.pm Test.pm \
 	November/Storage.pm November/Storage/File.pm Tags.pm \
 	URI.pm URI/Grammar.pm Dispatcher.pm \
