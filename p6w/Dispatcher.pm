@@ -1,6 +1,6 @@
-use Dispatcher::Rule;
-
 class Dispatcher {
+    use Dispatcher::Rule;
+
     has @.rules;
     has $.default is rw;
 
@@ -14,8 +14,8 @@ class Dispatcher {
         @!rules.push($rule);
     }
 
-    # I think a Hash might be better here, but Rakudo converts all hash keys
-    # into string now
+# I think a Hash might be better here, but Rakudo converts all hash keys
+# into string now
     method add_rules(@rules) {
         # RAKUDO: rakudo doesn't know return values in for loops yet
         my $r;

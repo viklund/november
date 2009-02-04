@@ -2,13 +2,13 @@ use CGI;
 use Tags;
 use HTML::Template;
 use Text::Markup::Wiki::MediaWiki;
-use November::Storage::File;  
 use Session;
 use Dispatcher;
 use Utils;
 use Config;
 
 class November does Session {
+    use November::Storage::File;  
 
     has $.template_path = Config.server_root ~ 'skins/' ~ Config.skin ~ '/';
     has $.userfile_path = Config.server_root ~ 'data/users';
