@@ -3,5 +3,6 @@
   'Hi there. November is a wiki engine written in Perl 6, and runs on top of Rakudo. It currently does viewing/editing of pages, and sessions.
 
 Pages are written in a simple wiki markup, and parsed using a Perl 6 grammar. This grammar is used to produce links, for example to [[Another_Page]]. A link to a [[Page_that_does_not_exist]] is shown in red, and clicking it takes you into edit mode for that page.',
-  'carl'
+  'carl',
+ 1227000000 
 ]

@@ -1,141 +1,136 @@
-use v6;
+class HTML::Template;
 
-class HTML::Template {
+use Text::Escape;
+use HTML::Template::Grammar;
 
-    has $.filename;
-    has %!params;
+has $!in;
+has %!params;
+has %!meta;
 
-    method param( Pair $param ) {
-        %!params{$param.key} = $param.value;
-    }
+method from_string( Str $in ) {
+    return self.new(in => $in);
+}
 
-    method output() {
-        # RAKUDO: Poor man's CATCH.
-        my $worked = False;
-        my $template;
-        try {
-            $template = slurp( $.filename );
-            $worked = True;
-        }
-        die "Could not open $.filename" if !$worked;
-        return self.serialize($template);
-    }
+method from_file($file_path) {
+    return self.from_string( slurp($file_path) );
+}
 
-    method serialize($text is rw) {
-        my @loops;
+method param( Pair $param ) {
+    %!params{$param.key} = $param.value;
+}
 
-        while ( $text ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' / ) {
-            my $directive = $0;
-            my $name = $1;
+method with_params( Hash %params ) {
+    %!params = %params;
+    return self;
+}
 
-            # `$s ne $a & $b` means `$s ne $a || $s ne $b`,
-            # which is confusing, so we'll write it like this instead:
-            die "Unrecognized directive: TMPL_$directive"
-              if !($directive eq 'VAR' | 'LOOP' | 'IF');
+method output() {
+    return self.substitute( self.parse, %!params );
+}
 
-            my $value = %!params{$name};
-            if !defined($value) && $directive ne 'IF' {
-                die "$name is defined in the template but undefined in source";
+method parse( $in? ) {
+    # TODO: If used .parse fall tests, fix it! 
+    ($in || $!in) ~~ /<HTML::Template::Grammar::TOP>/;
+    die("No match") unless $/;
+    return $/<HTML::Template::Grammar::TOP><contents>;
+}
+
+method substitute( $contents, %params ) {
+    my $output = ~$contents<plaintext>;
+
+    for ($contents<chunk> // ()) -> $chunk {
+
+        if $chunk<directive><insertion> -> $i {
+            my $key = ~$i<attributes><name>;
+
+            my $value; 
+            if (defined %params{$key}) {
+                $value = %params{$key}; 
+            } else {
+                $value = %!params{$key};
             }
+            
+            # RAKUDO: Scalar type not implemented yet
+            warn "Param $key is a { $value.WHAT }" unless $value ~~ Str | Int;
 
-            if $directive eq 'LOOP' {
-
-                # TODO: In the presence of nested loops: this is wrong.
-                unless $text ~~ / '<TMPL_LOOP NAME=' \w+ '>' (.*?)
-                                  '</TMPL_LOOP>' / {
-                    die "No closing </TMPL_LOOP>"
+            if $i<attributes><escape> {
+                my $et = ~$i<attributes><escape>[0];
+                # RAKUDO: Segfault here :(
+                #$value = escape($value, $et);
+                if $et eq 'HTML' {
+                    $value = escape($value, 'HTML');
+                } 
+                elsif $et eq 'URL' | 'URI' {
+                    $value = escape($value, 'URL');
                 }
-                my $loop_inside = $0;
 
-                # RAKUDO: Dotty methods don't work.
-                $text = $text.subst( / '<TMPL_LOOP NAME=' \w+ '>' .*?
-                                       '</TMPL_LOOP>' /,
-                                     self.serialize_loop(
-                                         $loop_inside,
-                                         $value ));
             }
-            elsif $directive eq 'IF' {
-
-                # TODO: In the presence of nested ifs: this is wrong.
-                unless $text ~~ / '<TMPL_IF NAME=' \w+ '>' (.*?)
-                                  '</TMPL_IF>' / {
-                    die "No closing </TMPL_IF>"
-                }
-                my $text_inside = $0;
-                my $if_inside = $text_inside;
-                my $else_inside = '';
-                if $text_inside ~~ / ^ (.*?) '<TMPL_ELSE>' (.*) $ / {
-                    # RAKUDO: Need to match again. [perl #57858]
-                    $text_inside ~~ / ^ (.*?) '<TMPL_ELSE>' (.*) $ /;
-                    $if_inside = $0;
-                    $else_inside = $1;
-                }
-                # TODO: In a perfect world, the contents should also be
-                # parsed and substituted.
-                $text = $text.subst( / '<TMPL_IF NAME=' \w+ '>' .*?
-                                       '</TMPL_IF>' /,
-                                       $value ?? $if_inside !! $else_inside );
-            }
-            else { # it's TMPL_VAR
-                # RAKUDO: Dotty methods don't work.
-                $text = $text.subst( / '<TMPL_VAR NAME=' \w+ '>' /,
-                                     $value );
-            }
+            $output ~= ~$value;
         }
-
-        # Also need to check whether some parameters went unused during the
-        # substitution. This might be best to do here, or in param(), I don't
-        # know. Probably in param, with the allowed parameters pre-cached.
-        # It's a little bit tricky, though, once you take <TEMPL_LOOP> into
-        # account. Need to think about that.
-        return $text;
-    }
-
-    method serialize_loop($text is rw, @hashes) {
-        my $result = "";
-
-        for @hashes.values -> $hash {
-            $result ~= self.serialize_iteration($text, $hash);
-        }
-        return $result;
-    }
-
-    method serialize_iteration($text, %hash) {
-        my $result = $text;
-        while ( $result ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' / ) {
-            # RAKUDO: Need to match again inside while loop. [perl #58352]
-            $result ~~ / '<TMPL_' (<alnum>+) ' NAME=' (\w+) '>' /;
-
-            my $directive = $0;
-            my $name = $1;
-
-            die "Nested TMPL_LOOPs not supported" if $directive eq 'LOOP';
-
-            # `$s ne $a & $b` means `$s ne $a || $s ne $b`,
-            # which is confusing, so we'll write it like this instead:
-            die "Unrecognized directive: TMPL_$directive"
-              if !($directive eq 'VAR' | 'LOOP');
-
-            # TODO: Converting it to lowercase here is definitely wrong.
-            # But it works for now.
-            my $value = %hash{$name.lc}
-              // die "$name is defined in the template but undefined in source";
-
-            if $directive eq 'VAR' {
-                # RAKUDO: Dotty methods don't work.
-                $result = $result.subst( / '<TMPL_VAR NAME=' \w+ '>' /,
-                                         $value );
+        elsif $chunk<directive><if_statement> -> $if {
+            my $cond;
+            if $if<attributes><name><lctrls> -> $lc {
+                if %!meta<loops><current> -> $c {
+                    if $lc<lc_last> {
+                        $cond = ?($c<elems> == $c<iteration>);
+                    } 
+                    elsif $lc<lc_first> {
+                        $cond = ?($c<iteration> == 1);
+                    }
+                }
             }
             else {
-                die("I haven't implemented TMPL_$directive in loops yet.");
+                $cond = %params{~$if<attributes><name>};
+            }
+
+            if $cond {
+                $output ~= self.substitute(
+                                $if<contents>,
+                                %params
+                            );
+            }
+            elsif $if<else> {
+                $output ~= self.substitute(
+                                $if<else>[0],
+                                %params
+                            );
+            }
+        }
+        elsif $chunk<directive><for_statement> -> $for {
+            my $key = ~$for<attributes><name><val>;
+
+            my $iterations = %params{$key};
+            
+            # RAKUDO: Rakudo doesn't understand autovivification of multiple
+            # hash indices %!meta<loops><current> = $key; [perl #61740]
+            %!meta<loops> = {} unless defined %!meta<loops>;
+
+            # that will fail on nested same-named loops... hm
+            %!meta<loops>{$key} = {elems => $iterations.elems, iteration => 0};
+            %!meta<loops><current> = %!meta<loops>{$key};
+            
+            for $iterations.values -> $iteration {
+                %!meta<loops>{$key}<iteration>++;
+                $output ~= self.substitute(
+                                $for<contents>,
+                                $iteration
+                            );
+            }
+        }
+        elsif $chunk<directive><include> {
+            my $file = ~$chunk<directive><include><attributes><name><val>;
+            $file = %params<TMPL_PATH> ~ $file;
+            if $file ~~ :e  {
+                $output ~= self.substitute(
+                                self.parse( slurp($file) ),
+                                %params
+                            );
             }
         }
 
-        # Also need to check whether some parameters went unused during the
-        # substitution. This might be best to do here, or in param(), I don't
-        # know. Probably in param, with the allowed parameters pre-cached.
-        # It's a little bit tricky, though, once you take <TMPL_LOOP> into
-        # account. Need to think about that.
-        return $result;
+        $output ~= ~$chunk<plaintext>;
     }
+    return $output;
 }
+
+# vim:ft=perl6

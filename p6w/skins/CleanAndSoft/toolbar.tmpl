@@ -1,0 +1,20 @@
+<ul id="toolbar">
+    <TMPL_IF NAME=LOGGED_IN>
+        <TMPL_IF NAME=VIEW_PAGE>
+            <li><a href="<TMPL_VAR NAME=WEBROOT>/edit/<TMPL_VAR NAME=PAGE>">Edit</a></li>
+            <!-- <li><a href="<TMPL_VAR NAME=WEBROOT>/history/<TMPL_VAR NAME=PAGE>"">History</a></li> -->
+        <TMPL_ELSE>
+        
+            <TMPL_IF NAME=PAGE>
+                <li><a href="<TMPL_VAR NAME=WEBROOT>/view/<TMPL_VAR NAME=PAGE>">Back to <TMPL_VAR NAME=TITLE></a></li>
+            <TMPL_ELSE>
+                <li><a href="/<TMPL_VAR NAME=WEBROOT>">Back to Main Page</a></li>
+            </TMPL_IF>
+
+        </TMPL_IF>
+        <li><a href="<TMPL_VAR NAME=WEBROOT>/recent">Recent Changes</a></li>
+        <li><a href="<TMPL_VAR NAME=WEBROOT>/out">Log out</a></li>
+    <TMPL_ELSE>
+        <li><a href="<TMPL_VAR NAME=WEBROOT>/in">Log in</a></li>
+    </TMPL_IF>
+</ul>

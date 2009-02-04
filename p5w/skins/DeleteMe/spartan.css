@@ -1,0 +1,96 @@
+body {
+    background: white;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: sans-serif;
+}
+
+h1 {
+    border-bottom: solid 3px #888;
+}
+
+#toolbar {
+    border-bottom: solid #88f 1px;
+    background: #ccf;
+    padding-top: 1em;
+    list-style: none;
+    margin: 0;
+    font-family: sans-serif;
+}
+
+#toolbar li {
+    line-height: 1.4em;
+    display: inline;
+}
+
+#toolbar a {
+    color: black;
+    text-decoration: none;
+    padding: .4em 1em 0;
+}
+
+#toolbar a:link    { background: #bbe; }
+#toolbar a:visited { background: #bbe; }
+#toolbar a:hover   { background: #ffc; }
+#toolbar a:active  { background: #cca; }
+
+#content {
+    padding: 20px 40px 0;
+}
+
+.diff .insertion {
+    border: solid 1px #080;
+    background: #8f8;
+}
+
+.diff .deletion {
+    border: solid 1px #800;
+    background: #f88;
+}
+
+a.nonexistent {
+    color: #F00;
+}
+
+.pagetags a, .cloud a {
+    color: #333;
+}
+
+.pagetags a:hover, .cloud a:hover {
+    color: #00c;
+}
+
+.cloud a {
+    margin-right:12px;
+}
+.cloud {
+    float:right;
+    clear:both;
+    line-height:1.9em;
+    width: 200px;
+    padding:0 0 30px 30px;
+}
+
+.pagetags {
+    font-size:0.6em;
+    margin:-12px 0 10px 0;
+	background-image: url('/imgs/tag.png');
+	background-position: left bottom;
+	background-repeat: no-repeat;
+}
+
+.t0 { font-size:0.7em;}
+.t1 { font-size:0.8em;}
+.t2 { font-size:0.9em;}
+.t2 { font-size:1.0em;}
+.t3 { font-size:1.1em;}
+.t4 { font-size:1.2em;}
+.t5 { font-size:1.3em;}
+.t6 { font-size:1.4em;}
+.t7 { font-size:1.5em;}
+.t8 { font-size:1.6em;}
+.t9 { font-size:1.7em;}
+.t10 { font-size:1.8em;}

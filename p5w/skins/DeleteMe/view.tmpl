@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <title><TMPL_VAR NAME=TITLE></title>
+        <link rel="stylesheet" type="text/css" href="spartan.css" />
+    </head>
+    <body>
+        <TMPL_INCLUDE NAME="toolbar.tmpl">
+        <div id="content">
+            <h1><TMPL_VAR NAME=TITLE></h1>
+            <TMPL_IF NAME=PAGETAGS>
+            <div class="pagetags"><TMPL_VAR NAME=PAGETAGS></div>
+            </TMPL_IF>
+
+            <TMPL_IF NAME=TAGS>
+            <div class="cloud">
+                <h3>All tags</h3>
+                <TMPL_VAR NAME=TAGS>
+            </div>
+            </TMPL_IF>
+            
+            <TMPL_VAR NAME=CONTENT>
+        </div>
+    </body>
+</html>

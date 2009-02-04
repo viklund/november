@@ -1,0 +1,20 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <TMPL_INCLUDE NAME="_head.tmpl">
+    <body>
+        <div id="logo"></div>
+
+        <TMPL_INCLUDE NAME="nav/top.tmpl">
+
+        <div id="content">
+            <h1><TMPL_VAR NAME=TITLE></h1>
+            <form method="POST">
+                <textarea name="articletext" rows="22" cols="110"><TMPL_VAR NAME=CONTENT></textarea>
+                <p/>
+                Tags: <input type="text" name="tags" size="100" value="<TMPL_IF NAME=PAGETAGS><TMPL_VAR NAME=PAGETAGS></TMPL_IF>" />
+                <p/>
+                <input type="submit" value="Save" /> or <a href="<TMPL_VAR NAME=WEBROOT>/view/<TMPL_VAR NAME=PAGE>">cancel</a>
+            </form>
+        </div>
+    </body>
+</html>

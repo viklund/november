@@ -2,9 +2,9 @@
 use v6;
 
 use CGI;
-use Wiki;
+use November;
 
-my Wiki $wiki = Wiki.new;
+my November $wiki = November.new;
 $wiki.init();
 my $cgi = CGI.new;
 $cgi.init();

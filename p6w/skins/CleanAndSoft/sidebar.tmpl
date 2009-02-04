@@ -1,0 +1,20 @@
+    <div id="sidebar">
+        <ul>
+            <li><h2>Navigation</h2>
+                <ul>
+                    <li><a href='/'>Main Page</a></li>
+                    <li><a href='<TMPL_VAR NAME=WEBROOT>/view/About'>About this site</a></li>
+                    <li><a href='<TMPL_VAR NAME=WEBROOT>/recent'>Recent Changes</a></li>
+                </ul>
+            </li>
+
+            <TMPL_IF NAME=PAGE>
+            <li><h2>This page</h2>
+                <ul>
+                    <li><a href="<TMPL_VAR NAME=WEBROOT>/edit/<TMPL_VAR NAME=PAGE>">Edit</a></li>
+                    <li><a href="<TMPL_VAR NAME=WEBROOT>/history/<TMPL_VAR NAME=PAGE>">View history</a></li>
+                </ul>
+            </li>
+            </TMPL_IF>
+        </ul>
+    </div>

@@ -1,0 +1,19 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <TMPL_INCLUDE NAME="_head.tmpl">
+    <body>
+        <div id="logo"></div>
+        <ul id="toolbar">
+            <li><a href="/edit/<TMPL_VAR NAME=PAGE>">Edit</a></li>
+            <TMPL_IF NAME=LOGGED_IN>
+                <li><a href="<TMPL_VAR NAME=WEBROOT>/out">Log out</a></li>
+            <TMPL_ELSE>
+                <li><a href="<TMPL_VAR NAME=WEBROOT>/in">Log in</a></li>
+            </TMPL_IF>
+        </ul>
+        <div id="content">
+            <h1>Page not found</h1>
+            The page <TMPL_VAR NAME=PAGE> was not found.
+        </div>
+    </body>
+</html>

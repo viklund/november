@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <title><TMPL_VAR NAME=TITLE></title>
+        <link rel="stylesheet" type="text/css" href="main.css" />
+    </head>
+    <body>
+        <div id="page">
+            <div id="headerimg">
+            <TMPL_INCLUDE NAME="toolbar.tmpl">
+            </div>
+            <div id="pagebar">&nbsp;</div>
+            <div id="content">
+                <h1><TMPL_VAR NAME=ACTION> <TMPL_VAR NAME=TITLE></h1>
+                <form method="POST">
+                    <input type="hidden" name="page" value="<TMPL_VAR NAME=PAGE>" />
+                    <input type="hidden" name="action" value="edit" />
+                    <div class="articlecontent">
+                        <textarea name="articletext" rows="22" cols="60"><TMPL_VAR NAME=CONTENT></textarea>
+                    </div>
+                    Tags: <input type="text" name="tags" size="50" value="<TMPL_IF NAME=PAGETAGS><TMPL_VAR NAME=PAGETAGS></TMPL_IF>" />
+                    <p/>
+                    <input type="submit" value="Save" /> or <a href="?page=<TMPL_VAR NAME=PAGE>">cancel</a>
+                </form>
+            </div>
+    <div id="sidebar">
+        <ul>
+            <li><h2>Navigation</h2>
+                <ul>
+                    <li><a href='/'>Main Page</a></li>
+                    <li><a href='/?page=About'>About this site</a></li>
+                    <li><a href='/?action=recent_changes'>Recent Changes</a></li
+>
+                </ul>
+            </li>
+
+            <li><h2>This page</h2>
+                <ul>
+                    <li><a href='/?page=<TMPL_VAR NAME=PAGE>&action=edit'>Edit</
+a>
+                    <li><a href='/?page=<TMPL_VAR NAME=PAGE>&action=view_history
+'>View history</a>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+
+<div id="footer">
+    <p>
+        November. Powered by Rakudo Perl 6.
+    </p>
+</div>
+
+        </div>
+    </body>
+</html>

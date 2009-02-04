@@ -1,0 +1,20 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <TMPL_INCLUDE NAME="_head.tmpl">
+    <body onload="document.login.user_name.focus()">
+        <div id="logo"></div>
+        <ul id="toolbar">
+            &nbsp;
+        </ul>
+        <div id="content">
+            <h1>Log in</h1>
+            <p>Once you are logged in, you can edit pages.</p>
+
+            <form method="POST" name="login">
+              <p>Username: <input name="user_name" /></p>
+              <p>Password: <input name="password" type="password" /></p>
+              <input type="submit" value="Log in" />
+            </form>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,39 @@
+<TMPL_INCLUDE NAME="header.tmpl">
+        <title>Diff of <TMPL_VAR NAME=PAGE></title>
+    </head>
+    <body>
+        <div id="page">
+            <div id="headerimg">
+            <TMPL_INCLUDE NAME="toolbar.tmpl">
+            </div>
+            <div id="pagebar">&nbsp;</div>
+            <div id="content">
+                <h1>Diff of <TMPL_VAR NAME=TITLE></h1>
+
+                <table class="diff">
+                    <TMPL_LOOP NAME=HUNKS>
+                        <TMPL_LOOP NAME=INDELS>
+                            <tr>
+                                <td class="deletion">
+                                    <TMPL_VAR NAME=DELETION>
+                                </td>
+                                <td class="insertion">
+                                    <TMPL_VAR NAME=INSERTION>
+                                </td>
+                            </tr>
+                        </TMPL_LOOP>
+                    </TMPL_LOOP>
+                </table>
+            </div>
+    <TMPL_INCLUDE NAME="sidebar.tmpl">
+
+
+<div id="footer">
+    <p>
+        November. Powered by Rakudo Perl 6.
+    </p>
+</div>
+
+        </div>
+    </body>
+</html>

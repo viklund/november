@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <TMPL_INCLUDE NAME="_head.tmpl">
+    <body>
+        <div id="logo"></div>
+
+        <TMPL_INCLUDE NAME="nav/top.tmpl">
+
+        <TMPL_IF NAME=TAGS>
+            <TMPL_INCLUDE NAME="tags/all_rblock.tmpl">
+        </TMPL_IF>
+
+        <div id="content">
+            <h1>
+            <TMPL_IF NAME=TAG>
+                Articles with tag "<TMPL_VAR NAME=TAG>"
+            <TMPL_ELSE>
+                All articles list
+            </TMPL_IF>
+            </h1>
+
+            <TMPL_IF NAME=LIST>
+            <ul>
+                <TMPL_LOOP NAME=LIST>
+                    <li>
+                        <a href="<TMPL_VAR NAME=WEBROOT>/view/<TMPL_VAR NAME=PAGE>"><TMPL_VAR NAME=PAGE></a>
+                    </li>
+                </TMPL_LOOP>
+            </ul>
+            </TMPL_IF>
+
+            <TMPL_IF NAME=TAG>
+            <p><a href="<TMPL_VAR NAME=WEBROOT>/all">Return to all articles list</a></p>
+            </TMPL_IF>
+
+        </div>
+    </body>
+</html>

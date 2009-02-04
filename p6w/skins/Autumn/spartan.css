@@ -1,0 +1,140 @@
+body {
+    background: white;
+    margin: 0;
+    padding: 0;
+    line-height:1.5em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: sans-serif;
+}
+
+h1 {
+    font-size:2em; /* 32px */
+    line-height:1.25em; /* 45px */    
+    border-bottom: solid 3px #888;
+}
+
+h3 {
+    font-size:1.125em; /* 18px */
+    margin:1em 0 0.5625em 0;
+    color:#330;
+}
+
+#toolbar {
+    border-bottom: solid #330 2px;
+    background: #863;
+    padding-top: 1em;
+    list-style: none;
+    margin: 0;
+    font-family: sans-serif;
+}
+
+#toolbar li {
+    line-height: 1.4em;
+    display: inline;
+}
+
+#toolbar a {
+    color: black;
+    text-decoration: none;
+    padding: .4em 1em 0;
+}
+
+#toolbar a:link    { background: #dc8; }
+#toolbar a:visited { background: #dc8; }
+#toolbar a:hover   { background: #ee8; }
+#toolbar a:active  { background: #ffa; }
+
+#logo {
+    position: absolute;
+    top: 5px;
+    right: 35px;
+    background: no-repeat 100% 0% url(november-logo.png);
+    width: 70px;
+    height: 70px;
+}
+
+#content {
+    padding: 1.4em 40px 0;
+    margin-right:284px;
+}
+
+.diff .insertion {
+    border: solid 1px #080;
+    background: #8f8;
+}
+
+.diff .deletion {
+    border: solid 1px #800;
+    background: #f88;
+}
+
+a.nonexistent {
+    color: #F00;
+}
+
+.block-right {
+    float:right;
+    clear:both;
+    margin: 1.5625em 40px 0px 20px;
+    border: 2px solid #863;
+
+    width: 200px;
+    padding:0 20px 20px 20px;
+}
+.space-top-h1 {
+    margin-top:5.1875em /* 83px */
+}
+
+.list-simple {
+    margin:0; padding:0;
+    list-style:none;
+}
+
+.list-simple li {
+    margin-bottom:0.3em;
+}
+
+/* Tags
+----------------------------------------------*/
+.pagetags a, .cloud a {
+    color: #333;
+}
+
+.pagetags a:hover, .cloud a:hover {
+    color: #00c;
+}
+
+.cloud {
+    line-height:1.8em;
+}
+
+
+.cloud a {
+    margin-right:12px;
+}
+
+.pagetags {
+    font-size:0.8em;
+    margin-top:-12px;
+    padding-left:22px;
+    /* TODO: need WEBROOT here? */ 
+	background-image: url('/skins/Autumn/images/tag.png');
+	background-position: left bottom;
+	background-repeat: no-repeat;
+}
+
+.t0 { font-size:0.7em;}
+.t1 { font-size:0.8em;}
+.t2 { font-size:0.9em;}
+.t2 { font-size:1.0em;}
+.t3 { font-size:1.1em;}
+.t4 { font-size:1.2em;}
+.t5 { font-size:1.3em;}
+.t6 { font-size:1.4em;}
+.t7 { font-size:1.5em;}
+.t8 { font-size:1.6em;}
+.t9 { font-size:1.7em;}
+.t10 { font-size:1.8em;}
+

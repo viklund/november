@@ -1,0 +1,6 @@
+<div class="block-right cloud space-top-h1">
+    <h3>All tags</h3>
+    <TMPL_LOOP NAME=TAGS>
+    <a href="<TMPL_VAR NAME=WEBROOT>/all?tag=<TMPL_VAR NAME=NAME ESCAPE=URL>" class="t<TMPL_VAR NAME=COUNT>"><TMPL_VAR NAME=NAME></a> 
+    </TMPL_LOOP>
+</div>

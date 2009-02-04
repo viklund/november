@@ -1,0 +1,41 @@
+[
+  'Main_Page',
+  'November is a wiki engine written in Perl 6.
+
+== What is Perl? ==
+
+[http://www.perl.org/about.html Perl] is a dynamic programming language with tendencies towards expressivity rather than minimalism. One of its central tenets being that \'\'[http://en.wikipedia.org/wiki/There_is_more_than_one_way_to_do_it There Is More Than One Way To Do It]\'\', Perl accomodates a many-cultured assortment of solutions to common programming problems. Through [http://use.perl.org/ various] [http://www.perlmonks.org/ fora], a well-written [http://perldoc.perl.org/ core documentation], and a central repository of thousands of [http://search.cpan.org/ modules], Perl culture is constantly being passed on and added to.
+
+== What is Perl 6? ==
+
+\'\'"Perl 5 was my rewrite of Perl. I want Perl 6 to be the community\'s rewrite of Perl and of the community." &mdash; Larry Wall\'\'
+
+Since the year 2000, [http://perl.net.au/wiki/Perl_6 Perl 6] has been in the making. The process of arriving at a full implementation of the language has taken a long time; not least because the [http://www.parrotcode.org/ Parrot] virtual machine and its assorted toolchain needed to be built to host the language. Even the design process itself has [http://perlcabal.org/syn/ evolved] and [http://www.nntp.perl.org/group/perl.perl6.language/ matured] during this time. Perl 6 is a fresh redesign of Perl, throwing away unfortunate design elements that have accrued &mdash; not only in Perl, but in the language design field in general &mdash; while keeping the good parts and throwing in some new gems as well.
+
+\'\'"Our unofficial slogan is: \'Perl 6: second-system syndrome done right\'. " &mdash; Larry Wall\'\'
+
+== Why use Perl 6? ==
+
+People who have experience with Perl 5 might ask themselves what they have to gain from using Perl 6. Here\'s what we believe are the advantages:
+
+* At the early stages of development, Perl 6 allows for rapid prototyping and fluent experimentation.
+* As the application matures, the [http://perlcabal.org/syn/S12.html OO techniques] built into Perl 6 help to organize things into component parts, with much flexibility (using classes, subtypes, roles, traits and multimethod dispatch).
+* When the problem domain becomes clearer, the presence of [http://en.wikipedia.org/wiki/Hygienic_macro clean] [http://perlcabal.org/syn/S02.html macros] and [http://perlcabal.org/syn/S13.html user-defined operators] help in specializing Perl 6 for the task at hand.
+* Somewhat less radical, but no less powerful, the built-in [http://perlcabal.org/syn/S05.html grammar support] allows you to specify domain-specific languages, with parsing and abstract syntax trees included in the deal.
+* [http://search.cpan.org/ CPAN] is still there, so the power of Perl 5 can be leveraged in Perl 6 as well. While backwards-incompatible, Perl 6 can still talk to Perl 5 (and many other languages) through the Parrot platform.
+
+== Why write a wiki? ==
+
+A web site that users can contribute to without themselves being owners or administrators of the site, the wiki stands as one of the cornerstones in the Web 2.0 paradigm. There are hundreds of wiki engines out there, embracing the [http://moinmo.in/WikiNature "wiki nature"] to various degrees, written in [http://en.wikipedia.org/wiki/Comparison_of_wiki_software many different languages]. Although in essence very much the same, programming languages often differ in what is easy/convenient to express. We believe Perl 6 to be especially well suited for implementing a wiki engine, not only for the general reasons above, but also because the adaptability of Perl 6 goes well with the mutating requirements of a wiki platform. It will be interesting to see just how far Perl 6 can carry the wiki idea.
+
+As one of the first large-scale applications written in Perl 6, it is also a nice show-case of what Perl 6 on Parrot can accomplish today.
+
+== Longing for Christmas? ==
+
+\'\'"when it\'s ready, every day will be christmas" &mdash; Roger Hale (<spinclad>) on Perl 6\'\'
+
+Are you eager to see Perl 6 being released, so you can write cool programs in it without worrying if the language is "done" yet? \'\'You\'\' can help make faster progress. If you show up on #perl6 @ freenode and offer to give a helping hand, someone will greet you and give directions. No prior knowledge of Perl 6 required. Most likely, your help will consist in diving into the Synopses, finding a feature that you like, and making sure that the test suites cover it in sufficient detail. Before you know it, you\'ll be humming along, fudging tests, writing little Perl 6 scripts, [mailto:rakudobug@perl.org submitting bugs], and generally being very happy. Scientists have proved that Perl 6 programmers are 23% more harmonic than people in general. Become a Perl 6 hacker today!
+
+Of course, you\'re welcome to [http://github.com/viklund/november/ hack on the wiki engine], as well. Since it exercises the capabilities of Perl 6, programming the wiki helps the language implementations along, too.',
+  'carl'
+]

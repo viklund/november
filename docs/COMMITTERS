@@ -1,0 +1,112 @@
+Hello, committer. Glad you're here. In case you haven't seen
+http://use.perl.org/~masak/journal/37340 yet, here's the informative part
+reproduced:
+
+== 5 things you might be helped by if you plan to hack on November ==
+
+1. First, feel free to ignore these rules if they inconvenience you. They are
+there to help you, not to restrict you.
+
+2. The three files FEATURES, JANITORS and LOOKINTO in the docs/ directory
+constitute our roadmap right now.
+
+3. As a rule, we implement feature-size things in p5w before we try them out on
+p6w. This is because bugs easily distract from the goal in p6w. The Perl 5
+version is a sort of live spec for the Perl 6 version.
+
+4. We're currently doing quite a bit of our work in branches, so it might be
+a very good idea to take a look at what development goes on in different
+branches. Branching and merging is typically a good thing to announce on the
+mailing list november-wiki@googlegroups.com.
+
+5. Patches are very welcome, nowadays through the mailing list
+november-wiki@googlegroups.com, or the IRC channel #november-wiki over at
+irc.freenode.org.
+
+== Coding standard
+
+There's also an emerging coding standard, starting with the message
+http://groups.google.com/group/november-wiki/msg/1f168acfb2049830 on
+the november-wiki mailing list:
+
+* All module files start with the line "use v6" and end with an empty
+line followed by "# vim:ft=perl6".
+
+* No "#!perl6" shebang line is needed in the module files.
+
+* No copyright statements, no authorship statements, no version
+numbers. We keep the copyright statement in Test.pm out of courtesy -- and
+likely for legal reasons, too.
+
+* People are encouraged to add themselves to the AUTHORS file, even
+before committing anything else. 
+
+== Data model
+
+Also, here's a reproduction of <http://use.perl.org/~masak/journal/37877>,
+with the part about the data model reproduced. This part is expected to be
+up-to-date with respect to the model, as opposed to the blog post which may
+be declared obsolete at some point in the future.
+
+November, being a wiki engine, stores articles containing (markup) text. It
+also stores earlier revisions of each article, as well as a list of the recent
+changes to the wiki as a whole. On top of that, there's a tagging system with
+which you can associate a 'tag' ('label', 'category', whatever) with a page.
+
+The directory data/articles contains files describing the revision history of
+the wiki's articles. One would perhaps think that these files could contain the
+(latest) contents of the article instead, and in fact they once did, sometime
+early this summer. But that direct model was changed and replaced by the
+current scheme involving one level of indirection, to make article histories
+and recent changes work.
+
+A typical file in data/articles looks like this:
+
+    [
+      '1218057494',
+      '1218057386',
+      '1218056287',
+      '1215026471'
+    ]
+
+There are two things to note about this file. First, it's legal Perl. Turned
+out that was by far the easiest way to read stuff from files, by parsing them
+with eval. This design decision will likely be replaced some time in the
+future... but currently it works well for us.
+
+Second, the numbers (which are strings for some reason) are unique IDs --
+actually return values from the &time builtin. They function as pointers to
+files with the same name in data/modifications. The revisions are stored
+latest-first. So, for example, information about the latest modification of the
+article above can be found in the file data/modifications/1218057494. It could
+look something like this:
+
+    [
+      'Example_article',
+      'Look, I\'m the contents of an illustrative example!
+
+    I even contain newlines, fancy that.',
+      'carl'
+    ]
+
+Again, this is an array reference, readily parseable by Perl. It contains three
+elements: the title, the contents and the user who made the change.
+
+Now you know enough to figure out how the file data/recent-changes is
+structured. That's right, it's a serialized array of unique IDs, much like
+those in the files in data/articles.
+
+In fact, all files in the data directory are similarly serialized data
+structures. (Except for the files in data/page_tags, for some reason. I should
+find out why.)
+
+Finally, tags. For every article that has tags, data/page_tags has a file with
+that article's name containing a single line with a comma-separated list of tag
+names.
+
+    automobiles, airplanes, trains, space vessels
+
+And the data/tags_count contains a simple serialized hash which keeps track of
+the number of occurrences of each tag on the page. As far as I can see, this
+file does not reflect the actual number of tags on the wiki in the repository
+right now — most likely, it's only for testing purposes at this stage.

@@ -1,0 +1,34 @@
+<TMPL_INCLUDE NAME="header.tmpl">
+        <title>Recent changes</title>
+    </head>
+    <body>
+        <div id="page">
+            <div id="headerimg">
+            <TMPL_INCLUDE NAME="toolbar.tmpl">
+            </div>
+            <div id="pagebar">&nbsp;</div>
+            <div id="content">
+                <h1>Recent changes</h1>
+
+                <ul>
+                    <TMPL_LOOP NAME=CHANGES>
+                        <li>
+                            <TMPL_VAR NAME=PAGE> was changed
+                            <TMPL_VAR NAME=TIME> by
+                            <TMPL_VAR NAME=AUTHOR>
+                        </li>
+                    </TMPL_LOOP>
+                </ul>
+            </div>
+    <TMPL_INCLUDE NAME="sidebar.tmpl">
+
+
+<div id="footer">
+    <p>
+        November. Powered by Rakudo Perl 6.
+    </p>
+</div>
+
+        </div>
+    </body>
+</html>

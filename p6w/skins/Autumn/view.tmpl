@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <TMPL_INCLUDE NAME="_head.tmpl">
+    <body>
+        <div id="logo"></div>
+
+        <TMPL_INCLUDE NAME="nav/top.tmpl">
+
+        <TMPL_IF NAME=TAGS>
+            <TMPL_INCLUDE NAME="tags/all_rblock.tmpl">
+        </TMPL_IF>
+
+        <TMPL_IF NAME=RECENTLY>
+        <div class="block-right">
+            <h3>Recently changed</h3>
+            <ul class="list-simple">
+                <TMPL_LOOP NAME=RECENTLY>
+                    <li>
+                        <TMPL_VAR NAME=TIME> by <TMPL_VAR NAME=AUTHOR>
+                    </li>
+                </TMPL_LOOP>
+            </ul>
+        </div>
+        </TMPL_IF>
+
+        <div id="content">
+            <h1><TMPL_VAR NAME=TITLE></h1>
+
+            <TMPL_IF NAME=PAGETAGS>
+                <TMPL_INCLUDE NAME="tags/page.tmpl">        
+            </TMPL_IF>
+            
+            <TMPL_VAR NAME=CONTENT>
+        </div>
+    </body>
+</html>

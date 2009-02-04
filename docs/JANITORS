@@ -1,0 +1,51 @@
+This is the JANITORS file, where small p5w tasks are written down so that they
+are not forgotten. Since the tasks are often fairly low-hanging fruit, many of
+them are likely to be good starting-points for volunteers.
+
+If there's an item appearing here which has already been implemented, feel
+free to remove it.
+
+* Find all messages on the page and replace them with sensible things.
+
+* Rethink the exact layout of the login screen.
+
+* Refine the time indications in recent changes. (Right now they are just
+  seconds since epoch.)
+
+* Add 'return_to' links for the login and logout actions. And maybe redirects,
+  or at least manual links.
+
+* Implement 'created new page' flag in recent-changes.
+
+* Implement 'minor edits'.
+
+* Think about the pre- and postconditions of every subroutine. For example,
+  read_old_page currently assumes that $revision lies in the right interval
+  (1..$latest). Implement checks so that the wiki engine never crashes from
+  this kind of user input. Document pre- and postconditions.
+
+* Add a nice little message 'You are viewing an old revision of this page'
+  to the view-old-revision pages.
+
+* Add nice little '<- go to previous edition' and 'go to next revision ->'
+  to the view-old-revision pages. Provided such previous/next revisions
+  exist, of course.
+
+* Make the CSS stylesheet adhere to a baseline grid
+  <http://webtypography.net/Rhythm_and_Proportion/Vertical_Motion/2.2.2/>
+  <http://www.alistapart.com/articles/settingtypeontheweb/>
+
+* It would probably be a good idea to make the contents of the files in
+  data/modifications/ hash references instead of array references. Right now,
+  different fields are indexed by number, which is quite opaque.
+
+* Add ability to edit old revision pages. This should be accompanied by a
+  "Warning: this is an old revision you're editing." and a link to editing
+  the latest version of the page.
+
+* Don't save an edit unless anything is changed.
+
+* Add a 'Cancel' button to the edit form.
+
+* Consider following this advice:
+  <http://developers.slashdot.org/comments.pl?sid=622185&cid=24295989>
