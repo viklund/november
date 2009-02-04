@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 3;
+plan 4;
 
 use HTML::Template;
 our $*WARNINGS = 1;
