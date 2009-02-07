@@ -2,6 +2,7 @@ use v6;
 
 use Test;
 plan 6;
+todo('not yet implemented', 6);
 
 use Text::Markup::Wiki::MediaWiki;
 
