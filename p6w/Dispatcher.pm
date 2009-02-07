@@ -19,7 +19,7 @@ class Dispatcher {
     method add_rules(@rules) {
         # RAKUDO: rakudo doesn't know return values in for loops yet
         my $r;
-        for @rules -> Object @tokens, $action {
+        for @rules -> @tokens, $action {
             $r = self.add(@tokens, $action);
         }
         return $r;
