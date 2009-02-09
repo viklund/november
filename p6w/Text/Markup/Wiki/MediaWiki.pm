@@ -32,12 +32,19 @@ class Text::Markup::Wiki::MediaWiki {
             if @parlist[$ix] ~~ /^'<p>'/ && @parlist[$ix+1] ~~ /^'<p>'/ {
                 @parlist[$ix+1] = @parlist[$ix] ~ @parlist[$ix+1];
                 @parlist[$ix+1] .= subst( '</p><p>', ' ' );
-
+                @parlist[$ix] = undef;
+            }
+            if @parlist[$ix] ~~ /^'<li>'/ && @parlist[$ix+1] ~~ /^'<li>'/ {
+                @parlist[$ix+1] = [~] @parlist[$ix], "\n", @parlist[$ix+1];
                 @parlist[$ix] = undef;
             }
         }
 
-        return @parlist.grep( { $_ } );
+        my &surround_with_uls = {
+            $^line ~~ /^'<li>'/ ?? "<ul>\n$line\n</ul>" !! $line;
+        }
+
+        return @parlist.grep( { $_ } ).map( { surround_with_uls($_) } );
     }
 
     # Turns a style on of it was off, and vice versa. Outputs the result.
@@ -68,6 +75,10 @@ class Text::Markup::Wiki::MediaWiki {
 
         my $line_rw = $line;
         my $partype = 'p';
+        if $line.substr(0, 1) eq '*' {
+            $partype = 'li';
+            $line_rw = $line.substr(1);
+        }
         if $line ~~ /^ '==' (.*) '==' $/ {
             $partype = 'h2';
             $line_rw = ~$/[0];
