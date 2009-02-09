@@ -9,7 +9,7 @@ my @tests =
 
 [
     "# a\n\n# c" =>
-    "<ol>\n<li>a</li>\n</ol>\n<ol>\n<li>c</li>\n</ol>",
+    "<ol>\n<li>a</li>\n</ol>\n\n<ol>\n<li>c</li>\n</ol>",
     'an empty line creates a new list'
 ],
 

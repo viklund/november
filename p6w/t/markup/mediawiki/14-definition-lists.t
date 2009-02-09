@@ -15,7 +15,7 @@ my @tests =
 
 [
     "; a\n\n: c" =>
-    "<dl>\n<dt>a</dt>\n</dl>\n<dl>\n<dd>c</dd>\n</dl>",
+    "<dl>\n<dt>a</dt>\n</dl>\n\n<dl>\n<dd>c</dd>\n</dl>",
     'an empty line creates a new list'
 ],
 
