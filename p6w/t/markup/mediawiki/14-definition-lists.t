@@ -35,6 +35,8 @@ my @tests =
 use Test::InputOutput;
 plan +@tests;
 
+todo('not implemented yet', +@tests);
+
 use Text::Markup::Wiki::MediaWiki;
 
 my $converter = Text::Markup::Wiki::MediaWiki.new;
