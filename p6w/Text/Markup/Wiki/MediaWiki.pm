@@ -32,12 +32,26 @@ class Text::Markup::Wiki::MediaWiki {
             if @parlist[$ix] ~~ /^'<p>'/ && @parlist[$ix+1] ~~ /^'<p>'/ {
                 @parlist[$ix+1] = @parlist[$ix] ~ @parlist[$ix+1];
                 @parlist[$ix+1] .= subst( '</p><p>', ' ' );
-
+                @parlist[$ix] = undef;
+            }
+            if @parlist[$ix] ~~ /^'<uli>'/ && @parlist[$ix+1] ~~ /^'<uli>'/
+            || @parlist[$ix] ~~ /^'<oli>'/ && @parlist[$ix+1] ~~ /^'<oli>'/ {
+                @parlist[$ix+1] = [~] @parlist[$ix], "\n", @parlist[$ix+1];
                 @parlist[$ix] = undef;
             }
         }
 
-        return @parlist.grep( { $_ } );
+        my &strip_prefix = {
+            .subst(/'<' ('/'?) <[uo]> 'li>'/, { "<$0li>" }, :g)
+        };
+
+        my &surround_with_list = {
+            $^line ~~ /^'<uli>'/   ?? "<ul>\n{strip_prefix($line)}\n</ul>"
+            !! $line ~~ /^'<oli>'/ ?? "<ol>\n{strip_prefix($line)}\n</ol>"
+                                   !! $line;
+        }
+
+        return @parlist.grep( { $_ } ).map( { surround_with_list($_) } );
     }
 
     # Turns a style on of it was off, and vice versa. Outputs the result.
@@ -68,7 +82,15 @@ class Text::Markup::Wiki::MediaWiki {
 
         my $line_rw = $line;
         my $partype = 'p';
-        if $line ~~ /^ '==' (.*) '==' $/ {
+        if $line.substr(0, 1) eq '*' {
+            $partype = 'uli';
+            $line_rw = $line.substr(1);
+        }
+        elsif $line.substr(0, 1) eq '#' {
+            $partype = 'oli';
+            $line_rw = $line.substr(1);
+        }
+        elsif $line ~~ /^ '==' (.*) '==' $/ {
             $partype = 'h2';
             $line_rw = ~$/[0];
         }
