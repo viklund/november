@@ -147,7 +147,7 @@ class Text::Markup::Wiki::MediaWiki {
                 }
                 elsif $token<entity> {
                     # TODO: Generalize.
-                    take '&mdash;';
+                    take '—';
                 }
                 else {
                     push @style_stack, @promises;
