@@ -9,9 +9,9 @@ my $d = Dispatcher.new;
 
 my @rules =  
     ['foo'],        { "A" },
-    /\d+/,          { "B" },
+    [/\d+/],        { "B" },
     ['foo', 'bar'], { "C" },
-    'her'|'boo',    { "D" };
+    ['her'|'boo'],  { "D" };
 
 is($d.add_rules(@rules), 4, "add list of rules, get the number added back");
 

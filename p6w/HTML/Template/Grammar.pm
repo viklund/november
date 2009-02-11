@@ -1,3 +1,7 @@
+use v6;
+# RAKUDO: It is uncertain whether a 'grammar' keyword can start a file, just
+#         like 'class' can.
+
 grammar HTML::Template::Grammar {
     regex TOP { ^ <contents> $ };
 
