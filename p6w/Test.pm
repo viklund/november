@@ -216,9 +216,8 @@ sub proclaim(Object $cond, $desc, $got?, $expected?) {
         print $todo_reason;
     }
 
-    unless $cond {
-        # Rakudo: exists not implimented yet
-        print "\n# got: " ~ $got ~ "\n# expected: " ~ $expected if defined $expected; # if $got.exists;
+    if !$cond && defined $expected {
+        printf "\n# got: %s\n# expected: %s", $got, $expected;
     }
     
     say '';
