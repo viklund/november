@@ -95,7 +95,7 @@ is( $d.dispatch(['summ', '2', '3']),
 
 $d.add: ['summ', / \w+ /, 1|2 ], { $^a ~ "oo" };
 
-is( $d.dispatch(['summ', 'Z', 2]), 
+is( $d.dispatch(['summ', 'Z', '2']), 
     'Zoo', 
     'Rule with a regexp and a junction'
 );
