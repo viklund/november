@@ -35,9 +35,13 @@ See instructions on the parrot site:
 REPOSITORY LAYOUT
 -----------------
 
-/
+/            Perl 6 wiki implementation
 │
-├─p6w/       Perl 6 wiki implementation
+├─data/      File database contents for an empty wiki instance
+│
+├─skins/     Default skins for the Perl 6 implementation
+│
+├─t/         Tests for the Perl 6 implementation
 │
 ├─p5w/       Perl 5 reference implementation
 │
