@@ -54,11 +54,14 @@ REPOSITORY LAYOUT
 RUNNING NOVEMBER
 ----------------
 
- Before building November you have to configure the PERL6LIB environment
- variable to include the lib/  subdirectory of the November repository.
- In bash that would look like this:
+ Before building November you have to set the PARROT_DIR and PERL6LIB
+ environment variables to include the lib/ subdirectory of the November
+ repository. In bash, that would look like this:
 
- export PERL6LIB=/path/to/repository/of/november/lib/
+ $ export PARROT_DIR=/path/to/parrot
+ $ export PERL6LIB=/path/to/repository/of/november/lib
+
+ After that, you can build as usual.
 
  $ perl Makefile.PL
  $ make             # not required; speeds up startup times
