@@ -54,6 +54,12 @@ REPOSITORY LAYOUT
 RUNNING NOVEMBER
 ----------------
 
+ Before building November you have to configure the PERL6LIB environment
+ variable to include the lib/  subdirectory of the November repository.
+ In bash that would look like this:
+
+ export PERL6LIB=/path/to/repository/of/november/lib/
+
  $ perl Makefile.PL
  $ make             # not required; speeds up startup times
  $ make test        # not required; requires Test::Harness v3.00 or higher
