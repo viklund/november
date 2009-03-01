@@ -1,6 +1,6 @@
 /* Begin Typography & Colors */
 body {
-    font-size: 62.5%; /* Resets 1em to 10px */
+    font-size: .9em/1.5em verdana, arial, sans-serif;
     font-family: 'Lucida Grande', Verdana, Arial, Sans-Serif;
     text-align: center;
     background-image:url(grey_stripes.png);

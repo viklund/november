@@ -1,7 +1,8 @@
 November
 ========
 
-November Copyright (C) 2008, Carl Mäsak & Johan Viklund
+November is Copyright (C) 2008-2009, the November contributors (as listed in
+AUTHORS).
 
 LICENSE INFORMATION
 -------------------
@@ -34,9 +35,13 @@ See instructions on the parrot site:
 REPOSITORY LAYOUT
 -----------------
 
-/
+/            Perl 6 wiki implementation
 │
-├─p6w/       Perl 6 wiki implementation
+├─data/      File database contents for an empty wiki instance
+│
+├─skins/     Default skins for the Perl 6 implementation
+│
+├─t/         Tests for the Perl 6 implementation
 │
 ├─p5w/       Perl 5 reference implementation
 │
@@ -49,9 +54,18 @@ REPOSITORY LAYOUT
 RUNNING NOVEMBER
 ----------------
 
- $ perl Makefile.PL
- $ make             # not required; speeds up startup times
- $ make test        # not required; requires Test::Harness v3.00 or higher
+Before building November you have to set the PARROT_DIR and PERL6LIB
+environment variables to include the lib/ subdirectory of the November
+repository. In bash, that would look like this:
+
+  $ export PARROT_DIR=/path/to/parrot
+  $ export PERL6LIB=/path/to/repository/of/november/lib
+
+After that, you can build as usual.
+
+  $ perl Makefile.PL
+  $ make             # not required; speeds up startup times
+  $ make test        # not required; requires Test::Harness v3.00 or higher
 
 * Running November on the command line
   
@@ -80,38 +94,37 @@ RUNNING NOVEMBER
 
     wiki.sh
     wiki
-    Config.pm
-    CGI.pm
-    Dispatcher.pm
-    Dispatcher/Rule.pm
-    HTML/Template.pm
-    HTML/Template/Grammar.pm
-    November.pm
-    November/Storage.pm
-    November/Storage/File.pm
-    Session.pm
-    Tags.pm
-    Text/Escape.pm
-    Text/Markup/Wiki/Minimal.pm
-    Text/Markup/Wiki/Minimal/Grammar.pm
-    Text/Markup/Wiki/MediaWiki.pm
-    URI.pm
-    URI/Grammar.pm
-    Utils.pm
-
+    lib/Config.pm
+    lib/CGI.pm
+    lib/Dispatcher.pm
+    lib/Dispatcher/Rule.pm
+    lib/HTML/Template.pm
+    lib/HTML/Template/Grammar.pm
+    lib/November.pm
+    lib/November/Storage.pm
+    lib/November/Storage/File.pm
+    lib/Session.pm
+    lib/Tags.pm
+    lib/Text/Escape.pm
+    lib/Text/Markup/Wiki/Minimal.pm
+    lib/Text/Markup/Wiki/Minimal/Grammar.pm
+    lib/Text/Markup/Wiki/MediaWiki.pm
+    lib/URI.pm
+    lib/URI/Grammar.pm
+    lib/Utils.pm
     skin/
 
   Then put these directories somewhere else. Preferably someplace where apache
-  can't serve them over the net. And yes, skin/ should be in both places we're
-  working on that.
+  can't serve them over the net. And yes, skin/ should be in both places,
+  which is not optimal. We're working on that.
 
     data/
     skin/
 
   Edit the Config.pm file and set the $.server_root variable to the directory
-  under which both skin/ and data/ is accessible (remember to include a
-  trailing slash). $.web_root has to be '' for the moment, we haven't yet
-  implemented the ability to have november anywhere else, but hang in there.
+  under which both skin/ and data/ are accessible (remember to include a
+  trailing slash). $.web_root has to be '' for the moment, we don't yet
+  support having November anywhere else, but hang in there.
 
   If you have compiled November you can copy the .pir files instead of the .pm
   files. Make sure that the files and directories below data/ are readable
@@ -127,7 +140,6 @@ RUNNING NOVEMBER
   After this, you can direct your browser to the wiki:
 
     http://localhost/
-
 
 CONTACT
 -------

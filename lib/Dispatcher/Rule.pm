@@ -5,7 +5,7 @@ has $.action;
 
 method match (@chunks) {
     return False if @chunks != @.tokens;
-    for @.tokens Z @chunks -> Object $token, $chunk {
+    for @chunks Z @.tokens-> Str $chunk, Object $token {
         if ~$chunk ~~ $token {
             @!args.push($/) if $/;
         }

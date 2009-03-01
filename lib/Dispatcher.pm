@@ -9,7 +9,7 @@ class Dispatcher {
         @!rules.push($rule);
     }
 
-    multi method add (@tokens, $action){
+    multi method add (@tokens, $action) {
         my $rule = Dispatcher::Rule.new( tokens => @tokens, action => $action );
         @!rules.push($rule);
     }
@@ -29,8 +29,8 @@ class Dispatcher {
         my @matched =  @!rules.grep: { .match(@chunks); };    
 
         if @matched {
-            # RAKUDO: [*-1] do not work in array-attribute [perl #61766] 
-            my $result = @matched[@matched.end].apply;
+            # *-1 dosn't work, havent submitted bug yet (nor pinpointed it)...
+            my $result = @matched[@matched.elems-1].apply;
             .clear for @!rules; 
             return $result;
         }

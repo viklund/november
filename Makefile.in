@@ -1,0 +1,25 @@
+PARROT_DIR=<PARROT_DIR>
+
+SOURCES=lib/CGI.pm lib/Text/Markup/Wiki/Minimal.pm \
+	lib/Text/Markup/Wiki/MediaWiki.pm lib/Test.pm \
+	lib/November/Storage.pm lib/November/Storage/File.pm lib/Tags.pm \
+	lib/URI.pm lib/URI/Grammar.pm lib/Dispatcher.pm \
+	lib/Dispatcher/Rule.pm lib/Session.pm lib/Utils.pm lib/Config.pm \
+	lib/Test/InputOutput.pm lib/Text/Escape.pm lib/HTML/Template/Grammar.pm \
+	lib/HTML/Template.pm lib/November.pm
+
+PIRS=$(SOURCES:.pm=.pir)
+
+all: $(PIRS)
+
+%.pir: %.pm
+	$(PARROT_DIR)/parrot $(PARROT_DIR)/languages/rakudo/perl6.pbc --target=pir --output=$@ $<
+
+clean:
+	rm -f $(PIRS)
+
+tests: test
+
+test: all
+	prove -e '$(PARROT_DIR)/parrot $(PARROT_DIR)/languages/rakudo/perl6.pbc'\
+	      -r --nocolor t/
