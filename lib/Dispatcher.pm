@@ -29,7 +29,8 @@ class Dispatcher {
         my @matched =  @!rules.grep: { .match(@chunks); };    
 
         if @matched {
-            my $result = @matched[*-1].apply;
+            # *-1 dosn't work, havent submitted bug yet (nor pinpointed it)...
+            my $result = @matched[@matched.elems-1].apply;
             .clear for @!rules; 
             return $result;
         }
