@@ -27,8 +27,6 @@ class November does Session {
     method handle_request(CGI $cgi) {
         $!cgi = $cgi;
 
-        my $action = $cgi.params<action> // 'view';
-
         my $d = Dispatcher.new( default => { self.not_found } );
 
         $d.add_rules(
