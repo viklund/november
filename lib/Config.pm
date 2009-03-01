@@ -1,6 +1,6 @@
 use v6;
 class Config {
-    has $.server_root = '/home/johan/Devel/november/p6w/';
+    has $.server_root = '';
     has $.web_root    = '';
     has $.skin        = 'CleanAndSoft';
     has $.markup      = 'Text::Markup::Wiki::MediaWiki';
