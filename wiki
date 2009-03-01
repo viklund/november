@@ -3,8 +3,15 @@ use v6;
 
 use CGI;
 use November;
+use Config;
 
-my November $wiki = November.new;
+my $c = Config.new(
+    markup => 'Text::Markup::Wiki::MediaWiki',
+    skin   => 'CleanAndSoft'
+);
+my November $wiki = November.new(
+    config => $c,
+);
 $wiki.init();
 my $cgi = CGI.new;
 $cgi.init();
