@@ -21,6 +21,7 @@ if ( ! -d $parrot_dir ) {
     exit 1;
 }
 
+my @scripts = qw< test_wiki.sh wiki.sh >;
 my @infiles = map { $_.'.in' } qw< Makefile test_wiki.sh wiki.sh >;
 
 my %replacements = (
@@ -48,3 +49,6 @@ for my $infile (@infiles) {
         print "Created $outfile \n";
     }
 }
+
+# Make shell-scripts executable
+chmod 0744, @scripts;
