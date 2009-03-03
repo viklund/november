@@ -5,7 +5,6 @@ use strict;
 use warnings;
 
 use File::Spec;
-use File::HomeDir;
 
 my $parrot_dir = $ENV{PARROT_DIR}
     or die 'Please set $PARROT_DIR (see README).'."\n";

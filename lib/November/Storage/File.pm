@@ -1,18 +1,25 @@
 use November::Storage;
 use Utils;
-use Config;
 
 class November::Storage::File is November::Storage {
 
-    my $r = Config.server_root;
+    has $.storage_root is rw;
+    #my $r = $.config.server_root;
 
     # RAKUDO: initial attr value do not fully works 
     # given Config.server_root { # and use $_ inside. 
     # But we can`t do that now because "my".
-    my $.content_path        is rw = $r ~ 'data/articles/';
-    my $.modifications_path  is rw = $r ~ 'data/modifications/';
-    my $.recent_changes_path is rw = $r ~ 'data/recent-changes';
-    my $.index_path          is rw = $r ~ 'data/index';
+    has $.content_path        is rw; # = $r ~ 'data/articles/';
+    has $.modifications_path  is rw; # = $r ~ 'data/modifications/';
+    has $.recent_changes_path is rw; # = $r ~ 'data/recent-changes';
+    has $.index_path          is rw; # = $r ~ 'data/index';
+
+    method init {
+        $.content_path        = $.storage_root ~ 'articles/';
+        $.modifications_path  = $.storage_root ~ 'modifications/';
+        $.recent_changes_path = $.storage_root ~ 'recent-changes';
+        $.index_path          = $.storage_root ~ 'index';
+    }
 
     method wiki_page_exists($page) {
         return ($.content_path ~ $page) ~~ :e;

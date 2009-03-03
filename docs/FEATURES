@@ -11,8 +11,8 @@ not-yet-features to be investigated.)
 
                                                          p5w     |    p6w
 -----------------------------------------------------------------+------------
-* Linking . . . . . . . . . . . . . . . . . . . . . [2008-06-28] |
-* Editing . . . . . . . . . . . . . . . . . . . . . [2008-07-02] |
+* Linking . . . . . . . . . . . . . . . . . . . . . [2008-06-28] | [2008-07-30]
+* Editing . . . . . . . . . . . . . . . . . . . . . [2008-07-02] | [2008-08-13]
 -----------------------------------------------------------------+------------
 
 == Important features ========================================================
@@ -21,32 +21,32 @@ not-yet-features to be investigated.)
                                                          p5w     |    p6w
 -----------------------------------------------------------------+------------
 * Creating new pages (without resorting to URL                   |
-  rewriting). . . . . . . . . . . . . . . . . . . . [2008-07-02] |
+  rewriting). . . . . . . . . . . . . . . . . . . . [2008-07-02] | [2008-07-30]
                                                                  |
-* User authentication . . . . . . . . . . . . . . . [2008-08-07] |
-* Logging in logging out. . . . . . . . . . . . . . [2008-08-07] |
+* User authentication . . . . . . . . . . . . . . . [2008-08-07] | [2008-08-13]
+* Logging in logging out. . . . . . . . . . . . . . [2008-08-07] | [2008-08-13]
                                                                  |
                                                                  |
-* The concept of a user authoring an edit . . . . . [2008-08-07] |
+* The concept of a user authoring an edit . . . . . [2008-08-07] | [2008-08-14]
                                                                  |
 * Collision prevention -- warning people                         |
-  who are editing at the same time                               |
+  who are editing at the same time. . . . . . . . . not yet      |
                                                                  |
-* Article history . . . . . . . . . . . . . . . . . [2008-08-10] |
-** Ability to view old revisions of pages . . . . . [2008-08-10] |
-** Diffs between consequtive revisions. . . . . . . [2008-08-11] |
-** Diffs between arbritary revisions (a la Mediawiki)            |
+* Article history . . . . . . . . . . . . . . . . . [2008-08-10] | not yet
+** Ability to view old revisions of pages . . . . . [2008-08-10] | not yet
+** Diffs between consecutive revisions. . . . . . . [2008-08-11] | not yet
+** Diffs between arbritary revisions. . . . . . . . not yet      |
                                                                  |
-* Recent changes. . . . . . . . . . . . . . . . . . [2008-07-02] |
+* Recent changes. . . . . . . . . . . . . . . . . . [2008-07-02] | [2008-08-15]
                                                                  |
-* Images (and other files)                                       |
+* Images (and other files). . . . . . . . . . . . . not yet      |
                                                                  |
-* Text formatting . . . . . . . . . . . . . . . . . [2008-08-23] |
+* Text formatting . . . . . . . . . . . . . . . . . [2008-08-23] | [2008-07-30]
                                                                  |
-* Unicode support                                                |
+* Unicode support . . . . . . . . . . . . . . . . . not yet      |
                                                                  |
-* A decent default CSS layout . . . . . . . . . . . [2008-07-31] |
-** Pluggable layouts                                             |
+* A decent default CSS layout . . . . . . . . . . . [2008-07-31] | [2008-08-14]
+** Pluggable layouts. . . . . . . . . . . . . . . . [2008-11-03] | [2009-01-20]
 -----------------------------------------------------------------+------------
 
 == Desirable features ========================================================
@@ -54,15 +54,15 @@ not-yet-features to be investigated.)
 
                                                          p5w     |    p6w
 -----------------------------------------------------------------+------------
-* Contents (summarizing the headings in the article)             |
+* Contents (summarizing headings in the article). . not yet      |
                                                                  |
-* Good merging when conflicts occur                              |
+* Good merging when conflicts occur . . . . . . . . not yet      |
                                                                  |
 * A plug-in system, so that formatting capabilities              |
-  can be extended by the wiki owner                              |
+  can be extended by the wiki owner . . . . . . . . not yet      |
                                                                  |
 * RSS/Atom feeds                                                 |
-** ...for site-wide recent changes                               |
-** ...for individual pages                                       |
-** ...for a group of pages subscribed to by the user             |
+** ...for site-wide recent changes. . . . . . . . . not yet      |
+** ...for individual pages. . . . . . . . . . . . . not yet      |
+** ...for a group of pages subscribed to by a user. not yet      |
 -----------------------------------------------------------------+------------

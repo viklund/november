@@ -1,30 +1,31 @@
-use CGI;
-use Tags;
-use HTML::Template;
-use Text::Markup::Wiki::MediaWiki;
 use Session;
-use Dispatcher;
-use Utils;
-use Config;
 
 class November does Session {
-    use November::Storage::File;  
 
-    has $.template_path = Config.server_root ~ 'skins/' ~ Config.skin ~ '/';
-    has $.userfile_path = Config.server_root ~ 'data/users';
+    use CGI;
+    use Tags;
+    use HTML::Template;
+    use Dispatcher;
+    use Utils;
+    use Config;
+    use November::Storage::File;
 
     has November::Storage $.storage;
     has CGI     $.cgi;
+    has Config  $.config;
 
     # RAKUDO: BUILD do not implemented yet
     method init {
-        $!storage = November::Storage::File.new();
+        $!storage = November::Storage::File.new(
+            storage_root => $.config.server_root ~ 'data/'
+        );
+        $!storage.init(); # Want ze BUILD submethod
+        #$!config = Config.new;
+        #say "MARKUP IS: ",$.config.markup;
     }
 
     method handle_request(CGI $cgi) {
         $!cgi = $cgi;
-
-        my $action = $cgi.params<action> // 'view';
 
         my $d = Dispatcher.new( default => { self.not_found } );
 
@@ -51,22 +52,23 @@ class November does Session {
             return;
         }
 
-        my $minimal = Text::Markup::Wiki::MediaWiki.new;
+        use $.config.markup;
+        my $markup = $.config.markup.new; # Text::Markup::Wiki::MediaWiki.new;
 
         # TODO: we need plugin system (see topics in mail-list)
         my $t = Tags.new;
 
         my $title = $page.trans( ['_'] => [' '] );
-        
-        self.response( 'view.tmpl', 
-            { 
+
+        self.response( 'view.tmpl',
+            {
             TITLE    => $title,
             PAGE     => $page,
-            CONTENT  => $minimal.format($.storage.read_page( $page ),
+            CONTENT  => $markup.format($.storage.read_page( $page ),
                                  link_maker    => { self.make_link($^p, $^t) },
                                  extlink_maker => { self.make_extlink($^p, $^t) }
             ),
-            PAGETAGS => $t.page_tags($page), 
+            PAGETAGS => $t.page_tags($page),
             RECENTLY => self.get_changes( page => $page, :limit(8) ),
 
             TAGS     => $t.all_tags,
@@ -106,8 +108,8 @@ class November does Session {
 
         # TODO: we need plugin system (see topics in mail-list)
         my $t = Tags.new;
-        self.response( 'edit.tmpl', 
-            { 
+        self.response( 'edit.tmpl',
+            {
             PAGE     => $page,
             TITLE    => $title,
             CONTENT  => $old_content,
@@ -125,7 +127,7 @@ class November does Session {
     }
 
     method not_authorized {
-        self.response( 'action_not_authorized.tmpl', 
+        self.response( 'action_not_authorized.tmpl',
             { DISALLOWED_ACTION => 'edit pages' }
         );
     }
@@ -136,9 +138,9 @@ class November does Session {
     }
 
     method not_found($page?) {
-        #TODO: that should by 404 when no $page 
-        self.response('not_found.tmpl', 
-            { 
+        #TODO: that should by 404 when no $page
+        self.response('not_found.tmpl',
+            {
             'PAGE' => $page || 'Action Not found'
             }
         );
@@ -151,7 +153,7 @@ class November does Session {
             my %users = self.read_users();
 
             # Yes, this is cheating. Stand by for a real MD5 hasher.
-            if (defined %users{$user_name} 
+            if (defined %users{$user_name}
                 and $password eq %users{$user_name}<plain_text>) {
     #            if Digest::MD5::md5_base64(
     #                   Digest::MD5::md5_base64($user_name) ~ $password
@@ -160,14 +162,14 @@ class November does Session {
                 my $session_id = self.new_session($user_name);
                 my $session_cookie = "session_id=$session_id";
 
-                self.response('login_succeeded.tmpl', 
+                self.response('login_succeeded.tmpl',
                     {},
                     { cookie => $session_cookie }
                 );
                 return;
             }
 
-            self.response('login_failed.tmpl'); 
+            self.response('login_failed.tmpl');
             return;
         }
         self.response('log_in.tmpl');
@@ -181,7 +183,7 @@ class November does Session {
             my $session_cookie = "session_id=";
 
             self.response('logout_succeeded.tmpl',
-                {}, 
+                {},
                 { :cookie($session_cookie) }
             );
             return;
@@ -220,7 +222,7 @@ class November does Session {
                 'PAGE' => self.make_link($modification[0],$modification[0]),
                 'TIME' => time_to_period_str($modification[3])
                           || $modification_id,
-                'AUTHOR' => $modification[2] || 'somebody' 
+                'AUTHOR' => $modification[2] || 'somebody'
                 };
             # RAKUDO: last not implemented yet :(
             return @changes if $limit && $count == $limit;
@@ -242,18 +244,18 @@ class November does Session {
             my $tags_index = $t.read_tags_index;
             $index = $tags_index{$tag};
             %params<TAG> = $tag;
-        } 
+        }
         else {
             $index = $.storage.read_index;
         }
 
         if $index {
             # RAKUDO: @($arrayref) not implemented yet, so:
-            # my @list = map { { page => $_ } }, @($index); 
+            # my @list = map { { page => $_ } }, @($index);
             # does not work. Workaround:
             my @list = map { { PAGE => $_,
                                TITLE => $_.trans( ['_'] => [' '] )
-                           } }, $index.values; 
+                           } }, $index.values;
             %params<LIST> = @list;
         }
 
@@ -262,14 +264,14 @@ class November does Session {
 
     # RAKUDO: die at hash merge if %params undef, so I use default value
     method response ($tmpl, %params?={}, %opts?) {
-        my $template = HTML::Template.from_file($.template_path ~ $tmpl);
-        
+        my $template = HTML::Template.from_file($.config.template_path ~ $tmpl);
+
         $template.with_params(
             {
-            WEBROOT   => Config.web_root,
+            WEBROOT   => $.config.web_root,
             LOGGED_IN => self.logged_in,
-            SKIN      => Config.skin,
-            TMPL_PATH => $.template_path,
+            SKIN      => $.config.skin,
+            TMPL_PATH => $.config.template_path,
             %params
             }
         );
