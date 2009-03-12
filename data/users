@@ -10,5 +10,9 @@
   'ihrd' => {
     'password' => 'yG7xslKNZt59hpwVBkWrFQ',
     'plain_text' => 'gfhjkm'
+  },
+  'moritz' => {
+    'password' => '48f81da1091e84dbab7204',
+    'plain_text' => 'srhew49'
   }
 }
