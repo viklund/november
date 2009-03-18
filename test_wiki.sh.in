@@ -2,8 +2,9 @@
 
 QS=$1
 PARROT_DIR=<PARROT_DIR>
+RAKUDO_DIR=<RAKUDO_DIR>
 env REQUEST_METHOD=GET \
 SERVER_NAME='test.foo' \
 SERVER_PORT='80' \
 REQUEST_URI=$QS \
-$PARROT_DIR/parrot $PARROT_DIR/languages/rakudo/perl6.pbc wiki
+$PARROT_DIR/parrot $RAKUDO_DIR/perl6.pbc wiki
