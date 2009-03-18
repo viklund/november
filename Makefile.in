@@ -6,7 +6,7 @@ SOURCES=lib/CGI.pm lib/Text/Markup/Wiki/Minimal.pm \
 	lib/URI.pm lib/URI/Grammar.pm lib/Dispatcher.pm \
 	lib/Dispatcher/Rule.pm lib/Session.pm lib/Utils.pm lib/Config.pm \
 	lib/Test/InputOutput.pm lib/Test/CGI.pm lib/Text/Escape.pm \
-	lib/November.pm
+	lib/Cache.pm lib/November.pm
 
 PIRS=$(SOURCES:.pm=.pir)
 
