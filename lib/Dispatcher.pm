@@ -28,11 +28,10 @@ class Dispatcher {
     }
 
     method dispatch (@chunks) {
-        my @matched =  @!rules.grep: { .match(@chunks); };    
+        my @matched =  @!rules.grep: { .match(@chunks) };    
 
         if @matched {
-            # *-1 dosn't work, havent submitted bug yet (nor pinpointed it)...
-            my $result = @matched[@matched.elems-1].apply;
+            my $result = @matched[*-1].apply;
             .clear for @!rules; 
             return $result;
         }
