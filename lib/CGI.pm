@@ -7,12 +7,11 @@ class CGI {
     has @.keywords;
     has URI $.uri;
 
-    has $!crlf;
+    has $!crlf = "\x[0D]\x[0A]";
 
     # RAKUDO: BUILD method not supported
     method init() {
         self.parse_params(%*ENV<QUERY_STRING>);
-
         # It's prudent to handle CONTENT_LENGTH too, but right now that's not
         # a priority. It would make our tests scripts more complicated, with
         # little gains. It would look like this:
@@ -30,14 +29,13 @@ class CGI {
             self.parse_params($input);
         }
 
-        self.eat_cookie( %*ENV<HTTP_COOKIE> );
-        $!crlf = "\x[0D]\x[0A]";
+        self.eat_cookie( %*ENV<HTTP_COOKIE> ) if %*ENV<HTTP_COOKIE>;
+
         $!uri = URI.new;
         my $uri_str = 'http://' ~ %*ENV<SERVER_NAME>;
         $uri_str ~= ':' ~ %*ENV<SERVER_PORT> if %*ENV<SERVER_PORT>;  
         $uri_str ~=  %*ENV<MODPERL6> ?? %*ENV<PATH_INFO> !! %*ENV<REQUEST_URI>;
         $.uri.init($uri_str);
-
     }
 
     # For debugging

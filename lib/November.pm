@@ -280,7 +280,7 @@ class November does Session {
     }
 
     method make_link($page, $title) {
-        my $root = Config.web_root;
+        my $root = $!config.web_root;
         if $title {
             if $page ~~ m/':'/ {
                 return qq|<a href="{ $root ~ $page }">$title</a>|;
