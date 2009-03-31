@@ -97,7 +97,7 @@ sub exists_wiki_page {
 }
 
 # Pretty-printing of page names. A more self-explanatory (but still succinct)
-# name for this subrouting would be a good thing -- suggestions welcome.
+# name for this subroutine would be a good thing -- suggestions welcome.
 sub pp {
     my ($name) = @_;
 
@@ -222,10 +222,17 @@ sub write_page_history {
 sub read_page {
     my ($page) = @_;
 
+    my $latest_change = read_modification(latest_revision($page));
+    return $latest_change->[1];
+}
+
+sub latest_revision {
+    my ($page) = @_;
+
     my $page_history = read_page_history($page);
     return unless @$page_history;
-    my $latest_change = read_modification(shift @$page_history);
-    return $latest_change->[1];
+    my $latest_revision = shift @$page_history;
+    return $latest_revision;
 }
 
 sub read_old_page {
@@ -534,10 +541,10 @@ sub edit_page {
 
     my $page = $cgi->param('page') or return not_found($cgi, '');
 
-    my $already_exists
-                    = exists_wiki_page($page);
-    my $action      = $already_exists ? 'Editing' : 'Creating';
-    my $old_content = $already_exists ? read_page($page) : '';
+    my $already_exists = exists_wiki_page($page);
+    my $action         = $already_exists ? 'Editing'              : 'Creating';
+    my $old_content    = $already_exists ? read_page($page)       : '';
+    my $old_revision   = $already_exists ? latest_revision($page) : 0;
 
     # Hmmm... what happens, really, if someone includes a '</textarea>' in the
     # page source?
@@ -559,6 +566,7 @@ sub edit_page {
     $template->param(TITLE => pp($page));
     $template->param(PAGETAGS => read_page_tags($page));
     $template->param(CONTENT => $old_content);
+    $template->param(OLD_REV => $old_revision);
     $template->param(LOGGED_IN => logged_in($cgi));
 
     print status_ok(),
