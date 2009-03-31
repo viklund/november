@@ -550,6 +550,22 @@ sub edit_page {
     # page source?
 
     if ( my $article_text = $cgi->param('articletext') ) {
+        # Check if the page has been saved since editing begun, and pull the
+        # brakes if it has.
+        if ( $cgi->param('old-revision') < latest_revision($page) ) {
+            my $template = HTML::Template->new(
+                filename => $TEMPLATE_PATH.'page_too_old.tmpl');
+
+            $template->param(PAGE => $page);
+            $template->param(TITLE => pp($page));
+            $template->param(LOGGED_IN => logged_in($cgi));
+
+            print status_ok(),
+                  $template->output();
+
+            return;
+        }
+
         my $session_id = $cgi->cookie('session_id');
         my $author = $sessions{$session_id}{user_name};
         my $tags = $cgi->param('tags');
