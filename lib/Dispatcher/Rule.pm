@@ -8,6 +8,7 @@ method match (@chunks) {
     for @chunks Z @.tokens-> $chunk, Object $token {
         if ~$chunk ~~ $token {
             @!args.push($/) if $/;
+            @!args.push(~$chunk) if $token ~~ Whatever;
         }
         else {
             self.clear;

@@ -29,7 +29,7 @@ class Dispatcher {
 
     method dispatch (@chunks) {
         my @matched =  @!rules.grep: { .match(@chunks) };    
-
+        
         if @matched {
             my $result = @matched[*-1].apply;
             .clear for @!rules; 
