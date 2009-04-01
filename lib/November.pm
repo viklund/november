@@ -1,6 +1,7 @@
 use Session;
+use Cache;
 
-class November does Session {
+class November does Session does Cache {
 
     use CGI;
     use Tags;
@@ -52,22 +53,33 @@ class November does Session {
             return;
         }
 
-        use $.config.markup;
-        my $markup = $.config.markup.new; # Text::Markup::Wiki::MediaWiki.new;
-
         # TODO: we need plugin system (see topics in mail-list)
         my $t = Tags.new;
 
         my $title = $page.trans( ['_'] => [' '] );
 
+        my $content;
+        my $cached_page = self.get-cache-entry( $page );
+        if ( $cached_page ) {
+            $content = $cached_page;
+        }
+        else {
+            use $.config.markup;
+            my $markup = $.config.markup.new; # Text::Markup::Wiki::MediaWiki.new;
+
+            $content = $markup.format($.storage.read_page( $page ),
+                         link_maker    => { self.make_link($^p, $^t) },
+                         extlink_maker => { self.make_extlink($^p, $^t)
+                         });
+
+            self.set-cache-entry( $page, $content );
+        }
+
         self.response( 'view.tmpl',
             {
             TITLE    => $title,
             PAGE     => $page,
-            CONTENT  => $markup.format($.storage.read_page( $page ),
-                                 link_maker    => { self.make_link($^p, $^t) },
-                                 extlink_maker => { self.make_extlink($^p, $^t) }
-            ),
+            CONTENT  => $content,
             PAGETAGS => $t.page_tags($page),
             RECENTLY => self.get_changes( page => $page, :limit(8) ),
 
@@ -97,6 +109,7 @@ class November does Session {
             my $session_id = $.cgi.cookie<session_id>;
             my $author     = $sessions{$session_id}<user_name>;
             $.storage.save_page($page, $new_text, $author);
+            self.remove-cache-entry( $page );
 
             # TODO: we need plugin system (see topics in mail-list)
             my $t = Tags.new();
