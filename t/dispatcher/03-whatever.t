@@ -6,7 +6,7 @@ use Dispatcher;
 
 my $d = Dispatcher.new( default => { "default" } );
 
-$d.add_rules(
+$d.add(
     [
         [*,],                 {  $^a  },
         [*,*],                {  $^a + $^b },
@@ -16,11 +16,11 @@ $d.add_rules(
     ]
 );
 
-is( $d.dispatch([42]), 42, 'Use pattern *' );
-is( $d.dispatch([1, 2]), 3, 'Use pattern */* ' );
-is( $d.dispatch(['foo', '5']), "foo/5", 'Use pattern foo/*' );
-is( $d.dispatch(['foo', '5', 1]), "foo:4", 'Use pattern foo/*/*' );
-is( $d.dispatch(['foo', 'baz', 'bar']), "baz", 'Use pattern foo/*/bar' );
+is( $d.dispatch([42]), 42, 'Pattern *' );
+is( $d.dispatch([1, 2]), 3, 'Pattern */* ' );
+is( $d.dispatch(['foo', '5']), "foo/5", 'Pattern foo/*' );
+is( $d.dispatch(['foo', '5', 1]), "foo:4", 'Pattern foo/*/*' );
+is( $d.dispatch(['foo', 'baz', 'bar']), "baz", 'Pattern foo/*/bar' );
 
 
 # vim:ft=perl6

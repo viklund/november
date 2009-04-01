@@ -5,7 +5,7 @@ plan 6;
 
 use Dispatcher;
 my $d = Dispatcher.new;
-$d.add_rules: [
+$d.add: [
     ['foo', /^ \d+ $/],          { $^d },
     [/^ \w+ $/],                 { "Yep!" if $^w.WHAT eq 'Match' },
     ['foo', / \d+ /],            { $^d + 10 },

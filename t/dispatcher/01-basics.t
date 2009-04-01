@@ -14,7 +14,7 @@ my $d = Dispatcher.new;
 dies_ok( { $d.add: Dispatcher::Rule.new }, 
          '.add adds only complete Rule objects' );
 
-$d.add: Dispatcher::Rule.new( :pattern(''), action => { "Krevedko" } );
+$d.add: Dispatcher::Rule.new( :pattern(['']), code => { "Krevedko" } );
 
 is( $d.dispatch(['']), 
     'Krevedko', 
@@ -22,7 +22,7 @@ is( $d.dispatch(['']),
 );
 
 ok( $d.add( ['foo', 'bar'], { "Yay" } ), 
-           '.add(@patterb, &action) -- shortcut for fast add Rule object' );
+           '.add(@pattern, $code) -- shortcut for fast add Rule object' );
 
 nok( $d.dispatch(['foo']), 
     'Dispatcher return False if can`t find matched Rule and do not have default' );

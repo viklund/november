@@ -30,8 +30,7 @@ class November does Session does Cache {
 
         my $d = Dispatcher.new( default => { self.not_found } );
 
-        $d.add_rules(
-            [
+        $d.add:[
             [''],                { self.view_page },
             ['view', /^ \w+ $/], { self.view_page(~$^page) },
             ['edit', /^ \w+ $/], { self.edit_page(~$^page) },
@@ -39,8 +38,7 @@ class November does Session does Cache {
             ['out'],             { self.log_out },
             ['recent'],          { self.list_recent_changes },
             ['all'],             { self.list_all_pages },
-            ]
-        );
+        ];
 
         my @chunks = $cgi.uri.chunks.list;
         $d.dispatch(@chunks);

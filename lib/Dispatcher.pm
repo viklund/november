@@ -9,14 +9,12 @@ class Dispatcher {
         @!rules.push($rule);
     }
 
-    multi method add (@pattern, $action) {
-        my $rule = Dispatcher::Rule.new( pattern => @pattern, action => $action );
+    multi method add (@pattern, Code $code) {
+        my $rule = Dispatcher::Rule.new( pattern => @pattern, code => $code );
         @!rules.push($rule);
     }
 
-    # I think a Hash might be better here, but Rakudo converts all hash keys
-    # into string now
-    method add_rules(@rules) {
+    multi method add (@rules) {
         # RAKUDO: rakudo doesn't know return values in for loops yet
         my $r;
         # RAKUDO: Larry -- "the default parameter to a block is now Object and 

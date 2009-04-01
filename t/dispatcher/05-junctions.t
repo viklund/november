@@ -6,7 +6,7 @@ plan 4;
 use Dispatcher;
 my $d = Dispatcher.new;
 
-$d.add_rules: [
+$d.add: [
     ['foo'|'bar'],    { 'First' },
     ['foo', 'a'|'b'], { 'Second' },
 ];
