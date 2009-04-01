@@ -72,9 +72,7 @@ class November does Session does Cache {
                          extlink_maker => { self.make_extlink($^p, $^t)
                          });
 
-            say 'SETTING CACHE';
             self.set-cache-entry( $page, $content );
-            say 'DONE';
         }
 
         self.response( 'view.tmpl',
