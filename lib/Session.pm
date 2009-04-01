@@ -2,7 +2,8 @@ role Session;
 
 use Config;
 
-has $.sessionfile_path = Config.server_root ~ 'data/sessions';
+# TODO can we use November $!config here? or parametrise this role?
+has $.sessionfile_path = Config.new.server_root ~ 'data/sessions';
 
 method add_session($id, %stuff) {
     my $sessions = self.read_sessions();

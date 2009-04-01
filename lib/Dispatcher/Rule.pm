@@ -8,6 +8,7 @@ method match (@chunks) {
     for @chunks Z @.tokens-> $chunk, Object $token {
         if ~$chunk ~~ $token {
             @!args.push($/) if $/;
+            @!args.push(~$chunk) if $token ~~ Whatever;
         }
         else {
             self.clear;
@@ -18,27 +19,11 @@ method match (@chunks) {
 }
 
 method apply {
-    # RAKUDO: | do not implemented yet :( so... only two args now
-    # RAKUDO: strange bug here, it assigns 0 when ifs are nested
-    #if @.args {
-    if @.args == 1 {
-        $.action(@.args[0]);
-
-        # RAKUDO: strange bug here, it assigns 0 when ifs are nested
-        #$.action(@.args[0]) if @.args == 1;
-        #$.action(@.args[0], @.args[1]) if @.args == 2;
-        #$.action(@.args[0], @.args[1], @.args[2]) if @.args == 3;
-    }
-    elsif @.args == 2 {
-            $.action(@.args[0], @.args[1]);
-    }
-    else {
-        $.action();
-    }
+    $!action(| @!args);
 }
 
 method is_complete {
-    return ?( @.tokens && $.action );
+    return ?( @!tokens && $!action );
 }
 
 method clear {

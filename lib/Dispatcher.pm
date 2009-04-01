@@ -14,11 +14,13 @@ class Dispatcher {
         @!rules.push($rule);
     }
 
-# I think a Hash might be better here, but Rakudo converts all hash keys
-# into string now
+    # I think a Hash might be better here, but Rakudo converts all hash keys
+    # into string now
     method add_rules(@rules) {
         # RAKUDO: rakudo doesn't know return values in for loops yet
         my $r;
+        # RAKUDO: Larry -- "the default parameter to a block is now Object and 
+        # not Any" but this is NIY 
         for @rules -> Object @tokens, $action {
             $r = self.add(@tokens, $action);
         }
@@ -26,11 +28,10 @@ class Dispatcher {
     }
 
     method dispatch (@chunks) {
-        my @matched =  @!rules.grep: { .match(@chunks); };    
-
+        my @matched =  @!rules.grep: { .match(@chunks) };    
+        
         if @matched {
-            # *-1 dosn't work, havent submitted bug yet (nor pinpointed it)...
-            my $result = @matched[@matched.elems-1].apply;
+            my $result = @matched[*-1].apply;
             .clear for @!rules; 
             return $result;
         }

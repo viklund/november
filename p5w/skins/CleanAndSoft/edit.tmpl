@@ -15,6 +15,7 @@
                 <form method="POST">
                     <input type="hidden" name="page" value="<TMPL_VAR NAME=PAGE>" />
                     <input type="hidden" name="action" value="edit" />
+                    <input type="hidden" name="old-revision" value="<TMPL_VAR NAME=OLD_REV>" />
                     <div class="articlecontent">
                         <textarea name="articletext" rows="22" cols="60"><TMPL_VAR NAME=CONTENT></textarea>
                     </div>

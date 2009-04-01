@@ -1,4 +1,5 @@
 #!/bin/sh
 
 PARROT_DIR=<PARROT_DIR>
-exec $PARROT_DIR/parrot $PARROT_DIR/languages/rakudo/perl6.pbc wiki
+RAKUDO_DIR=<RAKUDO_DIR>
+exec $PARROT_DIR/parrot $RAKUDO_DIR/perl6.pbc wiki

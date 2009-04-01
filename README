@@ -54,11 +54,12 @@ REPOSITORY LAYOUT
 RUNNING NOVEMBER
 ----------------
 
-Before building November you have to set the PARROT_DIR and PERL6LIB
-environment variables to include the lib/ subdirectory of the November
-repository. In bash, that would look like this:
+Before building November you have to set the PARROT_DIR, RAKUDO_DIR and
+PERL6LIB environment variables to include the lib/ subdirectory of the
+November repository. In bash, that would look like this:
 
   $ export PARROT_DIR=/path/to/parrot
+  $ export RAKUDO_DIR=/path/to/rakudo
   $ export PERL6LIB=/path/to/repository/of/november/lib
 
 After that, you can build as usual.
