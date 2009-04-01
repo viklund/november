@@ -1,14 +1,22 @@
 class Dispatcher::Rule;
-has @.tokens;
+has @.pattern;
 has @.args;
+
+has $.controller;
 has $.action;
 
+
 method match (@chunks) {
-    return False if @chunks != @.tokens;
-    for @chunks Z @.tokens-> $chunk, Object $token {
-        if ~$chunk ~~ $token {
-            @!args.push($/) if $/;
-            @!args.push(~$chunk) if $token ~~ Whatever;
+    return False if @chunks != @!pattern;
+    for @chunks Z @!pattern-> $chunk, Object $rule {
+
+        my $param;
+        if $rule ~~ Pair { ($param, $rule) = $rule.kv }
+
+        if ~$chunk ~~ $rule {
+            # RAKUDO: /./ ~~ Regex us false, but /./ ~~ Code is true  
+            @!args.push($/ || $chunk) if $rule ~~ Code | Whatever; # should by Regex | Whatever
+            self.$param($/ || $chunk) if $param;
         }
         else {
             self.clear;
@@ -23,7 +31,7 @@ method apply {
 }
 
 method is_complete {
-    return ?( @!tokens && $!action );
+    return ?( @!pattern && $!action );
 }
 
 method clear {

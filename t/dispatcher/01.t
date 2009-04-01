@@ -14,7 +14,7 @@ my $d = Dispatcher.new;
 dies_ok( { $d.add: Dispatcher::Rule.new }, 
          'Dispatch .add adds only complete Rule objects' );
 
-$d.add: Dispatcher::Rule.new( :tokens(''), action => { "Krevedko" } );
+$d.add: Dispatcher::Rule.new( :pattern(''), action => { "Krevedko" } );
 
 is( $d.dispatch(['']), 
     'Krevedko', 
@@ -22,7 +22,7 @@ is( $d.dispatch(['']),
 );
 
 ok( $d.add( ['foo', 'bar'], { "Yay" } ), 
-           '.add fith @tokens and $action -- shortcut for fast add Rule object' );
+           '.add(@patterb, &action) -- shortcut for fast add Rule object' );
 
 nok( $d.dispatch(['foo']), 
     'Dispatcher return False if can`t find match Rule and do not have default'  );
@@ -44,19 +44,19 @@ $d.add: ['foo', 'a'|'b'], { "Zzzz" };
 
 is( $d.dispatch(['foo', 'a']), 
     'Zzzz', 
-    'Dispatch to Rule with Junction a'  
+    'Pattern with Junction (foo/a|b) a'  
 );
 
 is( $d.dispatch(['foo', 'b']), 
     'Zzzz', 
-    'Dispatch to Rule with Junction (foo/a|b) b'  
+    'Pattern with Junction (foo/a|b) b'  
 );
 
 $d.add: ['foo', /^ \d+ $/], { $^d };
 
 is( $d.dispatch(['foo', '50']), 
     '50', 
-    "Dispatch to Rule with regexp ['foo', /^ \d+ \$/])"  
+    "Pattern with regexp ['foo', /^ \d+ \$/])"  
 );
 
 $d.add( [/^ \w+ $/], { "Yep!" if $^w.WHAT eq 'Match' } );

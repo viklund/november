@@ -9,8 +9,8 @@ class Dispatcher {
         @!rules.push($rule);
     }
 
-    multi method add (@tokens, $action) {
-        my $rule = Dispatcher::Rule.new( tokens => @tokens, action => $action );
+    multi method add (@pattern, $action) {
+        my $rule = Dispatcher::Rule.new( pattern => @pattern, action => $action );
         @!rules.push($rule);
     }
 
@@ -21,8 +21,8 @@ class Dispatcher {
         my $r;
         # RAKUDO: Larry -- "the default parameter to a block is now Object and 
         # not Any" but this is NIY 
-        for @rules -> Object @tokens, $action {
-            $r = self.add(@tokens, $action);
+        for @rules -> Object @pattern, $action {
+            $r = self.add(@pattern, $action);
         }
         return $r;
     }
