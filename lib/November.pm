@@ -53,9 +53,6 @@ class November does Session does Cache {
             return;
         }
 
-        use $.config.markup;
-        my $markup = $.config.markup.new; # Text::Markup::Wiki::MediaWiki.new;
-
         # TODO: we need plugin system (see topics in mail-list)
         my $t = Tags.new;
 
@@ -67,6 +64,9 @@ class November does Session does Cache {
             $content = $cached_page;
         }
         else {
+            use $.config.markup;
+            my $markup = $.config.markup.new; # Text::Markup::Wiki::MediaWiki.new;
+
             $content = $markup.format($.storage.read_page( $page ),
                          link_maker    => { self.make_link($^p, $^t) },
                          extlink_maker => { self.make_extlink($^p, $^t)

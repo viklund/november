@@ -2,27 +2,26 @@ role Cache;
 
 use Config;
 
-has $.cache_dir = Config.server_root ~ 'data/cache';
+method cache-dir {
+    return $.config.server_root ~ 'data/cache';
+}
 
 method set-cache-entry( $key, $value ) {
-    my $file = $.cache_dir ~ '/' ~ $key;
+    my $file = self.cache-dir ~ '/' ~ $key;
     my $fh = open( $file, :w );
-    say 'DOUBLE SETTING';
-    $fh.say( $value.perl );
-    say 'TRIPPLE SETTING';
+    $fh.say( $value );
     $fh.close;
 }
 
 method get-cache-entry( $key ) {
-    my $file = $.cache_dir ~ '/' ~ $key;
+    my $file = self.cache-dir ~ '/' ~ $key;
     return undef unless $file ~~ :e;
     my $string = slurp( $file );
-    my $stuff = eval( $string );
-    return $stuff;
+    return $string;
 }
 
 method remove-cache-entry( $key ) {
-    my $file = $.cache_dir ~ '/' ~ $key;
+    my $file = self.cache-dir ~ '/' ~ $key;
     return unless $file ~~ :e;
     unlink( $file );
 }
