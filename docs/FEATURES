@@ -29,8 +29,8 @@ not-yet-features to be investigated.)
                                                                  |
 * The concept of a user authoring an edit . . . . . [2008-08-07] | [2008-08-14]
                                                                  |
-* Collision prevention -- warning people                         |
-  who are editing at the same time. . . . . . . . . [2009-03-31] | not yet
+* Collision prevention -- preventing an                          |
+  edit on an old article from going through . . . . [2009-03-31] | not yet
                                                                  |
 * Article history . . . . . . . . . . . . . . . . . [2008-08-10] | not yet
 ** Ability to view old revisions of pages . . . . . [2008-08-10] | not yet
