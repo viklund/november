@@ -1,3 +1,4 @@
+PARROT_EXEC=<PARROT_EXEC>
 PARROT_DIR=<PARROT_DIR>
 RAKUDO_DIR=<RAKUDO_DIR>
 
@@ -14,7 +15,8 @@ PIRS=$(SOURCES:.pm=.pir)
 all: $(PIRS)
 
 %.pir: %.pm
-	$(PARROT_DIR)/parrot $(RAKUDO_DIR)/perl6.pbc --target=pir --output=$@ $<
+	$(PARROT_DIR)/$(PARROT_EXEC) $(RAKUDO_DIR)/perl6.pbc --target=pir\
+    --output=$@ $<
 
 clean:
 	rm -f $(PIRS)
@@ -22,5 +24,5 @@ clean:
 tests: test
 
 test: all
-	prove -e '$(PARROT_DIR)/parrot $(RAKUDO_DIR)/perl6.pbc'\
+	prove -e '$(PARROT_DIR)/$(PARROT_EXEC) $(RAKUDO_DIR)/perl6.pbc'\
 	      -r --nocolor t/

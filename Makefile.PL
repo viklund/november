@@ -15,10 +15,11 @@ my $rakudo_dir = $ENV{RAKUDO_DIR}
 $ENV{PERL6LIB}
     or die 'Please set $PERL6LIB (see README).'."\n";
 
+my $parrot_exec = $^O eq 'MSWin32' ? 'parrot.exe' : 'parrot';
 if ( ! -d $parrot_dir ) {
-    print STDERR "Not a directory $parrot_dir, exiting...\n";
-    exit 1;
-} elsif ( ! -x File::Spec->catfile( $parrot_dir, 'parrot' )) {
+     print STDERR "Not a directory $parrot_dir, exiting...\n";
+     exit 1;
+} elsif ( ! -x File::Spec->catfile( $parrot_dir, $parrot_exec )) {
     print STDERR "Couldn't find parrot executable in $parrot_dir, "
                  . "have you compiled?\n";
     exit 1;
@@ -37,8 +38,9 @@ my @scripts = qw< test_wiki.sh wiki.sh >;
 my @infiles = map { $_.'.in' } qw< Makefile test_wiki.sh wiki.sh >;
 
 my %replacements = (
-    PARROT_DIR => $parrot_dir,
-    RAKUDO_DIR => $rakudo_dir,
+    PARROT_DIR  => $parrot_dir,
+    PARROT_EXEC => $parrot_exec,
+    RAKUDO_DIR  => $rakudo_dir,
 );
 
 if ( !-e 'lib/Test.pm' ) {
