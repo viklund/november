@@ -30,7 +30,7 @@ class November does Session does Cache {
 
         my $d = Dispatcher.new( default => { self.not_found } );
 
-        $d.add:[
+        $d.add: [
             [''],                { self.view_page },
             ['view', /^ \w+ $/], { self.view_page(~$^page) },
             ['edit', /^ \w+ $/], { self.edit_page(~$^page) },
