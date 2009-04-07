@@ -32,6 +32,28 @@ See instructions on the parrot site:
 
  <http://www.parrotcode.org/>
 
+You'll also need the projects listed in deps.proto, presently only
+HTML::Template. It is preferrable to build HTML::Template before building
+November.
+
+$ pwd
+/tmp
+$ git clone git://github.com/viklund/november.git
+$ git clone git://github.com/masak/html-template.git
+$ export RAKUDO_DIR=$PARROT_DIR/languages/rakudo
+$ export PERL6LIB=$RAKUDO_DIR:/tmp/november/lib:/tmp/html-template/lib
+$ cd html-template/
+$ perl Makefile.PL
+$ make
+$ cd ../november/
+$ perl Makefile.PL
+$ make
+
+The package installer 'proto' (at <http://github.com/masak/proto>) does all of
+the above for you automatically:
+
+$ ./proto install november   # installs Rakudo/Parrot, November & all its deps
+
 REPOSITORY LAYOUT
 -----------------
 
