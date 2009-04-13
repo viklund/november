@@ -9,8 +9,6 @@ Things to investigate further with p6w:
 
 * Packaging for CPAN.
 
-* Server-side caching.
-
 * Markups.
 ** MediaWiki
 ** Creole (file://feather/home/juerd/creole)
