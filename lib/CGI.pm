@@ -85,7 +85,7 @@ class CGI {
             my @param_values = $string.split(/ '&' | ';' /);
 
             for @param_values -> $param_value {
-                my @kvs = split('=', $param_value);
+                my @kvs = $param_value.split("=");
                 self.add_param( @kvs[0], unescape(@kvs[1]) );
             }
         } 
@@ -104,7 +104,7 @@ class CGI {
         my @param_values  = $http_cookie.split('; ');
 
         for @param_values -> $param_value {
-            my @kvs = split('=', $param_value);
+            my @kvs = $param_value.split('=');
             %!cookie{ @kvs[0] } = unescape( @kvs[1] );
         }
     }
