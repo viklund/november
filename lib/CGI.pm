@@ -50,8 +50,8 @@ class CGI {
 # From `perldoc perlop`:
 #
 #      All systems use the virtual "\n" to represent a line terminator, called
-#      a "newline".  There is no such thing as an ine
-#      character.  It is only an illusion that the operating system, devic
+#      a "newline".  There is no such thing as an unvarying, physical newline
+#      character.  It is only an illusion that the operating system, device
 #      drivers, C libraries, and Perl all conspire to preserve.  Not all
 #      systems read "\r" as ASCII CR and "\n" as ASCII LF.  For example, on a
 #      Mac, these are reversed, and on systems without line terminator,
