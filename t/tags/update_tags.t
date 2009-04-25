@@ -24,23 +24,62 @@ $t.clear;
 
 $t.update_tags('Test_Page', 'Foo, Bar');
 
-is_deeply( $t.read_tags_count, {"foo" => 1, "bar" => 1}, 'Simple tags counting');
-is_deeply( $t.read_tags_index, {"foo" => ["Test_Page"], "bar" => ["Test_Page"]}, 'Simple tags indexing' );
+is_deeply(
+    $t.read_tags_count,
+    {"foo" => 1, "bar" => 1},
+    'Simple tag counting'
+);
+is_deeply(
+    $t.read_tags_index,
+    {"foo" => ["Test_Page"], "bar" => ["Test_Page"]},
+    'Simple tag indexing'
+);
 
 $t.update_tags('Test_Page', 'Bar, Her');
 
-is_deeply( $t.read_tags_count, {"bar" => 1, "her" => 1}, 'Tags counting after add and remove');
-is_deeply( $t.read_tags_index, {"foo" => [], "bar" => ["Test_Page"], "her" => ["Test_Page"]}, 'Tags indexing after add and remove' );
+is_deeply(
+    $t.read_tags_count,
+    {"bar" => 1, "her" => 1},
+    'Tag count after addition and removal'
+);
+is_deeply(
+    $t.read_tags_index,
+    {"foo" => [], "bar" => ["Test_Page"], "her" => ["Test_Page"]},
+    'Tag index after add and remove'
+);
 
 $t.update_tags('Another_Page', 'Bar, Her');
 
-is_deeply( $t.read_tags_count, {"bar" => 2, "her" => 2}, 'Tags count after add another page');
-is_deeply( $t.read_tags_index, {"foo" => [], "bar" => ["Test_Page", "Another_Page"], "her" => ["Test_Page", "Another_Page"]}, 'Tags index after add another page' );
+is_deeply(
+    $t.read_tags_count,
+    {"bar" => 2, "her" => 2},
+    'Tag count after adding another page'
+);
+is_deeply(
+    $t.read_tags_index,
+    {
+        "foo" => [],
+        "bar" => ["Test_Page", "Another_Page"],
+        "her" => ["Test_Page", "Another_Page"]
+    },
+    'Tags index after adding another page'
+);
 
 $t.update_tags('Test_Page', 'Bar, Her');
 
-is_deeply( $t.read_tags_count, {"bar" => 2, "her" => 2}, 'Tags count after save page without changes');
-is_deeply( $t.read_tags_index, {"foo" => [], "bar" => ["Test_Page", "Another_Page"], "her" => ["Test_Page", "Another_Page"]}, 'Tags index after save page without changes' );
+is_deeply(
+    $t.read_tags_count,
+    {"bar" => 2, "her" => 2},
+    'Tag count after saving a page without changes');
+is_deeply(
+    $t.read_tags_index,
+    {
+        "foo" => [],
+        "bar" => ["Test_Page", "Another_Page"],
+        "her" => ["Test_Page", "Another_Page"]
+    },
+    'Tag index after save page without changes'
+);
 
 $t.clear;
 
