@@ -1,4 +1,6 @@
+use v6;
 use CGI;
+
 class Test::CGI is CGI {
 
     has $.response is rw;

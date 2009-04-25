@@ -1,3 +1,5 @@
+use v6;
+
 # Based on:
 # Copyright (C) 2007, The Perl Foundation.
 # $Id: Test.pm 30592 2008-08-27 14:31:45Z moritz $
