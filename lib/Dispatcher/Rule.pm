@@ -9,7 +9,7 @@ has Code $.code;
 
 method match (@chunks) {
     return False if @chunks != @!pattern;
-    for @chunks Z @!pattern-> $chunk, Object $rule is copy {
+    for @chunks Z @!pattern -> $chunk, Object $rule is copy {
 
         my $param;
         if $rule ~~ Pair { ($param, $rule) = $rule.kv }
