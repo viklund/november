@@ -13,7 +13,7 @@ sub get_unique_id is export {
 }
 
 sub get_period ($modif_time, $time_now?) is export {
-    my $time = $time_now || int time;
+    my $time = $time_now || int(time);
     my $period = $time - $modif_time;
 
     my $mins  = int($period / 60);
