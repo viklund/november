@@ -160,7 +160,7 @@ multi sub is_deeply($this, $that) {
     proclaim( $val, '', $this.perl, $that.perl );
 }
 
-sub _is_deeply( $this, $that) {
+sub _is_deeply($this, $that) {
 
     if $this ~~ List && $that ~~ List {
         return if +$this.values != +$that.values;
