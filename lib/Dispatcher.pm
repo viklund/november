@@ -15,11 +15,18 @@ class Dispatcher {
     }
 
     multi method add (@rules) {
-        # RAKUDO: rakudo doesn't know return values in for loops yet
+        # RAKUDO: "Return" values of for loop statements
         my $r;
-        # RAKUDO: Larry -- "the default parameter to a block is now Object and 
-        # not Any" but this is NIY 
-        for @rules -> Object @pattern, $action {
+        # The following line of code is in relatively high flux, due to
+        # changes in the Spec and Rakudo when it comes to handling of
+        # typed arrays etc. For a long time, it said 'Object @pattern',
+        # in order to prevent autothreading on the elements of @pattern.
+        # (Object, as opposed to Any, causes signature bindings not to
+        # autothread.) However, (a) this typing might not be needed, because
+        # 'Object' might actually be the default, and (b) in current
+        # versions of Rakudo, writing 'Object @pattern' wrongly causes
+        # the Array not to bind, despite the fact that any Array should.
+        for @rules -> @pattern, $action {
             $r = self.add(@pattern, $action);
         }
         return $r;
