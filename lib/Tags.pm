@@ -23,7 +23,7 @@ class Tags {
         .write_page_tags($page, $new_tags);
     }
 
-    method add_tags (Str $page, Array @tags) {
+    method add_tags (Str $page, @tags) {
 
         my %count = self.read_tags_count;
         %count{$_}++ for @tags;
@@ -44,7 +44,7 @@ class Tags {
         self.write_tags_index($index);
     }
 
-    method remove_tags(Str $page, Array @tags) {
+    method remove_tags(Str $page, @tags) {
         
         my $count = self.read_tags_count;
 
