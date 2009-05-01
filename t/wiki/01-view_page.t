@@ -6,8 +6,6 @@ use Test::CGI;
 use Config;
 use URI;
 
-plan 28;
-
 my @markups = < Text::Markup::Wiki::Minimal Text::Markup::Wiki::MediaWiki >;
 my @skins   = < Autumn CleanAndSoft >;
 
@@ -22,6 +20,7 @@ my %gets    = {
     '/all?tag=november' =>  'All pages, specific tag',
 };
 
+plan @markups * @skins * %gets;
 
 my $uri = URI.new();
 my $cgi = Test::CGI.new( uri => $uri );
