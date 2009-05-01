@@ -7,7 +7,7 @@ use Dispatcher;
 my $d = Dispatcher.new;
 $d.add: [
     ['foo', /^ \d+ $/],          { $^d },
-    [/^ \w+ $/],                 { "Yep!" if $^w.WHAT eq 'Match' },
+    [/^ \w+ $/],                 { "Yep!" if $^w ~~ Match },
     ['foo', / \d+ /],            { $^d + 10 },
     ['foo', / \d+ /, 'bar' ],    { $^d + 1 },
     ['summ', / \d+ /, / \d+ / ], { $^a + $^b },
