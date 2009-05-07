@@ -28,9 +28,9 @@ and follow the instructions in the checkout. Note that the latest 'stable
 release' of Parrot/Rakudo often isn't new enough, since we tend to use features
 developed after the latest release.
 
-See instructions on the parrot site:
+See instructions on the Rakudo web site:
 
- <http://www.parrotcode.org/>
+ <http://rakudo.org/how-to-get-rakudo>
 
 You'll also need the projects listed in deps.proto, presently only
 HTML::Template. It is preferrable to build HTML::Template before building
