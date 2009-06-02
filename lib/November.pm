@@ -64,8 +64,7 @@ class November does Session does Cache {
             $content = $cached_page;
         }
         else {
-            use $.config.markup;
-            my $markup = $.config.markup.new; # Text::Markup::Wiki::MediaWiki.new;
+            my $markup = $.config.markup;
 
             $content = $markup.format($.storage.read_page( $page ),
                          link_maker    => { self.make_link($^p, $^t) },
@@ -146,8 +145,8 @@ class November does Session does Cache {
     }
 
     method read_users {
-        return {} unless $.userfile_path ~~ :e;
-        return eval( slurp( $.userfile_path ) );
+        return {} unless $.config.userfile_path ~~ :e;
+        return eval( slurp( $.config.userfile_path ) );
     }
 
     method not_found($page?) {

@@ -6,8 +6,8 @@ use Test::CGI;
 use Config;
 use URI;
 
-my @markups = < Text::Markup::Wiki::Minimal Text::Markup::Wiki::MediaWiki >;
-my @skins   = < Autumn CleanAndSoft >;
+my @markups = < Text::Markup::Wiki::MediaWiki >;
+my @skins   = < CleanAndSoft >;
 
 my %gets    = {
     #''                  =>  'View main page',
