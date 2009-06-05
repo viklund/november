@@ -12,19 +12,18 @@ class November does Session does Cache {
     use Utils;
     use Config;
     use November::Storage::File;
+    use Text::Markup::Wiki::MediaWiki;
 
     has November::Storage $.storage;
     has CGI     $.cgi;
     has Config  $.config;
 
-    # RAKUDO: BUILD do not implemented yet
+    # RAKUDO: BUILD not implemented yet
     method init {
         $!storage = November::Storage::File.new(
             storage_root => $.config.server_root ~ 'data/'
         );
         $!storage.init(); # Want ze BUILD submethod
-        #$!config = Config.new;
-        #say "MARKUP IS: ",$.config.markup;
     }
 
     method handle_request(CGI $cgi) {

@@ -4,9 +4,10 @@ use v6;
 use CGI;
 use November;
 use Config;
+use Text::Markup::Wiki::MediaWiki;
 
 my $c = Config.new(
-    markup => 'Text::Markup::Wiki::MediaWiki',
+    markup => Text::Markup::Wiki::MediaWiki.new(),
     skin   => 'CleanAndSoft'
 );
 my November $wiki = November.new(
