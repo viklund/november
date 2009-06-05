@@ -106,6 +106,11 @@ class November does Session does Cache {
             my $tags       = $.cgi.params<tags>;
             my $session_id = $.cgi.cookie<session_id>;
             my $author     = $sessions{$session_id}<user_name>;
+
+            return self.error_page(
+            "We're sorry, but for the moment November can only consume ASCII.") 
+                unless self.check_utf8_error( $new_text, $tags );
+
             $.storage.save_page($page, $new_text, $author);
             self.remove-cache-entry( $page );
 
@@ -127,6 +132,13 @@ class November does Session does Cache {
             PAGETAGS => $t.read_page_tags($page),
             }
         );
+    }
+
+    method check_utf8_error( *@strings ) {
+        for @strings.split("") -> $c {
+            return False if ord($c) > 127;
+        }
+        return True;
     }
 
     method logged_in() {
@@ -203,6 +215,9 @@ class November does Session does Cache {
         self.response('logout_succeeded.tmpl');
     }
 
+    method error_page($message = "Generic Error Message") {
+        self.response( 'error.tmpl', { MESSAGE => $message } );
+    }
 
     method list_recent_changes {
         self.response('recent_changes.tmpl',
