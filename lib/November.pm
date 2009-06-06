@@ -107,10 +107,6 @@ class November does Session does Cache {
             my $session_id = $.cgi.cookie<session_id>;
             my $author     = $sessions{$session_id}<user_name>;
 
-            return self.error_page(
-            "We're sorry, but for the moment November can only consume ASCII.") 
-                unless self.check_utf8_error( $new_text, $tags );
-
             $.storage.save_page($page, $new_text, $author);
             self.remove-cache-entry( $page );
 
