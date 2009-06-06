@@ -32,20 +32,21 @@ class November does Session does Cache {
         my $d = Dispatcher.new( default => { self.not_found } );
 
         $d.add: [
-            [''],                { self.view_page },
-            ['view', /^ \w+ $/], { self.view_page(~$^page) },
-            ['edit', /^ \w+ $/], { self.edit_page(~$^page) },
-            ['in'],              { self.log_in },
-            ['out'],             { self.log_out },
-            ['recent'],          { self.list_recent_changes },
-            ['all'],             { self.list_all_pages },
+            [''],                          { self.view_page },
+            ['view', /^ ( \w | '%' )+ $/], { self.view_page(~$^page) },
+            ['edit', /^ ( \w | '%' )+ $/], { self.edit_page(~$^page) },
+            ['in'],                        { self.log_in },
+            ['out'],                       { self.log_out },
+            ['recent'],                    { self.list_recent_changes },
+            ['all'],                       { self.list_all_pages },
         ];
 
         my @chunks = $cgi.uri.chunks.list;
         $d.dispatch(@chunks);
     }
 
-    method view_page($page='Main_Page') {
+    method view_page($page is rw='Main_Page') {
+        $page .= subst('%20', '_') while $page ~~ / '%20' /;
 
         unless $.storage.wiki_page_exists($page) {
             self.not_found($page);
@@ -87,7 +88,8 @@ class November does Session does Cache {
 
     }
 
-    method edit_page($page) {
+    method edit_page($page is rw) {
+        $page .= subst('%20', '_') while $page ~~ / '%20' /;
         my $sessions = self.read_sessions();
 
         return self.not_authorized() unless self.logged_in();
