@@ -33,8 +33,8 @@ class November does Session does Cache {
 
         $d.add: [
             [''],                          { self.view_page },
-            ['view', /^ ( \w | '%' )+ $/], { self.view_page(~$^page) },
-            ['edit', /^ ( \w | '%' )+ $/], { self.edit_page(~$^page) },
+            ['view', /^ ( \w | '%' | '-' )+ $/], { self.view_page(~$^page) },
+            ['edit', /^ ( \w | '%' | '-' )+ $/], { self.edit_page(~$^page) },
             ['in'],                        { self.log_in },
             ['out'],                       { self.log_out },
             ['recent'],                    { self.list_recent_changes },
