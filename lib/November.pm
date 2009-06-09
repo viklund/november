@@ -104,12 +104,13 @@ class November does Session does Cache {
         # POST data. The difference is the presence of the 'articletext'
         # parameter -- if there is one, the action is considered a save.
         if $.cgi.params<articletext> || $.cgi.params<tags> {
+            my $summary    = $.cgi.params<summary>;
             my $new_text   = $.cgi.params<articletext>;
             my $tags       = $.cgi.params<tags>;
             my $session_id = $.cgi.cookie<session_id>;
             my $author     = $sessions{$session_id}<user_name>;
 
-            $.storage.save_page($page, $new_text, $author);
+            $.storage.save_page($page, $new_text, $author, $summary);
             self.remove-cache-entry( $page );
 
             # TODO: we need plugin system (see topics in mail-list)

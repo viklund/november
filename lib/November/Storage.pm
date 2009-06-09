@@ -17,9 +17,9 @@ method add_to_index($page)                                   { ... }
 method read_index()                                          { ... }
 
 
-method save_page($_: $page, $new_text, $author) {
+method save_page($_: $page, $new_text, $author, $summary) {
     .add_to_index($page) unless .wiki_page_exists($page); 
-    my $modif_id = .write_modification([$page, $new_text, $author]);
+    my $modif_id = .write_modification([$page, $new_text, $author, $summary]);
     .add_page_history($page, $modif_id);
     .add_recent_change($modif_id); 
 }
