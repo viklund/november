@@ -46,7 +46,7 @@ class November does Session does Cache {
     }
 
     method view_page($page is rw='Main_Page') {
-        $page .= subst('%20', '_') while $page ~~ / '%20' /;
+        $page .= subst('%20', '_', :g);
 
         unless $.storage.wiki_page_exists($page) {
             self.not_found($page);
@@ -89,7 +89,7 @@ class November does Session does Cache {
     }
 
     method edit_page($page is rw) {
-        $page .= subst('%20', '_') while $page ~~ / '%20' /;
+        $page .= subst('%20', '_', :g);
         my $sessions = self.read_sessions();
 
         return self.not_authorized() unless self.logged_in();

@@ -106,10 +106,7 @@ class Text::Markup::Wiki::MediaWiki {
             [ entities < lt   gt  amp  #039 > ]
         );
 
-        while $xml_escaped ~~ / '&amp;#' / {
-            $*ERR.say("REPLACING");
-            $xml_escaped .= subst( / '&amp;#' /, '&#' );
-        }
+        $xml_escaped .= subst( / '&amp;#' /, '&#', :g );
 
         # A stack of all the active styles, in order of activation
         my @style_stack;
