@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 8;
+plan 9;
 
 use Dispatcher;
 ok(1,'We use Dispatcher and we are still alive');
@@ -37,7 +37,13 @@ $d.default = { "Woow" };
 
 is( $d.dispatch(['foo', 'bar', 'baz']), 
     "Woow", 
-    'Dispatch to default, when have no matched Rule'  
+    'Dispatch to default, when there\'s no matched Rule'  
 );
 
+$d = Dispatcher.new( default => { "Woow" } );
+
+is( $d.dispatch(['foo', 'bar', 'baz']), 
+    "Woow", 
+    'Dispatch to default created on init, when there\'s no matched Rule'  
+);
 # vim:ft=perl6

@@ -29,7 +29,7 @@ class November does Session does Cache {
     method handle_request(CGI $cgi) {
         $!cgi = $cgi;
 
-        my $d = Dispatcher.new( default => { self.not_found } );
+        my $d = Dispatcher.new( default => { self.error_page } );
 
         $d.add: [
             [''],                          { self.view_page },
@@ -133,13 +133,6 @@ class November does Session does Cache {
         );
     }
 
-    method check_utf8_error( *@strings ) {
-        for @strings.split("") -> $c {
-            return False if ord($c) > 127;
-        }
-        return True;
-    }
-
     method logged_in() {
         my $sessions = self.read_sessions();
         my $session_id = $.cgi.cookie<session_id>;
@@ -214,7 +207,7 @@ class November does Session does Cache {
         self.response('logout_succeeded.tmpl');
     }
 
-    method error_page($message = "Generic Error Message") {
+    method error_page($message = "You have commited a deadly URL") {
         self.response( 'error.tmpl', { MESSAGE => $message } );
     }
 
