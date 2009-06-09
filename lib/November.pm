@@ -238,21 +238,17 @@ class November does Session does Cache {
             $recent_changes = $.storage.read_recent_changes;
         }
 
-        # @recent_changes = @recent_changes[0..$limit] if $limit;
-        # RAKUDO: array slices do not implemented yet, so:
-        my @changes;
-        for $recent_changes.list -> $modification_id {
-            my $modification = $.storage.read_modification($modification_id);
-            my $count = push @changes, {
+        return map {
+            my $modification = $.storage.read_modification($_);
+            {
                 'PAGE' => self.make_link($modification[0],$modification[0]),
-                'TIME' => time_to_period_str($modification[3])
-                          || $modification_id,
+                'TIME' => time_to_period_str($modification[4])
+                          || $_,
                 'AUTHOR' => $modification[2] || 'somebody'
-                };
-            # RAKUDO: last not implemented yet :(
-            return @changes if $limit && $count == $limit;
-        }
-        return @changes;
+            }
+        }, $recent_changes[ $limit.defined
+                            ?? ^($limit min $recent_changes.elems)
+                            !! * ];
     }
 
     method list_all_pages {
