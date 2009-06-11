@@ -33,7 +33,7 @@ class CGI {
 
         $!uri = URI.new;
         my $uri_str = 'http://' ~ %*ENV<SERVER_NAME>;
-        $uri_str ~= ':' ~ %*ENV<SERVER_PORT> if %*ENV<SERVER_PORT>;  
+        $uri_str ~= ':' ~ %*ENV<SERVER_PORT> if %*ENV<SERVER_PORT>;
         $uri_str ~=  %*ENV<MODPERL6> ?? %*ENV<PATH_INFO> !! %*ENV<REQUEST_URI>;
         $.uri.init($uri_str);
     }
@@ -65,7 +65,7 @@ class CGI {
 
     method send_response($contents, %opts?) {
         # The header
-        print "Content-Type: text/html; charset=iso-8859-1$!crlf";
+        print "Content-Type: text/html; charset=utf-8$!crlf";
         if %opts && %opts<cookie> {
             print "Set-Cookie: {%opts<cookie>}; path=/;$!crlf";
         }
@@ -88,19 +88,19 @@ class CGI {
                 my @kvs = $param_value.split("=");
                 self.add_param( @kvs[0], unescape(@kvs[1]) );
             }
-        } 
+        }
         else {
             self.parse_keywords($string);
         }
     }
 
     method parse_keywords (Str $string is copy) {
-        my $kws = unescape($string); 
+        my $kws = unescape($string);
         @!keywords = $kws.split(/ \s+ /);
     }
 
     method eat_cookie(Str $http_cookie) {
-        # RAKODO: split(/ ; ' '? /) produce [""] on "", perl #60228 should cure that 
+        # RAKODO: split(/ ; ' '? /) produce [""] on "", perl #60228 should cure that
         my @param_values  = $http_cookie.split('; ');
 
         for @param_values -> $param_value {
@@ -114,16 +114,65 @@ class CGI {
         # RAKUDO: This could also be rewritten as a single .subst :g call.
         #         ...when the semantics of .subst is revised to change $/,
         #         that is.
-        while $string ~~ /\%(<[0..9A..F]>**2)/ {
-            my $match = $0;
-            my $character = chr(:16($match));
-            $string .= subst('%' ~ $match, $character);
+        # PARROT BUG: TT #752
+        # (https://trac.parrot.org/parrot/ticket/752)
+        # otherwise the solution is just .subst with a call to decode_urle...
+        my $buff = '';
+        my $more = 0;
+        my @chars;
+        for $string.comb -> $c {
+            if $c eq '%' { $buff ~= $c  ; $more=2 ; next }
+            if $more     { $buff ~= $c  ; $more-- ; next }
+            if $buff     { @chars.push: decode_urlencoded_utf8($buff); $buff='' }
+            @chars.push: $c;
         }
-        return $string;
+        @chars.push: decode_urlencoded_utf8($buff) if $buff;
+
+        # This is the evil hack, we can't join our decoded chars, we have to
+        # write them to a file so they all get the same encoding and charset
+        my $file_name = '/tmp/friggin_decode_problem';
+        my $fh = open($file_name, :w);
+        $fh.print(@chars);
+        $fh.close;
+        return slurp( $file_name );
+    }
+
+    sub decode_urlencoded_utf8($str) {
+        my @returns = ();
+        my @chars = $str.split('%').grep({$^w});
+        while @chars {
+            my $c = @chars.shift;
+            if :16($c) +& 0x80 { # UTF-8
+                if    :16($c) +& 0xF0 == 0xF0 { # 4 bytes
+                    my $chr = :16($c)           +& 0x07 +< 18;
+                    $chr   += :16(@chars.shift) +& 0x3F +< 12;
+                    $chr   += :16(@chars.shift) +& 0x3F +< 6;
+                    $chr   += :16(@chars.shift) +& 0x3F;
+                    $chr.=chr;
+                    push @returns, $chr;
+                }
+                elsif :16($c) +& 0xE0 == 0xE0 { # 3 bytes
+                    my $chr = :16($c)           +& 0x0F +< 12;
+                    $chr   += :16(@chars.shift) +& 0x3F +< 6;
+                    $chr   += :16(@chars.shift) +& 0x3F;
+                    $chr .= chr;
+                    push @returns, $chr
+                }
+                elsif :16($c) +& 0xC0 == 0xC0 { # 2 bytes
+                    my $chr = :16($c) +& 0x1F +< 6;
+                    $chr   += :16(@chars.shift) +& 0x3F;
+                    $chr.=chr;
+                    push @returns, $chr
+                }
+            } else {
+                push @returns, chr(:16($c));
+            }
+        }
+        return @returns;
     }
 
     method add_param ( Str $key, $value ) {
-        # RAKUDO: синтаксис Hash :exists еще не реализован 
+        # RAKUDO: синтаксис Hash :exists еще не реализован
         #        (Hash :exists{key} not implemented yet)
         # if %.params :exists{$key} {
         if %.params.exists($key) {
@@ -131,10 +180,10 @@ class CGI {
             if %.params{$key} ~~ Str | Int {
                 my $old_param = %.params{$key};
                 %!params{$key} = [ $old_param, $value ];
-            } 
+            }
             elsif %.params{$key} ~~ Array {
                 %!params{$key}.push( $value );
-            } 
+            }
         }
         else {
             %!params{$key} = $value;
