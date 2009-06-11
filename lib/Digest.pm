@@ -7,13 +7,13 @@ sub digest(Str $text, Str $algo is copy = 'md5') is export {
 		.local string text
 		.local string algo
 		.local pmc digest
-		
+
 		# Input
 		$P0 = find_lex '$text'
 		text = $P0
 		$P0 = find_lex '$algo'
 		algo = $P0
-		
+
 		# Choose the right digest.
 		$P1 = loadlib 'digest_group'
 		if algo == 'MD5' goto MD5
@@ -36,15 +36,15 @@ sub digest(Str $text, Str $algo is copy = 'md5') is export {
 	RIPEMD160:
 		digest = new 'RIPEMD160'
 		goto COMPUTE
-	
+
 	COMPUTE:
 		# Calculate the digest.
 		digest.'Init'()
 		digest.'Update'(text)
 		$S0 = digest.'Final'()
-		
+
 		%r = box $S0
 	};
 	# Convert to hex.
-	return join '', map { sprintf '%02x', (ord $^a) }, $binary.comb;
+	return [~] map { sprintf '%02x', .ord }, $binary.comb;
 }
