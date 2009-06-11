@@ -29,7 +29,7 @@ class November does Session does Cache {
     method handle_request(CGI $cgi) {
         $!cgi = $cgi;
 
-        my $d = Dispatcher.new( default => { self.not_found } );
+        my $d = Dispatcher.new( default => { self.error_page } );
 
         $d.add: [
             [''],                          { self.view_page },
@@ -104,12 +104,13 @@ class November does Session does Cache {
         # POST data. The difference is the presence of the 'articletext'
         # parameter -- if there is one, the action is considered a save.
         if $.cgi.params<articletext> || $.cgi.params<tags> {
+            my $summary    = $.cgi.params<summary>;
             my $new_text   = $.cgi.params<articletext>;
             my $tags       = $.cgi.params<tags>;
             my $session_id = $.cgi.cookie<session_id>;
             my $author     = $sessions{$session_id}<user_name>;
 
-            $.storage.save_page($page, $new_text, $author);
+            $.storage.save_page($page, $new_text, $author, $summary);
             self.remove-cache-entry( $page );
 
             # TODO: we need plugin system (see topics in mail-list)
@@ -130,13 +131,6 @@ class November does Session does Cache {
             PAGETAGS => $t.read_page_tags($page),
             }
         );
-    }
-
-    method check_utf8_error( *@strings ) {
-        for @strings.split("") -> $c {
-            return False if ord($c) > 127;
-        }
-        return True;
     }
 
     method logged_in() {
@@ -213,7 +207,7 @@ class November does Session does Cache {
         self.response('logout_succeeded.tmpl');
     }
 
-    method error_page($message = "Generic Error Message") {
+    method error_page($message = "You have commited a deadly URL") {
         self.response( 'error.tmpl', { MESSAGE => $message } );
     }
 
@@ -237,21 +231,17 @@ class November does Session does Cache {
             $recent_changes = $.storage.read_recent_changes;
         }
 
-        # @recent_changes = @recent_changes[0..$limit] if $limit;
-        # RAKUDO: array slices do not implemented yet, so:
-        my @changes;
-        for $recent_changes.list -> $modification_id {
-            my $modification = $.storage.read_modification($modification_id);
-            my $count = push @changes, {
+        return map {
+            my $modification = $.storage.read_modification($_);
+            {
                 'PAGE' => self.make_link($modification[0],$modification[0]),
-                'TIME' => time_to_period_str($modification[3])
-                          || $modification_id,
+                'TIME' => time_to_period_str($modification[4])
+                          || $_,
                 'AUTHOR' => $modification[2] || 'somebody'
-                };
-            # RAKUDO: last not implemented yet :(
-            return @changes if $limit && $count == $limit;
-        }
-        return @changes;
+            }
+        }, $recent_changes[ $limit.defined
+                            ?? ^($limit min $recent_changes.elems)
+                            !! * ];
     }
 
     method list_all_pages {

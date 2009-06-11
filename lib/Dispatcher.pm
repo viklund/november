@@ -15,8 +15,6 @@ class Dispatcher {
     }
 
     multi method add (@rules) {
-        # RAKUDO: "Return" values of for loop statements
-        my $r;
         # The following line of code is in relatively high flux, due to
         # changes in the Spec and Rakudo when it comes to handling of
         # typed arrays etc. For a long time, it said 'Object @pattern',
@@ -27,9 +25,9 @@ class Dispatcher {
         # versions of Rakudo, writing 'Object @pattern' wrongly causes
         # the Array not to bind, despite the fact that any Array should.
         for @rules -> @pattern, $action {
-            $r = self.add(@pattern, $action);
+            self.add(@pattern, $action);
         }
-        return $r;
+        return @.rules.elems;
     }
 
     method dispatch (@chunks) {
@@ -41,7 +39,7 @@ class Dispatcher {
             return $result;
         }
         elsif defined $.default {
-            $.default();
+            $.default().();
         }
         else {
             return Failure;
