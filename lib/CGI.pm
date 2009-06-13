@@ -139,34 +139,19 @@ class CGI {
 
     sub decode_urlencoded_utf8($str) {
         my @returns = ();
-        my @chars = $str.split('%').grep({$^w});
+        my @chars = map { :16($_) }, $str.split('%').grep({$^w});
         while @chars {
-            my $c = @chars.shift;
-            if :16($c) +& 0x80 { # UTF-8
-                if    :16($c) +& 0xF0 == 0xF0 { # 4 bytes
-                    my $chr = :16($c)           +& 0x07 +< 18;
-                    $chr   += :16(@chars.shift) +& 0x3F +< 12;
-                    $chr   += :16(@chars.shift) +& 0x3F +< 6;
-                    $chr   += :16(@chars.shift) +& 0x3F;
-                    $chr.=chr;
-                    push @returns, $chr;
-                }
-                elsif :16($c) +& 0xE0 == 0xE0 { # 3 bytes
-                    my $chr = :16($c)           +& 0x0F +< 12;
-                    $chr   += :16(@chars.shift) +& 0x3F +< 6;
-                    $chr   += :16(@chars.shift) +& 0x3F;
-                    $chr .= chr;
-                    push @returns, $chr
-                }
-                elsif :16($c) +& 0xC0 == 0xC0 { # 2 bytes
-                    my $chr = :16($c) +& 0x1F +< 6;
-                    $chr   += :16(@chars.shift) +& 0x3F;
-                    $chr.=chr;
-                    push @returns, $chr
-                }
-            } else {
-                push @returns, chr(:16($c));
+            my $bytes = 1;
+            my $mask  = 0xFF;
+            given @chars[0] {
+                when { $^c +& 0xF0 == 0xF0 } { $bytes = 4; $mask = 0x07 }
+                when { $^c +& 0xE0 == 0xE0 } { $bytes = 3; $mask = 0x0F }
+                when { $^c +& 0xC0 == 0xC0 } { $bytes = 2; $mask = 0x1F }
             }
+            my @shift = (^$bytes).reverse.map(**6);
+            my @mask  = $mask, 0x3F xx $bytes-1;
+            @returns.push: 
+                chr( [+] @chars.splice(0,$bytes) »+&« @mask »+<« @shift );
         }
         return @returns;
     }
