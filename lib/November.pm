@@ -110,6 +110,11 @@ class November does Session does Cache {
             my $session_id = $.cgi.cookie<session_id>;
             my $author     = $sessions{$session_id}<user_name>;
 
+            if $.cgi.params<preview> {
+                # It's only a preview, should just send it back formatted
+                return self.show_preview( $page, $summary, $new_text, $tags );
+            }
+
             $.storage.save_page($page, $new_text, $author, $summary);
             self.remove-cache-entry( $page );
 
@@ -129,6 +134,34 @@ class November does Session does Cache {
             TITLE    => $title,
             CONTENT  => $old_content,
             PAGETAGS => $t.read_page_tags($page),
+            }
+        );
+    }
+
+    method show_preview( $page is rw, $summary, $new_text, $tags ) {
+        $page .= subst('%20', '_', :g);
+        my $title = $page.trans( ['_'] => [' '] );
+
+        my $markup = $.config.markup;
+
+        my $content = $markup.format($new_text,
+                     link_maker    => { self.make_link($^p, $^t) },
+                     extlink_maker => { self.make_extlink($^p, $^t)
+                     });
+
+        # Should really use the $tags parameter here, this will do for now...
+        #my $t = Tags.new();
+        #my $tags = $t.tags_parse( $tags );
+
+        self.response( 'edit.tmpl',
+            {
+            ACTION   => 'Editing',
+            PAGE     => $page,
+            TITLE    => $title,
+            SUMMARY  => $summary,
+            CONTENT  => $new_text,
+            PREVIEW  => $content,
+            PAGETAGS => $tags,
             }
         );
     }

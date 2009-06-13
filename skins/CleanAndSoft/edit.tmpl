@@ -9,6 +9,10 @@
             <div id="pagebar">&nbsp;</div>
             <div id="content">
                 <h1><TMPL_VAR NAME=ACTION> <TMPL_VAR NAME=TITLE></h1>
+                <TMPL_IF NAME=PREVIEW>
+                    <h2>PREVIEW</h2>
+                    <TMPL_VAR NAME=PREVIEW>
+                </TMPL_IF>
                 <form method="POST">
                     <input type="hidden" name="page" value="<TMPL_VAR NAME=PAGE>" />
                     <input type="hidden" name="action" value="edit" />
@@ -16,9 +20,9 @@
                         <textarea name="articletext" rows="22" cols="60"><TMPL_VAR NAME=CONTENT></textarea>
                     </div>
                     Tags: <input type="text" name="tags" size="50" value="<TMPL_IF NAME=PAGETAGS><TMPL_VAR NAME=PAGETAGS></TMPL_IF>" />
-                    Summary: <input type="text" name="summary" size="50" />
+                    Summary: <input type="text" name="summary" size="50" value="<TMPL_IF NAME=SUMMARY><TMPL_VAR NAME=SUMMARY></TMPL_IF>" />
                     <p/>
-                    <input type="submit" value="Save" /> or <a href="/view/<TMPL_VAR NAME=PAGE>">cancel</a>
+                    <input type="submit" value="Save" />, <input type="submit" name="preview" value="Preview" /> or <a href="/view/<TMPL_VAR NAME=PAGE>">cancel</a>
                 </form>
             </div>
     <TMPL_INCLUDE NAME="sidebar.tmpl">
