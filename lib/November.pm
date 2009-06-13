@@ -66,10 +66,12 @@ class November does Session does Cache {
         else {
             my $markup = $.config.markup;
 
-            $content = $markup.format($.storage.read_page( $page ),
-                         link_maker    => { self.make_link($^p, $^t) },
-                         extlink_maker => { self.make_extlink($^p, $^t)
-                         });
+            $content = $markup.format(
+                        # MediaWiki markup can't handle trailing spaces, gh-16
+                        $.storage.read_page( $page ).subst(/[\s|\n]+$/, ''),
+                        link_maker    => { self.make_link($^p, $^t) },
+                        extlink_maker => { self.make_extlink($^p, $^t)}
+            );
 
             self.set-cache-entry( $page, $content );
         }
@@ -144,10 +146,12 @@ class November does Session does Cache {
 
         my $markup = $.config.markup;
 
-        my $content = $markup.format($new_text,
-                     link_maker    => { self.make_link($^p, $^t) },
-                     extlink_maker => { self.make_extlink($^p, $^t)
-                     });
+        my $content = $markup.format(
+                    # MediaWiki markup can't handle trailing spaces, gh-16
+                    $new_text.subst(/[\s|\n]+$/, ''),
+                    link_maker    => { self.make_link($^p, $^t) },
+                    extlink_maker => { self.make_extlink($^p, $^t)}
+        );
 
         # Should really use the $tags parameter here, this will do for now...
         #my $t = Tags.new();
