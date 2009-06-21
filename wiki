@@ -13,7 +13,5 @@ my $c = Config.new(
 my November $wiki = November.new(
     config => $c,
 );
-$wiki.init();
 my $cgi = CGI.new;
-$cgi.init();
 $wiki.handle_request($cgi);

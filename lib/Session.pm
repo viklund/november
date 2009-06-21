@@ -1,9 +1,8 @@
 role Session;
 
-use Config;
-
-# TODO can we use November $!config here? or parametrise this role?
-has $.sessionfile_path = Config.new.server_root ~ 'data/sessions';
+method sessionfile-path {
+    return $.config.server_root  ~ 'data/sessions';
+}
 
 method add_session($id, %stuff) {
     my $sessions = self.read_sessions();
@@ -18,14 +17,14 @@ method remove_session($id) {
 }
 
 method read_sessions {
-    return {} unless $.sessionfile_path ~~ :e;
-    my $string = slurp( $.sessionfile_path );
+    return {} unless self.sessionfile-path ~~ :e;
+    my $string = slurp( self.sessionfile-path );
     my $stuff = eval( $string );
     return $stuff;
 }
 
 method write_sessions( $sessions ) {
-    my $fh = open( $.sessionfile_path, :w );
+    my $fh = open( self.sessionfile-path, :w );
     $fh.say( $sessions.perl );
     $fh.close;
 }

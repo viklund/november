@@ -9,8 +9,11 @@ class CGI {
 
     has $!crlf = "\x[0D]\x[0A]";
 
-    # RAKUDO: BUILD method not supported
-    method init() {
+    submethod BUILD() {
+        # RAKUDO #66792, Attribute defaults don't get instantiated when BUILD
+        # method exists.
+        $!crlf = "\x[0D]\x[0A]";
+
         self.parse_params(%*ENV<QUERY_STRING>);
         # It's prudent to handle CONTENT_LENGTH too, but right now that's not
         # a priority. It would make our tests scripts more complicated, with
@@ -31,11 +34,11 @@ class CGI {
 
         self.eat_cookie( %*ENV<HTTP_COOKIE> ) if %*ENV<HTTP_COOKIE>;
 
-        $!uri = URI.new;
         my $uri_str = 'http://' ~ %*ENV<SERVER_NAME>;
         $uri_str ~= ':' ~ %*ENV<SERVER_PORT> if %*ENV<SERVER_PORT>;
         $uri_str ~=  %*ENV<MODPERL6> ?? %*ENV<PATH_INFO> !! %*ENV<REQUEST_URI>;
-        $.uri.init($uri_str);
+
+        $!uri = URI.new( uri => $uri_str );
     }
 
     # For debugging

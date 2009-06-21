@@ -1,21 +1,21 @@
 class URI;
 
+use URI::Grammar;
 # RAKUDO: Match object does not do assignment properly :(
 #my Match $.parts; dies in init with 'Type mismatch in assignment';
 # workaround:
 has $.uri;
 has @.chunks;
 
-method init ($str) {
-    use URI::Grammar;
+submethod BUILD(:$uri) {
 
     # clear string before parsing
-    my $c_str = $str;
+    my $c_str = $uri;
     $c_str .= subst(/^ \s* ['<' | '"'] /, '');
     $c_str .= subst(/ ['>' | '"'] \s* $/, '');
 
     URI::Grammar.parse($c_str);
-    unless $/ { die "Could not parse URI: $str" }
+    unless $/ { die "Could not parse URI: $uri" }
 
     $!uri = $/;
     @!chunks = $/<path><chunk> // ('');

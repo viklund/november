@@ -18,12 +18,11 @@ class November does Session does Cache {
     has CGI     $.cgi;
     has Config  $.config;
 
-    # RAKUDO: BUILD not implemented yet
-    method init {
+    submethod BUILD( :$config = Config.new ) {
+        $!config = $config;
         $!storage = November::Storage::File.new(
-            storage_root => $.config.server_root ~ 'data/'
+            storage_root => $!config.server_root ~ 'data/'
         );
-        $!storage.init(); # Want ze BUILD submethod
     }
 
     method handle_request(CGI $cgi) {
@@ -319,10 +318,10 @@ class November does Session does Cache {
 
         $template.with_params(
             {
-            WEBROOT   => $.config.web_root,
+            WEBROOT   => $!config.web_root,
             LOGGED_IN => self.logged_in,
-            SKIN      => $.config.skin,
-            TMPL_PATH => $.config.template_path,
+            SKIN      => $!config.skin,
+            TMPL_PATH => $!config.template_path,
             %params
             }
         );

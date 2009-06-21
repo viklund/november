@@ -16,11 +16,13 @@ class November::Storage::File is November::Storage {
     has $.recent_changes_path is rw; # = $r ~ 'data/recent-changes';
     has $.index_path          is rw; # = $r ~ 'data/index';
 
-    method init {
-        $.content_path        = $.storage_root ~ 'articles/';
-        $.modifications_path  = $.storage_root ~ 'modifications/';
-        $.recent_changes_path = $.storage_root ~ 'recent-changes';
-        $.index_path          = $.storage_root ~ 'index';
+    submethod BUILD(:$storage_root) {
+        $!storage_root = $storage_root;
+
+        $!content_path        = $!storage_root ~ 'articles/';
+        $!modifications_path  = $!storage_root ~ 'modifications/';
+        $!recent_changes_path = $!storage_root ~ 'recent-changes';
+        $!index_path          = $!storage_root ~ 'index';
     }
 
     method wiki_page_exists($page) {
