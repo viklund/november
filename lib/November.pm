@@ -32,13 +32,13 @@ class November does Session does Cache {
         my $d = Dispatcher.new( default => { self.error_page } );
 
         $d.add: [
-            [''],                         { self.view_page },
-            ['view', /^ ( <-[?/]> )+ $/], { self.view_page(~$^page) },
-            ['edit', /^ ( <-[?/]> )+ $/], { self.edit_page(~$^page) },
-            ['in'],                       { self.log_in },
-            ['out'],                      { self.log_out },
-            ['recent'],                   { self.list_recent_changes },
-            ['all'],                      { self.list_all_pages },
+            [''],                     { self.view_page },
+            ['view', /^ <-[?/]>+ $/], { self.view_page(~$^page) },
+            ['edit', /^ <-[?/]>+ $/], { self.edit_page(~$^page) },
+            ['in'],                   { self.log_in },
+            ['out'],                  { self.log_out },
+            ['recent'],               { self.list_recent_changes },
+            ['all'],                  { self.list_all_pages },
         ];
 
         my @chunks = $cgi.uri.chunks.list;

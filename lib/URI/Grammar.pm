@@ -7,7 +7,7 @@ grammar URI::Grammar {
     token port       { \d+ };
     token path       { <slash>? [ <chunk> '/'?]* }; # * mb wrong, because that allow '' URI
     token slash      { '/' };
-    token chunk      { <-[/?#:]>+ };
+    token chunk      { <-[/?#]>+ };
     token query      { <-[#]>* };
     token fragment   { .* };
 }
