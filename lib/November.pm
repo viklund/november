@@ -2,6 +2,7 @@ use v6;
 
 use Session;
 use Cache;
+use Digest;
 
 class November does Session does Cache {
 
@@ -204,11 +205,10 @@ class November does Session does Cache {
             my %users = self.read_users();
 
             # Yes, this is cheating. Stand by for a real MD5 hasher.
-            if (defined %users{$user_name}
-                and $password eq %users{$user_name}<plain_text>) {
-    #            if Digest::MD5::md5_base64(
-    #                   Digest::MD5::md5_base64($user_name) ~ $password
-    #               ) eq %users{$user_name}<password> {
+            if defined %users{$user_name}
+                and digest(digest($user_name, 'sha256') ~ $password,
+                          'sha256'
+                   ) eq %users{$user_name}<password> {
 
                 my $session_id = self.new_session($user_name);
                 my $session_cookie = "session_id=$session_id";
