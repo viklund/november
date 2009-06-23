@@ -329,7 +329,8 @@ class November does Session does Cache {
         $.cgi.send_response($template.output, %opts);
     }
 
-    method make_link($page, $title) {
+    method make_link($page is copy, $title) {
+        $page .= subst(' ', '_', :g);
         my $root = $!config.web_root;
         if $title {
             if $page ~~ m/':'/ {

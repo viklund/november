@@ -8,7 +8,7 @@ grammar Tokenizer {
     regex italic_marker { '&#039;&#039;' }
 
     regex wikilink { '[[' \s*  <page> \s* ']]' }
-    regex page { [<!before ']]'> \S]+ }
+    regex page { [<!before ']]'> \N]+<!after \s> }
 
     regex extlink { '[' \s* <url> [\s+ <title>]? \s* ']' }
     regex url { [<!before ']'> \S]+ }
