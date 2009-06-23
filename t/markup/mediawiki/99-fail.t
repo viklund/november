@@ -17,6 +17,6 @@ try {
   $succeeded = True;
 }
 
-ok( $succeedec, q[the parser doesn't crash on a final newline] ); # '
+ok( $succeeded, q[the parser doesn't crash on a final newline] ); # '
 
 # vim:ft=perl6
