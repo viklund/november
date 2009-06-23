@@ -34,7 +34,7 @@ class Text::Markup::Wiki::MediaWiki {
                 @parlist[$ix+1] .= subst( '</p><p>', ' ' );
                 @parlist[$ix] = undef;
             }
-            if @parlist[$ix] ~~ /^'<uli>'/ && @parlist[$ix+1] ~~ /^'<uli>'/
+            elsif @parlist[$ix] ~~ /^'<uli>'/ && @parlist[$ix+1] ~~ /^'<uli>'/
             || @parlist[$ix] ~~ /^'<oli>'/ && @parlist[$ix+1] ~~ /^'<oli>'/ {
                 @parlist[$ix+1] = [~] @parlist[$ix], "\n", @parlist[$ix+1];
                 @parlist[$ix] = undef;
@@ -118,7 +118,7 @@ class Text::Markup::Wiki::MediaWiki {
         my $result = join '', gather {
             Tokenizer.parse($xml_escaped) or return "Couldn't parse '$line'";
 
-            for $/<token>.values -> $token {
+            for $/<token>.values // () -> $token {
                 if $token<bold_marker> {
                     toggle(@style_stack, @promises, 'b');
                 }
