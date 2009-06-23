@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 10;
+plan 11;
 
 use Text::Markup::Wiki::MediaWiki;
 
@@ -61,6 +61,14 @@ my $extlink_maker = { "<a href=\"$^href\">$^title</a>" }
     my $actual_output = $converter.format($input, :$link_maker);
 
     is( $actual_output, $expected_output, 'malformed link III' );
+}
+
+{
+    my $input = "[[Link with spaces]]";
+    my $expected_output = '<p><a href="/?page=Link_with_spaces">Link with spaces</a></p>';
+    my $actual_output = $converter.format($input, :$link_maker);
+
+    is( $actual_output, $expected_output, 'link with spaces' );
 }
 
 {
