@@ -22,14 +22,12 @@ my %gets    = {
 
 plan @markups * @skins * %gets;
 
-my $uri = URI.new();
-my $cgi = Test::CGI.new( uri => $uri );
 for @markups X @skins -> $m, $s {
     my $c = Config.new( markup => $m, skin => $s );
     my $w = November.new( config => $c );
-    $w.init;
     for %gets.kv -> $page, $description {
-        $uri.init( 'http://testserver' ~ $page );
+        my $uri = URI.new( 'http://testserver' ~ $page );
+        my $cgi = Test::CGI.new( uri => $uri );
         $cgi.parse_params( $page );
         lives_ok( { $w.handle_request( $cgi ) }, "$m, $s, $description" );
     }

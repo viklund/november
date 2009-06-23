@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-plan 23;
+plan 22;
 
 use CGI;
 ok(1,'We use CGI and we are still alive');
@@ -9,10 +9,6 @@ ok(1,'We use CGI and we are still alive');
 my $cgi;
 $cgi = CGI.new();
 isa_ok( $cgi, 'CGI', 'Instant it');
-
-# Don't know why I do this
-$cgi.init();
-isa_ok( $cgi, 'CGI', '...still' );
 
 my @queries = (
     'test=',
