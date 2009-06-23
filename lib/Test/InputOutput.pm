@@ -20,12 +20,12 @@ class Test::InputOutput {
             else {
                 if $test.elems < 2 {
                     ok(0);
-                    return;
+                    return ();
                 }
                 $input, $expected, $description = $test.values;
             }
 
-            my $actual = $.filter($input);
+            my $actual = $!filter($input);
 
             is( $actual, $expected, $description );
         }
