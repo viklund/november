@@ -117,31 +117,28 @@ class CGI {
         # RAKUDO: This could also be rewritten as a single .subst :g call.
         #         ...when the semantics of .subst is revised to change $/,
         #         that is.
-        # PARROT BUG: TT #752
-        # (https://trac.parrot.org/parrot/ticket/752)
-        # otherwise the solution is just .subst with a call to decode_urle...
-        my $buff = '';
-        my $more = 0;
-        my @chars;
-        for $string.comb -> $c {
-            if $c eq '%' { $buff ~= $c  ; $more=2 ; next }
-            if $more     { $buff ~= $c  ; $more-- ; next }
-            if $buff     { @chars.push: decode_urlencoded_utf8($buff); $buff='' }
-            @chars.push: $c;
+        # The percent_hack can be removed once the bug is fixed and :g is
+        # added
+        while $string ~~ / ( [ '%' <[0..9A..F]>**2 ]+ ) / {
+            $string .= subst( ~$0,
+            percent_hack_start( decode_urlencoded_utf8( ~$0 ) ) );
         }
-        @chars.push: decode_urlencoded_utf8($buff) if $buff;
+        return percent_hack_end( $string );
+    }
 
-        # This is the evil hack, we can't join our decoded chars, we have to
-        # write them to a file so they all get the same encoding and charset
-        my $file_name = '/tmp/friggin_decode_problem';
-        my $fh = open($file_name, :w);
-        $fh.print(@chars);
-        $fh.close;
-        return slurp( $file_name );
+    sub percent_hack_start($str is rw) {
+        if $str ~~ '%' {
+            $str = '___PERCENT_HACK___';
+        }
+        return $str;
+    }
+
+    sub percent_hack_end($str) {
+        return $str.subst('___PERCENT_HACK___', '%', :g);
     }
 
     sub decode_urlencoded_utf8($str) {
-        my @returns = ();
+        my $r = '';
         my @chars = map { :16($_) }, $str.split('%').grep({$^w});
         while @chars {
             my $bytes = 1;
@@ -153,10 +150,9 @@ class CGI {
             }
             my @shift = (^$bytes).reverse.map(**6);
             my @mask  = $mask, 0x3F xx $bytes-1;
-            @returns.push: 
-                chr( [+] @chars.splice(0,$bytes) »+&« @mask »+<« @shift );
+            $r ~= chr( [+] @chars.splice(0,$bytes) »+&« @mask »+<« @shift );
         }
-        return @returns;
+        return $r;
     }
 
     method add_param ( Str $key, $value ) {
