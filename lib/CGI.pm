@@ -14,7 +14,7 @@ class CGI {
         # method exists.
         $!crlf = "\x[0D]\x[0A]";
 
-        self.parse_params(%*ENV<QUERY_STRING>);
+        self.parse_params(%*ENV<QUERY_STRING> // '');
         # It's prudent to handle CONTENT_LENGTH too, but right now that's not
         # a priority. It would make our tests scripts more complicated, with
         # little gains. It would look like this:
