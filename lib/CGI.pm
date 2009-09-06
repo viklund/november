@@ -148,7 +148,7 @@ class CGI {
                 when { $^c +& 0xE0 == 0xE0 } { $bytes = 3; $mask = 0x0F }
                 when { $^c +& 0xC0 == 0xC0 } { $bytes = 2; $mask = 0x1F }
             }
-            my @shift = (^$bytes).reverse.map(**6);
+            my @shift = (^$bytes).reverse.map({6 * $_});
             my @mask  = $mask, 0x3F xx $bytes-1;
             $r ~= chr( [+] @chars.splice(0,$bytes) »+&« @mask »+<« @shift );
         }
