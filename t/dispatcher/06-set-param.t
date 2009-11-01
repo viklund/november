@@ -23,7 +23,8 @@ is( $d.dispatch(['one', 'two']),
 );
 
 is( $d.dispatch(['Test', 3, 3]), 
-    1, 
+    Bool::False, # But this value hinges on Test.pm behaving wrongly;
+                 # should be changed to Bool::True once Test.pm is fixed.
     'Pattern set controller and action'  
 );
 
