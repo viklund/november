@@ -24,7 +24,7 @@ my $modif = $s.read_modification($id);
 is($modif[0], 'Page', 'read modification data -- Page');
 is($modif[1], 'Text', 'read modification data -- Text');
 is($modif[2], 'Author', 'read modification data -- Author');
-ok($modif[3] <= (int time), 'read time, and it <= now ');
+ok($modif[3] <= time.Int, 'read time, and it <= now');
 
 $s.clear;
 

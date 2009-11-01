@@ -62,7 +62,7 @@ class November::Storage::File is November::Storage {
 
     method write_modification ($modification) {
         my $modif = $modification;
-        $modif.push(int time);
+        $modif.push(time.Int);
         my $data = $modif.perl;
         r_remove($data);
 

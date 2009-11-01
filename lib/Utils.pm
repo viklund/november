@@ -6,19 +6,19 @@ sub r_remove( $str is rw ) is export {
 
 sub get_unique_id is export {
     # hopefully pretty unique ID
-    return int(time%1000000/100) ~ time%100
+    return (time%1000000/100).Int ~ time%100
 
     # mb that? just for simple time extracts after?
     # return int rand ~ ':' ~ time;
 }
 
 sub get_period ($modif_time, $time_now?) is export {
-    my $time = $time_now || int(time);
+    my $time = $time_now || time.Int;
     my $period = $time - $modif_time;
 
-    my $mins  = int($period / 60);
-    my $hours = int($period / 60 / 60);
-    my $days  = int($period / 60 / 60 / 24);
+    my $mins  = ($period / 60).Int;
+    my $hours = ($period / 60 / 60).Int;
+    my $days  = ($period / 60 / 60 / 24).Int;
 
     if $days >= 1 {
         $hours = $hours - $days * 24;
