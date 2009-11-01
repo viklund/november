@@ -10,6 +10,7 @@ my @tests =
 
 use Test::InputOutput;
 plan +@tests;
+todo 'Implement pre text';
 
 use Text::Markup::Wiki::MediaWiki;
 
