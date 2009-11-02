@@ -8,7 +8,7 @@ class Tags {
     my $.tags_count_path is rw = $server_root ~ 'data/tags_count';
     my $.tags_index_path is rw = $server_root ~ 'data/tags_index';
 
-    method update_tags ($_: Str $page, Str $new_tags) {
+    method update_tags($_: Str $page, Str $new_tags) {
         my $old_tags = .read_page_tags($page).chomp;
         return 1 if $new_tags eq $old_tags;
 
@@ -23,7 +23,7 @@ class Tags {
         .write_page_tags($page, $new_tags);
     }
 
-    method add_tags (Str $page, @tags) {
+    method add_tags(Str $page, @tags) {
 
         my %count = self.read_tags_count;
         %count{$_}++ for @tags;
@@ -76,46 +76,46 @@ class Tags {
         return slurp($file);
     }
 
-    method write_page_tags (Str $page, Str $tags) {
+    method write_page_tags(Str $page, Str $tags) {
         my $file = $.page_tags_path ~ $page;
         my $fh = open( $file, :w );
         $fh.say($tags);
         $fh.close;
     }
    
-    method read_tags_count {
+    method read_tags_count() {
         my $file = $.tags_count_path;
         return {} unless $file ~~ :e;
         return eval slurp $file;
     }
 
-    method write_tags_count (Hash $counts) {
+    method write_tags_count(Hash $counts) {
         my $file = $.tags_count_path;
         my $fh = open( $file, :w );
         $fh.say( $counts.perl );
         $fh.close;
     }
 
-    method read_tags_index {  
+    method read_tags_index() {
         my $file = $.tags_index_path;
         return {} unless $file ~~ :e;
         return eval slurp $file;
     }
 
-    method write_tags_index (Hash $index) {
+    method write_tags_index(Hash $index) {
         my $file = $.tags_index_path;
         my $fh = open( $file, :w );
         $fh.say( $index.perl );
         $fh.close;
     }
 
-    method tags_parse (Str $tags) {
+    method tags_parse(Str $tags) {
         return () if $tags ~~ m/^ \s* $/;
         my @tags = $tags.lc.split(/ \s* ( ',' | \n | '.' ) \s* /);
         grep { $_ ne "" }, @tags.uniq;
     }
 
-    method norm_counts (@tags?) {
+    method norm_counts(@tags?) {
         my %counts = self.read_tags_count;
 
         my ($min, $max) = 0, 0;
@@ -133,17 +133,17 @@ class Tags {
         return $norm_counts;
     }
 
-    method norm ($count, $min, $max) {
+    method norm($count, $min, $max) {
         my $step = ($count - $min) / (($max - $min) || 1);
         return ceiling( ( log($step + 1 ) * 10 ) / log 2 ); 
     }
     
-    method page_tags (Str $page) {
+    method page_tags(Str $page) {
         my @page_tags = self.tags_parse( self.read_page_tags: $page ); 
         return @page_tags.map: { {NAME => $_} };
     }
 
-    method all_tags {
+    method all_tags() {
         my $norm_counts = self.norm_counts; 
         return $norm_counts.keys.map: { {NAME => $_, COUNT => $norm_counts{$_}} };
     }
