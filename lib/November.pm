@@ -243,7 +243,7 @@ class November does Session does Cache {
         self.response('logout_succeeded.tmpl');
     }
 
-    method error_page($message = "You have commited a deadly URL") {
+    method error_page($message = "An internal error occurred. Apologies.") {
         self.response( 'error.tmpl', { MESSAGE => $message } );
     }
 
