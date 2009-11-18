@@ -38,6 +38,7 @@ class November does Session does Cache {
             ['in'],                   { self.log_in },
             ['out'],                  { self.log_out },
             ['recent'],               { self.list_recent_changes },
+            ['history'],              { self.view_page_history(~$^page) },
             ['all'],                  { self.list_all_pages },
         ];
 
@@ -251,6 +252,24 @@ class November does Session does Cache {
         self.response('recent_changes.tmpl',
             {
             'CHANGES'   => self.get_changes(limit => 50),
+            }
+        );
+    }
+
+    method view_page_history($page is rw = 'Main_Page') {
+        $page .= subst('%20', '_', :g);
+
+        unless $.storage.wiki_page_exists($page) {
+            self.not_found($page);
+            return;
+        }
+
+        my $title = $page.trans( ['_'] => [' '] );
+
+        self.response('page_history.tmpl',
+            {
+            'TITLE'     => $title,
+            'CHANGES'   => self.get_changes($page, limit => 50),
             }
         );
     }
