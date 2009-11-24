@@ -120,10 +120,10 @@ class Text::Markup::Wiki::MediaWiki {
 
             for $/<token>.values // () -> $token {
                 if $token<bold_marker> {
-                    toggle(@style_stack, @promises, 'strong');
+                    toggle(@style_stack, @promises, 'b');
                 }
                 elsif $token<italic_marker> {
-                    toggle(@style_stack, @promises, 'em');
+                    toggle(@style_stack, @promises, 'i');
                 }
                 elsif $token<wikilink> {
                     take defined $link_maker
