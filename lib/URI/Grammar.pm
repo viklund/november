@@ -4,7 +4,7 @@ grammar URI::Grammar {
     token scheme     { <-[:/&?#]>+ };
     token authority  { <host> [':' <port>]? };
     token host       { <-[/&?#:]>* };
-    token port       { \d+ };
+    token port       { ^\d**1..5$ }; # Need to limit this to 65535
     token path       { <slash>? [ <chunk> '/'?]* }; # * mb wrong, because that allow '' URI
     token slash      { '/' };
     token chunk      { <-[/?#]>+ };
