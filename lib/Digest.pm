@@ -35,7 +35,6 @@ sub digest(Str $text, Str $algo is copy = 'md5') is export {
 		goto COMPUTE
 	RIPEMD160:
 		digest = new 'RIPEMD160'
-		goto COMPUTE
 
 	COMPUTE:
 		# Calculate the digest.
