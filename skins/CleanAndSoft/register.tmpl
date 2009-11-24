@@ -1,22 +1,23 @@
 <TMPL_INCLUDE NAME="header.tmpl">
-        <title>Log in</title>
+        <title>Register</title>
     </head>
-    <body onload="document.login.user_name.focus()">
+    <body onload="document.register.user_name.focus()">
         <div id="page">
             <div id="headerimg">
             <TMPL_INCLUDE NAME="toolbar.tmpl">
             </div>
             <div id="pagebar">&nbsp;</div>
             <div id="content">
-                <h1>Log in</h1>
+                <h1>Register</h1>
                 <p>Everything you say can, and will, be used against you. Please
-                  put on your own mask first, then help others.</p>
+                  create your own mask first, then help others.</p>
 
-                <form method="POST" name="login">
-                  <input type="hidden" name="action" value="log_in" />
+                <form method="POST" name="register">
+                  <input type="hidden" name="action" value="register" />
                   <p>Username: <input name="user_name" /></p>
                   <p>Password: <input name="password" type="password" /></p>
-                  <input type="submit" value="Log in" />
+                  <p>Password again: <input name="passagain" type="passagain" /></p>
+                  <input type="submit" value="Register" />
                 </form>
             </div>
     <TMPL_INCLUDE NAME="sidebar.tmpl">
