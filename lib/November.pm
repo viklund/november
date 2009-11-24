@@ -202,6 +202,39 @@ class November does Session does Cache {
 
     method register {
         # Real work will come later.
+        if my $user_name = $.cgi.params<user_name> {
+            my $password = $.cgi.params<password>;
+            my $passagain = $.cgi.params<passagain>;
+            
+            my Str @errors;
+            
+            unless defined $password
+            {
+                push @errors, "Please provide a password for your mask.";
+            }
+            
+            if $password.chars < 6
+            {
+                push @errors, "Please provide at least six characters for your password.";
+            }
+            
+            if $password neq $passagain
+            {
+                push @errors, "The password and confirmation must match.";
+            }
+            
+            if defined self.read_users(){$user_name}
+            {
+                push @errors, "This username is taken. Please choose another.";
+            }
+
+            if @errors.elems
+            {
+                self.response('register_failed.tmpl');
+                return;
+            }
+            # The actual writing takes place here.
+        }
         self.response('register.tmpl');
     }
     
