@@ -208,28 +208,23 @@ class November does Session does Cache {
             
             my Str @errors;
             
-            unless defined $password
-            {
+            unless defined $password {
                 push @errors, "Please provide a password for your mask.";
             }
             
-            if $password.chars < 6
-            {
+            if $password.chars < 6 {
                 push @errors, "Please provide at least six characters for your password.";
             }
             
-            if $password neq $passagain
-            {
+            if $password neq $passagain {
                 push @errors, "The password and confirmation must match.";
             }
             
-            if defined self.read_users(){$user_name}
-            {
+            if defined self.read_users(){$user_name} {
                 push @errors, "This username is taken. Please choose another.";
             }
 
-            if @errors.elems
-            {
+            if @errors {
                 self.response('register_failed.tmpl');
                 return;
             }
