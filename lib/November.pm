@@ -37,6 +37,7 @@ class November does Session does Cache {
             ['edit', /^ <-[?/]>+ $/], { self.edit_page(~$^page) },
             ['in'],                   { self.log_in },
             ['out'],                  { self.log_out },
+            ['register'],             { self.register },
             ['recent'],               { self.list_recent_changes },
             ['history'],              { self.view_page_history(~$^page) },
             ['all'],                  { self.list_all_pages },
@@ -199,6 +200,11 @@ class November does Session does Cache {
         );
     }
 
+    method register {
+        # Real work will come later.
+        self.response('register.tmpl');
+    }
+    
     method log_in {
         if my $user_name = $.cgi.params<user_name> {
             my $password = $.cgi.params<password>;
