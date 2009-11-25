@@ -213,7 +213,7 @@ class November does Session does Cache {
             
             if $password && $password.chars < 6 {
                 push @errors, 'Please provide at least six characters for '
-                              'your password.';
+                              ~ 'your password.';
             }
             
             if $password & $passagain && $password neq $passagain {
