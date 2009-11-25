@@ -219,8 +219,8 @@ class November does Session does Cache {
             if $password & $passagain && $password neq $passagain {
                 push @errors, 'The password and confirmation must match.';
             }
-            
-            if defined self.read_users(){$user_name} {
+            my %users = self.read_users();
+            if defined %users{$user_name} {
                 push @errors, 'This username is taken. Please choose another.';
             }
 
@@ -229,7 +229,8 @@ class November does Session does Cache {
                 self.response('register_failed.tmpl');
                 return;
             }
-            # TODO: Implement registration code.
+            my $phash = digest(digest($user_name, 'sha256') ~ $password, 'sha256');
+            # TODO: Add the user to the users file.
         }
         self.response('register.tmpl');
     }
