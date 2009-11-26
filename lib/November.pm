@@ -216,7 +216,7 @@ class November does Session does Cache {
                               ~ 'your password.';
             }
             
-            if $password & $passagain && $password neq $passagain {
+            if $password & $passagain && $password ne $passagain {
                 push @errors, 'The password and confirmation must match.';
             }
             my %users = self.read_users();
