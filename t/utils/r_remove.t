@@ -2,7 +2,7 @@ use v6;
 use Test;
 plan 2;
 
-use Utils;
+use November::Utils;
 
 my $str = 'ar r \ r';
 r_remove($str);

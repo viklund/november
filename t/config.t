@@ -3,9 +3,9 @@ use v6;
 use Test;
 plan 3;
 
-use Config;
+use November::Config;
 
-my $c = Config.new;
+my $c = November::Config.new;
 
 ok($c.skin, 'find skin in Config');
 ok(defined $c.web_root, 'find web_root in Config');

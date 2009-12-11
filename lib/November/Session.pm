@@ -1,4 +1,4 @@
-role Session;
+role November::Session;
 
 method sessionfile-path {
     return $.config.server_root  ~ 'data/sessions';
@@ -30,7 +30,7 @@ method write_sessions( $sessions ) {
 }
 
 method new_session($user_name) {
-    use Utils;
+    use November::Utils;
     my $session_id = get_unique_id;
     self.add_session( $session_id, { user_name => $user_name } );
     return $session_id;

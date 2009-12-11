@@ -3,7 +3,7 @@ use v6;
 use Test;
 use November;
 use Test::CGI;
-use Config;
+use November::Config;
 use URI;
 
 my @markups = < Text::Markup::Wiki::MediaWiki >;
@@ -23,7 +23,7 @@ my %gets    = {
 plan @markups * @skins * %gets;
 
 for @markups X @skins -> $m, $s {
-    my $c = Config.new( markup => $m, skin => $s );
+    my $c = November::Config.new( markup => $m, skin => $s );
     my $w = November.new( config => $c );
     for %gets.kv -> $page, $description {
         my $uri = URI.new( 'http://testserver' ~ $page );

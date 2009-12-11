@@ -1,9 +1,9 @@
 use v6;
 
-use Config;
+use November::Config;
 
 class November::Tags {
-    my $server_root = Config.new.server_root;
+    my $server_root = November::Config.new.server_root;
     my $.page_tags_path  is rw = $server_root ~ 'data/page_tags/';
     my $.tags_count_path is rw = $server_root ~ 'data/tags_count';
     my $.tags_index_path is rw = $server_root ~ 'data/tags_index';

@@ -2,7 +2,7 @@ use v6;
 
 use Text::Markup::Wiki::MediaWiki;
 
-class Config {
+class November::Config {
     has $.server_root = '';
     has $.web_root    = '';
     has $.skin        = 'CleanAndSoft';

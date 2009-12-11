@@ -1,7 +1,7 @@
 use v6;
-use CGI;
+use November::CGI;
 
-class Test::CGI is CGI {
+class Test::CGI is November::CGI {
 
     has $.response is rw;
     has %.response_opts is rw;

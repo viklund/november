@@ -1,7 +1,7 @@
 use v6;
 
 use Test;
-use CGI;
+use November::CGI;
 
 my @t =
     '%61'                  => 'a',
@@ -22,7 +22,7 @@ my @t =
 plan +@t;
 
 for @t {
-    my $ans = CGI::unescape( ~.key );
+    my $ans = November::CGI::unescape( ~.key );
     ok( $ans eq .value, 'Decoding ' ~ .key )
         or say "GOT: {$ans.perl}\nEXPECTED: {.value.perl}";
 

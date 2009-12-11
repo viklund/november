@@ -1,7 +1,7 @@
 use v6;
 use URI;
 
-class CGI {
+class November::CGI {
     has %.params;
     has %.cookie;
     has @.keywords;

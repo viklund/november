@@ -3,12 +3,12 @@ use v6;
 use Test;
 plan 22;
 
-use CGI;
-ok(1,'We use CGI and we are still alive');
+use November::CGI;
+ok(1,'We use November::CGI and we are still alive');
 
 my $cgi;
-$cgi = CGI.new();
-isa_ok( $cgi, 'CGI', 'Instant it');
+$cgi = November::CGI.new();
+ok( $cgi ~~ November::CGI, 'an instance is of the right class');
 
 my @queries = (
     'test=',
@@ -34,7 +34,7 @@ my @queries = (
     );
 
 for @queries -> $in, $expected {
-    my $c = CGI.new();
+    my $c = November::CGI.new();
     $c.parse_params($in);
     is_deeply($c.params, $expected, 'Parse param: ' ~ $in);
 }
@@ -51,7 +51,7 @@ for @keywords -> $in, $expected {
     is_deeply($cgi.keywords, $expected , 'Parse param (keywords): ' ~ $in);
 }
 
-$cgi = CGI.new();
+$cgi = November::CGI.new();
 
 my @add_params = (
     :key1<val> , { :key1<val> },

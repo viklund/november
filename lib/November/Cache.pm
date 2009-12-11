@@ -1,6 +1,6 @@
-role Cache;
+role November::Cache;
 
-use Config;
+use November::Config;
 
 method cache-dir {
     return $.config.server_root ~ 'data/cache';

@@ -1,32 +1,32 @@
 use v6;
 
-use Session;
-use Cache;
+use November::Session;
+use November::Cache;
 use Digest;
 
-class November does Session does Cache {
+class November does November::Session does November::Cache {
 
-    use CGI;
+    use November::CGI;
     use November::Tags;
     use HTML::Template;
     use Dispatcher;
-    use Utils;
-    use Config;
+    use November::Utils;
+    use November::Config;
     use November::Storage::File;
     use Text::Markup::Wiki::MediaWiki;
 
     has November::Storage $.storage;
-    has CGI     $.cgi;
-    has Config  $.config;
+    has November::CGI     $.cgi;
+    has November::Config  $.config;
 
-    submethod BUILD( :$config = Config.new ) {
+    submethod BUILD( :$config = November::Config.new ) {
         $!config = $config;
         $!storage = November::Storage::File.new(
             storage_root => $!config.server_root ~ 'data/'
         );
     }
 
-    method handle_request(CGI $cgi) {
+    method handle_request(November::CGI $cgi) {
         $!cgi = $cgi;
 
         my $d = Dispatcher.new( default => { self.error_page } );
@@ -56,7 +56,7 @@ class November does Session does Cache {
         }
 
         # TODO: we need plugin system (see topics in mail-list)
-        my $t = Tags.new;
+        my $t = November::Tags.new;
 
         my $title = $page.trans( ['_'] => [' '] );
 
@@ -123,7 +123,7 @@ class November does Session does Cache {
             self.remove-cache-entry( $page );
 
             # TODO: we need plugin system (see topics in mail-list)
-            my $t = Tags.new();
+            my $t = November::Tags.new();
             $t.update_tags($page, $tags);
 
             $.cgi.redirect('/view/' ~ $page );
@@ -131,7 +131,7 @@ class November does Session does Cache {
         }
 
         # TODO: we need plugin system (see topics in mail-list)
-        my $t = Tags.new;
+        my $t = November::Tags.new;
         self.response( 'edit.tmpl',
             {
             PAGE     => $page,
@@ -156,7 +156,7 @@ class November does Session does Cache {
         );
 
         # Should really use the $tags parameter here, this will do for now...
-        #my $t = Tags.new();
+        #my $t = November::Tags.new();
         #my $tags = $t.tags_parse( $tags );
 
         self.response( 'edit.tmpl',
@@ -337,7 +337,7 @@ class November does Session does Cache {
 
     method list_all_pages {
 
-        my $t = Tags.new();
+        my $t = November::Tags.new();
         my %params;
         %params<TAGS> = $t.all_tags if $t;
 

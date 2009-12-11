@@ -2,7 +2,7 @@ use v6;
 use Test;
 plan 9;
 
-use Utils;
+use November::Utils;
 
 {
     my $t = get_period(1227315969, 1227316090);

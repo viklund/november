@@ -1,7 +1,7 @@
 use v6;
 
 use November::Storage;
-use Utils;
+use November::Utils;
 
 class November::Storage::File is November::Storage {
 
@@ -9,7 +9,7 @@ class November::Storage::File is November::Storage {
     #my $r = $.config.server_root;
 
     # RAKUDO: initial attr value do not fully works 
-    # given Config.server_root { # and use $_ inside. 
+    # given November::Config.server_root { # and use $_ inside. 
     # But we can`t do that now because "my".
     has $.content_path        is rw; # = $r ~ 'data/articles/';
     has $.modifications_path  is rw; # = $r ~ 'data/modifications/';
