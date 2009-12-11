@@ -3,7 +3,7 @@ use v6;
 use Test;
 plan 1;
 
-use Tags;
+use November::Tags;
 
 my @counts_to_test = 
         [ 2, 5, 6, 14 ], 
@@ -13,7 +13,7 @@ my @counts_to_test =
 #        [ 5,  5,  2, 1 ], 
 #        [ 10, 10, 4, 0 ]
 ;
-my $t = Tags.new;
+my $t = November::Tags.new;
 
 for @counts_to_test -> $in, $expected {
 

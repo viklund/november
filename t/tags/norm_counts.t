@@ -3,7 +3,7 @@ use v6;
 use Test;
 plan 3;
 
-use Tags;
+use November::Tags;
 
 role Testing {
     method clear {
@@ -12,7 +12,7 @@ role Testing {
     }
 }
 
-my $t = Tags.new does Testing;
+my $t = November::Tags.new does Testing;
 $t.tags_count_path = 't/tags/data/tags_count';
 $t.clear;
 

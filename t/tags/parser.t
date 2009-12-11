@@ -3,7 +3,7 @@ use v6;
 use Test;
 plan 11;
 
-use Tags;
+use November::Tags;
 
 my @to_parse = (    
     'foo',
@@ -30,7 +30,7 @@ my @to_parse = (
       ['foo', 'bar', 'perl 6'],
 );
 
-my $t = Tags.new;
+my $t = November::Tags.new;
 
 for @to_parse -> $in, $expected {
     is_deeply( [$t.tags_parse($in)], $expected, 'Parse tags: ' ~ $in.perl);

@@ -7,7 +7,7 @@ use Digest;
 class November does Session does Cache {
 
     use CGI;
-    use Tags;
+    use November::Tags;
     use HTML::Template;
     use Dispatcher;
     use Utils;
