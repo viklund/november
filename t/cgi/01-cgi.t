@@ -60,10 +60,11 @@ my @add_params = (
     :key3<4>   , { :key1<val val2>, :key2<val>, :key3<4> },
     :key4<4.1> , { :key1<val val2>, :key2<val>, :key3<4>, :key4<4.1> },
 
-    # Do not consistency :( but we don`t have adverbial syntax to set pairs with undef value
+    # Do not consistency :( but we don`t have adverbial syntax to set pairs
+    # with undefined value
     # see http://www.nntp.perl.org/group/perl.perl6.language/2008/09/msg29610.html
-    # Skip now, because is_deeply do not work properly with undef :(
-    #key2 => undef , { :key1<val val2>, key2 => ["val", undef], :key3<4>, :key4<4.1> },
+    # Skip now, because is_deeply do not work properly with Mu :(
+    #key2 => Mu , { :key1<val val2>, key2 => ["val", Mu], :key3<4>, :key4<4.1> },
 );
 
 for @add_params -> $in, $expected {

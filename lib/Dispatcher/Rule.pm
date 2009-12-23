@@ -51,8 +51,8 @@ method is_complete {
 
 method clear {
     @!args = ();
-    $!controller = undef;
-    $!action = undef;
+    $!controller = Mu;
+    $!action = Mu;
 }
 
 # vim:ft=perl6
