@@ -32,12 +32,12 @@ class Text::Markup::Wiki::MediaWiki {
             if @parlist[$ix] ~~ /^'<p>'/ && @parlist[$ix+1] ~~ /^'<p>'/ {
                 @parlist[$ix+1] = @parlist[$ix] ~ @parlist[$ix+1];
                 @parlist[$ix+1] .= subst( '</p><p>', ' ' );
-                @parlist[$ix] = undef;
+                @parlist[$ix] = Mu;
             }
             elsif @parlist[$ix] ~~ /^'<uli>'/ && @parlist[$ix+1] ~~ /^'<uli>'/
             || @parlist[$ix] ~~ /^'<oli>'/ && @parlist[$ix+1] ~~ /^'<oli>'/ {
                 @parlist[$ix+1] = [~] @parlist[$ix], "\n", @parlist[$ix+1];
-                @parlist[$ix] = undef;
+                @parlist[$ix] = Mu;
             }
         }
 
@@ -127,7 +127,7 @@ class Text::Markup::Wiki::MediaWiki {
                 }
                 elsif $token<wikilink> {
                     take defined $link_maker
-                            ?? $link_maker(~$token<wikilink><page>, undef)
+                            ?? $link_maker(~$token<wikilink><page>, Mu)
                             !! ~$token<wikilink>;
                 }
                 elsif $token<extlink> {

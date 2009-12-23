@@ -15,7 +15,7 @@ method set-cache-entry( $key, $value ) {
 
 method get-cache-entry( $key ) {
     my $file = self.cache-dir ~ '/' ~ $key;
-    return undef unless $file ~~ :e;
+    return Nil unless $file ~~ :e;
     my $string = slurp( $file );
     return $string;
 }
