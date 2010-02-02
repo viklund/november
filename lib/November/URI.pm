@@ -1,6 +1,13 @@
-class URI;
+class November::URI;
 
-use URI::Grammar;
+# This class used to be called just 'URI', but there was a collision with
+# the eponymous class in the 'uri' project. Arguably, that class has more
+# rights to that name, so this one was renamed. Since the 'uri' project
+# ought to cover the same functionality as this class, maybe long-term we
+# could switch to using that instead. One more dependency, but less code
+# duplication across projects.
+
+use November::URI::Grammar;
 # RAKUDO: Match object does not do assignment properly :(
 #my Match $.parts; dies in init with 'Type mismatch in assignment';
 # workaround:
@@ -14,7 +21,7 @@ submethod BUILD(:$uri) {
     $c_str .= subst(/^ \s* ['<' | '"'] /, '');
     $c_str .= subst(/ ['>' | '"'] \s* $/, '');
 
-    URI::Grammar.parse($c_str);
+    November::URI::Grammar.parse($c_str);
     unless $/ { die "Could not parse URI: $uri" }
 
     $!uri = $/;
@@ -84,13 +91,13 @@ method Str() {
 
 =head NAME
 
-URI — Uniform Resource Identifiers (absolute and relative) 
+November::URI — Uniform Resource Identifiers (absolute and relative) 
 
 =head SYNOPSYS
 
-    use URI;
-    my $u = URI.new;
-    $u.init('http://her.com/foo/bar?tag=woow#bla');
+    use November::URI;
+    my $u = November::URI.new;
+    $u.init('http://example.com/foo/bar?tag=woow#bla');
 
     my $scheme = $u.scheme;
     my $authority = $u.authority;

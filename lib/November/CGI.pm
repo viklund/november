@@ -1,11 +1,11 @@
 use v6;
-use URI;
+use November::URI;
 
 class November::CGI {
     has %.params;
     has %.cookie;
     has @.keywords;
-    has URI $.uri;
+    has November::URI $.uri;
 
     has $!crlf = "\x[0D]\x[0A]";
 
@@ -38,7 +38,7 @@ class November::CGI {
         $uri_str ~= ':' ~ %*ENV<SERVER_PORT> if %*ENV<SERVER_PORT>;
         $uri_str ~=  %*ENV<MODPERL6> ?? %*ENV<PATH_INFO> !! %*ENV<REQUEST_URI>;
 
-        $!uri = URI.new( uri => $uri_str );
+        $!uri = November::URI.new( uri => $uri_str );
     }
 
     # For debugging

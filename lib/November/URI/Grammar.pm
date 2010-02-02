@@ -1,5 +1,5 @@
 use v6;
-grammar URI::Grammar {
+grammar November::URI::Grammar {
     token TOP        { ^ [<scheme> ':']? [ '//' <authority>]? <path> ['?' <query>]? ['#' <fragment>]? $ };
     token scheme     { <-[:/&?#]>+ };
     token authority  { <host> [':' <port>]? };

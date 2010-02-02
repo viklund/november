@@ -4,7 +4,7 @@ use Test;
 use November;
 use Test::CGI;
 use November::Config;
-use URI;
+use November::URI;
 
 my @markups = < Text::Markup::Wiki::MediaWiki >;
 my @skins   = < CleanAndSoft >;
@@ -26,7 +26,7 @@ for @markups X @skins -> $m, $s {
     my $c = November::Config.new( markup => $m, skin => $s );
     my $w = November.new( config => $c );
     for %gets.kv -> $page, $description {
-        my $uri = URI.new( 'http://testserver' ~ $page );
+        my $uri = November::URI.new( 'http://testserver' ~ $page );
         my $cgi = Test::CGI.new( uri => $uri );
         $cgi.parse_params( $page );
         lives_ok( { $w.handle_request( $cgi ) }, "$m, $s, $description" );

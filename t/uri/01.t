@@ -2,10 +2,10 @@ use v6;
 use Test;
 plan 28;
 
-use URI;
+use November::URI;
 ok(1,'We use URI and we are still alive');
 
-my $u = URI.new(uri => 'http://example.com:80/about/us?foo#bar');
+my $u = November::URI.new(uri => 'http://example.com:80/about/us?foo#bar');
 
 is($u.scheme, 'http', 'scheme'); 
 is($u.host, 'example.com', 'host'); 
@@ -20,20 +20,20 @@ is($u.chunks[1], 'us', 'second chunk');
 is( ~$u, 'http://example.com:80/about/us?foo#bar',
     'Complete path stringification');
 
-$u = URI.new(uri => 'https://eXAMplE.COM');
+$u = November::URI.new(uri => 'https://eXAMplE.COM');
 
 is($u.scheme, 'https', 'scheme'); 
 is($u.host, 'example.com', 'host'); 
 is( "$u", 'https://example.com',
     'https://eXAMplE.COM stringifies to https://example.com');
 
-$u = URI.new(uri => '/foo/bar/baz');
+$u = November::URI.new(uri => '/foo/bar/baz');
 
 is($u.chunks, 'foo bar baz', 'chunks from absolute path'); 
 ok($u.absolute, 'absolute path'); 
 nok($u.relative, 'not relative path'); 
 
-$u = URI.new(uri => 'foo/bar/baz');
+$u = November::URI.new(uri => 'foo/bar/baz');
 
 is($u.chunks, 'foo bar baz', 'chunks from relative path'); 
 ok( $u.relative, 'relative path'); 
@@ -43,17 +43,17 @@ is($u.chunks[0], 'foo', 'first chunk');
 is($u.chunks[1], 'bar', 'second chunk'); 
 is($u.chunks[*-1], 'baz', 'last chunk'); 
 
-$u = URI.new(uri => 'http://foo.com');
+$u = November::URI.new(uri => 'http://foo.com');
 
 ok($u.chunks.list.perl eq '[""]', ".chunks return [''] for empty path");
 ok($u.absolute, 'http://foo.com has an absolute path'); 
 nok($u.relative, 'http://foo.com does not have a relative path'); 
 
-# test URI parsing with <> or "" and spaces
-$u = URI.new(uri => "<http://foo.com> ");
+# test November::URI parsing with <> or "" and spaces
+$u = November::URI.new(uri => "<http://foo.com> ");
 is("$u", 'http://foo.com', '<> removed from str');
 
-$u = URI.new(uri => ' "http://foo.com"');
+$u = November::URI.new(uri => ' "http://foo.com"');
 is("$u", 'http://foo.com', '"" removed from str');
 
 
