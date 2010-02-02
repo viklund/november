@@ -1,5 +1,4 @@
 *.pir
-Makefile
 test_wiki.sh
 wiki.sh
 index_data
