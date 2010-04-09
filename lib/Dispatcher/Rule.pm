@@ -9,14 +9,14 @@ has Code $.code;
 
 method match (@chunks) {
     return False if @chunks != @!pattern;
-    for @chunks Z @!pattern -> $chunk, Object $rule is copy {
+    for @chunks Z @!pattern -> $chunk, $rule is copy {
 
         my $param;
         if $rule ~~ Pair { ($param, $rule) = $rule.kv }
 
         if ~$chunk ~~ $rule {
             if $param {
-                self."$param" = (~$/ || ~$chunk);
+                self."$param"() = (~$/ || ~$chunk);
             } else {
                 # RAKUDO: /./ ~~ Regex us false, but /./ ~~ Code is true  
                 @!args.push($/ || $chunk) if $rule ~~ Code | Whatever; # should by Regex | Whatever

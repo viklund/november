@@ -42,7 +42,7 @@ class Text::Markup::Wiki::MediaWiki {
         }
 
         my &strip_prefix = {
-            .subst(/'<' ('/'?) <[uo]> 'li>'/, { "<$0li>" }, :g)
+            .subst(/'<' ('/'?) <[uo]> 'li>'/, { '<' ~ $0 ~ 'li>' }, :g)
         };
 
         my &surround_with_list = {
