@@ -1,4 +1,4 @@
-* [http://use.perl.org/~masak/journal/40280](http://use.perl.org/~masak/journal/40280)
+* [Step 1 on the road to recovery: admitting you have a problem](http://use.perl.org/~masak/journal/40280)
 * [Some module names don't deserve to be short](http://use.perl.org/~masak/journal/40008)
 * [November 18 2009 -- the history mystery](http://use.perl.org/~masak/journal/39915)
 * [November 16 2009 -- digging into some real paperwork](http://use.perl.org/~masak/journal/39906)
