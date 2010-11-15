@@ -1,5 +1,8 @@
 use v6;
 
+# RAKUDO: Needed because of [perl #73912]
+class November { ... }
+
 use November::Session;
 use November::Cache;
 use Digest;
