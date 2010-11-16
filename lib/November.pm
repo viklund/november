@@ -50,7 +50,8 @@ class November does November::Session does November::Cache {
         $d.dispatch(@chunks);
     }
 
-    method view_page($page is rw='Main_Page') {
+    # RAKUDO: Should `is rw` work with constant defaults? (It doesn't.)
+    method view_page($page is copy = 'Main_Page') {
         $page .= subst('%20', '_', :g);
 
         unless $.storage.wiki_page_exists($page) {
