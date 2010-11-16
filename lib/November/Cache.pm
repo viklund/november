@@ -15,14 +15,14 @@ method set-cache-entry( $key, $value ) {
 
 method get-cache-entry( $key ) {
     my $file = self.cache-dir ~ '/' ~ $key;
-    return Nil unless $file ~~ :e;
+    return Nil unless $file.IO ~~ :e;
     my $string = slurp( $file );
     return $string;
 }
 
 method remove-cache-entry( $key ) {
     my $file = self.cache-dir ~ '/' ~ $key;
-    return unless $file ~~ :e;
+    return unless $file.IO ~~ :e;
     unlink( $file );
 }
 
