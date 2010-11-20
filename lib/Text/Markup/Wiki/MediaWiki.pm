@@ -99,7 +99,7 @@ class Text::Markup::Wiki::MediaWiki {
         $trimmed .= subst( / ^ \s+ /, '' );
         $trimmed .= subst( / \s+ $ /, '' );
 
-        my $cleaned_of_whitespace = $trimmed.trans( [ /\s+/ => ' ' ] );
+        my $cleaned_of_whitespace = $trimmed.trans( / \s+ / => ' ' );
 
         my $xml_escaped = $cleaned_of_whitespace.trans(
             [           '<', '>', '&', '\''   ] =>
