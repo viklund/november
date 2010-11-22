@@ -409,9 +409,9 @@ class November does November::Session does November::Cache {
 
     method make_extlink($url, $title) {
         if $title {
-            return qq|<a href="$url">$title</a>|;
+            return qq|<a href="$url">{$title}</a>|;
         } else {
-            return qq|<a href="$url">$url</a>|;
+            return qq|<a href="$url">{$url}</a>|;
         }
     }
 }
