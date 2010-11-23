@@ -17,7 +17,7 @@ method remove_session($id) {
 }
 
 method read_sessions {
-    return {} unless self.sessionfile-path ~~ :e;
+    return {} unless self.sessionfile-path.IO ~~ :e;
     my $string = slurp( self.sessionfile-path );
     my $stuff = eval( $string );
     return $stuff;
