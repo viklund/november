@@ -4,9 +4,9 @@ use November::Config;
 
 class November::Tags {
     my $server_root = November::Config.new.server_root;
-    my $.page_tags_path  is rw = $server_root ~ 'data/page_tags/';
-    my $.tags_count_path is rw = $server_root ~ 'data/tags_count';
-    my $.tags_index_path is rw = $server_root ~ 'data/tags_index';
+    my $page_tags_path  = $server_root ~ 'data/page_tags/';
+    my $tags_count_path = $server_root ~ 'data/tags_count';
+    my $tags_index_path = $server_root ~ 'data/tags_index';
 
     method update_tags($_: Str $page, Str $new_tags) {
         my $old_tags = .read_page_tags($page).chomp;
@@ -71,39 +71,39 @@ class November::Tags {
     }
 
     method read_page_tags(Str $page) {
-        my $file = $.page_tags_path ~ $page;
-        return '' unless $file ~~ :e;
+        my $file = $page_tags_path ~ $page;
+        return '' unless $file.IO ~~ :e;
         return slurp($file);
     }
 
     method write_page_tags(Str $page, Str $tags) {
-        my $file = $.page_tags_path ~ $page;
+        my $file = $page_tags_path ~ $page;
         my $fh = open( $file, :w );
         $fh.say($tags);
         $fh.close;
     }
    
     method read_tags_count() {
-        my $file = $.tags_count_path;
-        return {} unless $file ~~ :e;
+        my $file = $tags_count_path;
+        return {} unless $file.IO ~~ :e;
         return eval slurp $file;
     }
 
     method write_tags_count(Hash $counts) {
-        my $file = $.tags_count_path;
+        my $file = $tags_count_path;
         my $fh = open( $file, :w );
         $fh.say( $counts.perl );
         $fh.close;
     }
 
     method read_tags_index() {
-        my $file = $.tags_index_path;
-        return {} unless $file ~~ :e;
+        my $file = $tags_index_path;
+        return {} unless $file.IO ~~ :e;
         return eval slurp $file;
     }
 
     method write_tags_index(Hash $index) {
-        my $file = $.tags_index_path;
+        my $file = $tags_index_path;
         my $fh = open( $file, :w );
         $fh.say( $index.perl );
         $fh.close;
