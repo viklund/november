@@ -371,8 +371,9 @@ class November does November::Session does November::Cache {
         self.response('list_all_pages.tmpl', %params);
     }
 
-    # RAKUDO: die at hash merge if %params undef, so I use default value
-    method response ($tmpl, %params?={}, %opts?) {
+    # RAKUDO: Instead of %params? we do %params = {}, because the former
+    #         doesn't quite work. [perl #79642]
+    method response ($tmpl, %params = {}, %opts = {}) {
         my $template = HTML::Template.from_file($.config.template_path ~ $tmpl);
 
         $template.with_params(
