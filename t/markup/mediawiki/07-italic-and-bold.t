@@ -86,6 +86,8 @@ my @tests =
 ],
 ;
 
+# RAKUDO: Doesn't respect "use Test :EXPORT"
+use Test;
 use Test::InputOutput;
 plan +@tests;
 
