@@ -29,7 +29,7 @@ is($s.read_index.perl, '["Foo"]', 'Add to index one page');
 $s.add_to_index('Bar');
 is($s.read_index.perl, '["Foo", "Bar"]', 'Add to index another page');
 $s.add_to_index('Foo');
-is($s.read_index.perl, '["Foo", "Bar"]', 'Do not add to index page doubble');
+is($s.read_index.perl, '["Foo", "Bar"]', 'Do not add dup to index page');
 
 $s.afterTest;
 

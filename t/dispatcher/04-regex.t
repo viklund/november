@@ -17,7 +17,7 @@ $d.add: [
 
 is( $d.dispatch(['foo']),
     'Yep!',
-    "Pattern with regex \w+, put Match in args"
+    'Pattern with regex \w+, put Match in args'
 );
 
 is( $d.dispatch(['foo', '50']),

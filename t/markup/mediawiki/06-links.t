@@ -10,9 +10,11 @@ my $link_maker = {
     my $l = $^page.ucfirst;
     my $t = $^title // $^page;
     $l .= subst(' ', '_', :g);
-    "<a href=\"/?page=$l\">$t</a>"
+    qq[<a href="/?page=$l">{$t}</a>];
 }
-my $extlink_maker = { "<a href=\"$^href\">$^title</a>" }
+my $extlink_maker = -> $href, $title {
+    qq[<a href="$href">{$title}</a>]
+}
 
 {
     my $input = 'An example of a [[link]]';
@@ -104,7 +106,7 @@ my $extlink_maker = { "<a href=\"$^href\">$^title</a>" }
 
 {
     my $input = 'This is an [http://example.com] external link';
-    my $expected_output = "<p>$input</p>";
+    my $expected_output = "<p>{$input}</p>";
     my $actual_output = $converter.format($input);
 
     is( $actual_output, $expected_output, 'no extlink maker, no conversion' );

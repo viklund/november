@@ -4,9 +4,10 @@ use November::Config;
 
 class November::Tags {
     my $server_root = November::Config.new.server_root;
-    my $page_tags_path  = $server_root ~ 'data/page_tags/';
-    my $tags_count_path = $server_root ~ 'data/tags_count';
-    my $tags_index_path = $server_root ~ 'data/tags_index';
+    # TODO Nasty hack to enable testing to use different paths
+    has $.page_tags_path is rw  = $server_root ~ 'data/page_tags/';
+    has $.tags_count_path is rw = $server_root ~ 'data/tags_count';
+    has $.tags_index_path is rw = $server_root ~ 'data/tags_index';
 
     method update_tags($_: Str $page, Str $new_tags) {
         my $old_tags = .read_page_tags($page).chomp;
@@ -37,7 +38,9 @@ class November::Tags {
             }
             unless any($index{$t}.values) eq $page {
                 $index{$t}.push($page);
-                $index{$t} = grep { $_ ne '' }, $index{$t}.values;
+                # RAKUDO: bug w/ var on both lhs and rhs
+                my @tmp = grep { $_ ne '' }, $index{$t}.values;
+                $index{$t} = @tmp;
             }
         }
 
@@ -64,48 +67,50 @@ class November::Tags {
             # RAKUDO: @ not implemented yet
             #if $index{$t} && any(@ $index{$t}) eq $page {
             if $index{$t} && any($index{$t}.values) eq $page {
-                    $index{$t} = grep { $_ ne $page }, $index{$t}.values;
+                    # RAKUDO: bug w/ var on both lhs and rhs
+                    my @tmp = grep { $_ ne $page }, $index{$t}.values;
+                    $index{$t} = @tmp;
             }
         }
         self.write_tags_index($index);
     }
 
     method read_page_tags(Str $page) {
-        my $file = $page_tags_path ~ $page;
+        my $file = $.page_tags_path ~ $page;
         return '' unless $file.IO ~~ :e;
         return slurp($file);
     }
 
     method write_page_tags(Str $page, Str $tags) {
-        my $file = $page_tags_path ~ $page;
+        my $file = $.page_tags_path ~ $page;
         my $fh = open( $file, :w );
         $fh.say($tags);
         $fh.close;
     }
    
     method read_tags_count() {
-        my $file = $tags_count_path;
+        my $file = $.tags_count_path;
         return {} unless $file.IO ~~ :e;
         return eval slurp $file;
     }
 
     method write_tags_count(Hash $counts) {
-        my $file = $tags_count_path;
+        my $file = $.tags_count_path;
         my $fh = open( $file, :w );
         $fh.say( $counts.perl );
         $fh.close;
     }
 
     method read_tags_index() {
-        my $file = $tags_index_path;
+        my $file = $.tags_index_path;
         return {} unless $file.IO ~~ :e;
         return eval slurp $file;
     }
 
     method write_tags_index(Hash $index) {
-        my $file = $tags_index_path;
+        my $file = $.tags_index_path;
         my $fh = open( $file, :w );
-        $fh.say( $index.perl );
+-        $fh.say( $index.perl );
         $fh.close;
     }
 

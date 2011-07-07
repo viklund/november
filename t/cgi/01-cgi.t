@@ -24,7 +24,7 @@ my @queries = (
     'test=5&params=3&words=first%0Asecond',
       { :test<5>, :params<3>, :words("first\nsecond") },
     'test=foo&test=bar',
-      { :test<foo bar> },
+      { test => [<foo bar>] },
     'test=2;params=2',
       { :test<2>, :params<2> },
     'test=3;params=3;words=first+second',
@@ -56,9 +56,9 @@ $cgi = November::CGI.new();
 my @add_params = (
     :key1<val> , { :key1<val> },
     :key2<val> , { :key1<val>,      :key2<val> },
-    :key1<val2>, { :key1<val val2>, :key2<val> },
-    :key3<4>   , { :key1<val val2>, :key2<val>, :key3<4> },
-    :key4<4.1> , { :key1<val val2>, :key2<val>, :key3<4>, :key4<4.1> },
+    :key1<val2>, { key1 => [<val val2>], :key2<val> },
+    :key3<4>   , { key1 => [<val val2>], :key2<val>, :key3<4> },
+    :key4<4.1> , { key1 => [<val val2>], :key2<val>, :key3<4>, :key4<4.1> },
 
     # Do not consistency :( but we don`t have adverbial syntax to set pairs
     # with undefined value
@@ -71,7 +71,7 @@ for @add_params -> $in, $expected {
     my $key = $in.key;
     my $val = $in.value;
     $cgi.add_param($key, $val);
-    is_deeply( $cgi.params, $expected, "Add kv: :$key<" ~ ($val or '') ~ ">" );
+    is_deeply( $cgi.params, $expected, "Add kv: :{$key}<" ~ ($val or '') ~ ">" );
 }
 
 is(  $cgi.param('key3'), '4', 'Test param' );
