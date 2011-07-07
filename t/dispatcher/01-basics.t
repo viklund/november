@@ -24,7 +24,10 @@ is( $d.dispatch(['']),
 ok( $d.add( ['foo', 'bar'], { "Yay" } ), 
            '.add(@pattern, $code) -- shortcut for fast add Rule object' );
 
-nok( $d.dispatch(['foo']), 
+# RAKUDO: dispatch() returns Failure here, and rakudo gives Null PMC access
+# when converting that to Bool; this works around it somehow
+#nok( $d.dispatch(['foo']),
+nok( $d.dispatch(['foo']) ?? True !! False, 
     'Dispatcher return False if can`t find matched Rule and do not have default' );
 
 
