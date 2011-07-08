@@ -108,9 +108,9 @@ my $converter = Text::Markup::Wiki::Minimal.new( link_maker => &make_link);
 sub  make_link($page, $title?) {
     if $title {
         if $page ~~ m/':'/ {
-            return "<a href=\"$page\">$title</a>";
+            return "<a href=\"$page\">{$title}</a>";
         } else {
-            return "<a href=\"?action=view&page=$page\">$title</a>";
+            return "<a href=\"?action=view&page=$page\">{$title}</a>";
         }
         
     } else {

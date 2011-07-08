@@ -18,12 +18,12 @@ method format($text, :$link_maker, :$extlink_maker) {
                 my $heading = ~$/<heading><parchunk>[0];
                 $heading .= subst( / ^ \s+ /, '' );
                 $heading .= subst( / \s+ $ /, '' );
-                $result = "<h1>$heading</h1>";
+                $result = "<h1>{$heading}</h1>";
             }
             else {
                 $result = '<p>';
 
-                for $/<parchunk> {
+                for $/<parchunk>.list {
                     if $_<twext> { 
                         $result ~= $_<twext>;
                     }

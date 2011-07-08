@@ -112,7 +112,7 @@ class November::CGI {
         }
     }
 
-    sub unescape($string is rw) {
+    our sub unescape($string is copy) {
         $string .= subst('+', ' ', :g);
         # RAKUDO: This could also be rewritten as a single .subst :g call.
         #         ...when the semantics of .subst is revised to change $/,

@@ -9,7 +9,7 @@ my $d = Dispatcher.new;
 $d.add: [
     [:controller(*), :action(*) ], { 'c:' ~ $:controller ~ ' a:' ~ $:action },
     [:controller(*), / \d / ],     {  $:controller ~ '/' ~ $^a },
-    [:controller(*), *, * ],       { my $c = $:controller; use "$c"; is($^a, $^b, 'Test within Rule') },
+    [:controller(*), *, * ],       { my $c = $:controller; require "$c"; is($^a, $^b, 'Test within Rule') },
 ];
 
 is( $d.dispatch(['one', 5]), 
@@ -23,8 +23,7 @@ is( $d.dispatch(['one', 'two']),
 );
 
 is( $d.dispatch(['Test', 3, 3]), 
-    Bool::False, # But this value hinges on Test.pm behaving wrongly;
-                 # should be changed to Bool::True once Test.pm is fixed.
+    Bool::True,
     'Pattern set controller and action'  
 );
 

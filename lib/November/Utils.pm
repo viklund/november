@@ -1,4 +1,4 @@
-use v6;
+module November::Utils;
 
 sub r_remove( $str is rw ) is export {
     $str .= subst( /\\r/, '', :g );
@@ -38,7 +38,7 @@ sub get_period ($modif_time, $time_now?) is export {
     return ($days, $hours, $mins)
 }
 
-sub time_to_period_str ($time) {
+sub time_to_period_str ($time) is export {
     return False unless $time;
     my $t = get_period($time);
     my $str =  '~'; 

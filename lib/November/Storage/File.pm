@@ -26,11 +26,11 @@ class November::Storage::File is November::Storage {
     }
 
     method wiki_page_exists($page) {
-        return ($.content_path ~ $page) ~~ :e;
+        return ($.content_path ~ $page).IO ~~ :e;
     }
 
     method read_recent_changes {
-        return [] unless $.recent_changes_path ~~ :e;
+        return [] unless $.recent_changes_path.IO ~~ :e;
         return eval( slurp( $.recent_changes_path ) );
     }
 
@@ -42,7 +42,7 @@ class November::Storage::File is November::Storage {
 
     method read_page_history($page) {
         my $file = $.content_path ~ $page;
-        return [] unless $file ~~ :e;
+        return [] unless $file.IO ~~ :e;
         my $page_history = eval( slurp($file) );
         return $page_history;
     }
@@ -56,7 +56,7 @@ class November::Storage::File is November::Storage {
 
     method read_modification($modification_id) {
         my $file = $.modifications_path ~ $modification_id;
-        return [] unless $file ~~ :e;
+        return [] unless $file.IO ~~ :e;
         return eval( slurp($file) );
     }
 

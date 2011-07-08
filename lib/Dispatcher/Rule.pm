@@ -9,17 +9,21 @@ has Code $.code;
 
 method match (@chunks) {
     return False if @chunks != @!pattern;
-    for @chunks Z @!pattern -> $chunk, Object $rule is copy {
+    # RAKUDO: Z seems to have a bug (fixed in nom), where [1,2] Z [*,*] yields (1, Any, 2, Any): the Whatever is lost
+    #for @chunks Z @!pattern -> $chunk, $rule is copy {
+    for ^@chunks -> $i {
+        my $chunk = @chunks[$i];
+        my $rule = @!pattern[$i];
+        #note "- chunk ({$chunk.perl}), rule ({$rule.perl})";
 
         my $param;
         if $rule ~~ Pair { ($param, $rule) = $rule.kv }
 
         if ~$chunk ~~ $rule {
             if $param {
-                self."$param" = (~$/ || ~$chunk);
+                self."$param"() = ~($/ // $chunk);
             } else {
-                # RAKUDO: /./ ~~ Regex us false, but /./ ~~ Code is true  
-                @!args.push($/ || $chunk) if $rule ~~ Code | Whatever; # should by Regex | Whatever
+                @!args.push($/ || $chunk) if $rule ~~ Regex | Whatever;
             }
         }
         else {
@@ -35,7 +39,7 @@ method apply {
     #$!code(| @!args, controller => $.controller, action => $.action );
     # workaround:
     if $!controller and $!action {
-        $!code(| @!args,action => $.action, controller => $.controller  );
+        $!code(| @!args, action => $.action, controller => $.controller );
     } elsif $!action {
         $!code(| @!args, action => $.action );
     } elsif $!controller {

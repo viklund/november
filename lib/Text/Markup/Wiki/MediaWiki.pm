@@ -8,7 +8,9 @@ grammar Tokenizer {
     regex italic_marker { '&#039;&#039;' }
 
     regex wikilink { '[[' \s*  <page> \s* ']]' }
-    regex page { [<!before ']]'> \N]+<!after \s> }
+    # RAKUDO <after> is not implemented
+    #regex page { [<!before ']]'> \N]+<!after \s> }
+    regex page { \N+? }
 
     regex extlink { '[' \s* <url> [\s+ <title>]? \s* ']' }
     regex url { [<!before ']'> \S]+ }
@@ -42,7 +44,9 @@ class Text::Markup::Wiki::MediaWiki {
         }
 
         my &strip_prefix = {
-            .subst(/'<' ('/'?) <[uo]> 'li>'/, { "<$0li>" }, :g)
+            # RAKUDO: -> $/ hack is nonportable; rakudo can't directly use match
+            # vars in subst closures
+            .subst(/'<' ('/'?) <[uo]> 'li>'/, -> $/ { '<' ~ $0 ~ 'li>' }, :g)
         };
 
         my &surround_with_list = {
@@ -99,7 +103,7 @@ class Text::Markup::Wiki::MediaWiki {
         $trimmed .= subst( / ^ \s+ /, '' );
         $trimmed .= subst( / \s+ $ /, '' );
 
-        my $cleaned_of_whitespace = $trimmed.trans( [ /\s+/ => ' ' ] );
+        my $cleaned_of_whitespace = $trimmed.trans( / \s+ / => ' ' );
 
         my $xml_escaped = $cleaned_of_whitespace.trans(
             [           '<', '>', '&', '\''   ] =>
@@ -127,14 +131,16 @@ class Text::Markup::Wiki::MediaWiki {
                 }
                 elsif $token<wikilink> {
                     take defined $link_maker
-                            ?? $link_maker(~$token<wikilink><page>, Mu)
+                            ?? $link_maker(~$token<wikilink><page>, Any)
                             !! ~$token<wikilink>;
                 }
                 elsif $token<extlink> {
                     my $url = ~$token<extlink><url>;
                     my $title;
 
-                    if defined $token<extlink><title> {
+                    # RAKUDO: <foo>? should be Nil if no match, but is []
+                    #if defined $token<extlink><title> {
+                    if $token<extlink><title> {
                         # RAKUDO: return 1 from ~$token<extlink><title> if title defined,
                         # but thats works:
                         $title = ~$token<extlink><title>[0];

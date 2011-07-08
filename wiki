@@ -1,17 +1,17 @@
 #!perl6
 use v6;
 
-use CGI;
 use November;
-use Config;
+use November::CGI;
+use November::Config;
 use Text::Markup::Wiki::MediaWiki;
 
-my $c = Config.new(
+my $c = November::Config.new(
     markup => Text::Markup::Wiki::MediaWiki.new(),
     skin   => 'CleanAndSoft'
 );
 my November $wiki = November.new(
     config => $c,
 );
-my $cgi = CGI.new;
+my $cgi = November::CGI.new;
 $wiki.handle_request($cgi);

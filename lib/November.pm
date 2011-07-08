@@ -1,5 +1,8 @@
 use v6;
 
+# RAKUDO: Needed because of [perl #73912]
+class November { ... }
+
 use November::Session;
 use November::Cache;
 use Digest;
@@ -39,7 +42,7 @@ class November does November::Session does November::Cache {
             ['out'],                  { self.log_out },
             ['register'],             { self.register },
             ['recent'],               { self.list_recent_changes },
-            ['history'],              { self.view_page_history(~$^page) },
+            ['history', /^ <-[?/]>+ $/], { self.view_page_history(~$^page) },
             ['all'],                  { self.list_all_pages },
         ];
 
@@ -47,7 +50,8 @@ class November does November::Session does November::Cache {
         $d.dispatch(@chunks);
     }
 
-    method view_page($page is rw='Main_Page') {
+    # RAKUDO: Should `is rw` work with constant defaults? (It doesn't.)
+    method view_page($page is copy = 'Main_Page') {
         $page .= subst('%20', '_', :g);
 
         unless $.storage.wiki_page_exists($page) {
@@ -92,7 +96,7 @@ class November does November::Session does November::Cache {
 
     }
 
-    method edit_page($page is rw) {
+    method edit_page($page is copy) {
         $page .= subst('%20', '_', :g);
         my $sessions = self.read_sessions();
 
@@ -187,7 +191,9 @@ class November does November::Session does November::Cache {
     }
 
     method read_users {
-        return {} unless $.config.userfile_path ~~ :e;
+        # RAKUDO: NYI ~~ :X file 
+        #return {} unless $.config.userfile_path ~~ :e;
+        return {} unless $.config.userfile_path.IO.e;
         return eval( slurp( $.config.userfile_path ) );
     }
 
@@ -281,7 +287,7 @@ class November does November::Session does November::Cache {
     }
 
     method error_page($message = "An internal error occurred. Apologies.") {
-        self.response( 'error.tmpl', { MESSAGE => $message } );
+        self.response( 'error.tmpl', { MESSAGE => $message ~ "<pre>{self.perl}</pre>" } );
     }
 
     method list_recent_changes {
@@ -292,7 +298,7 @@ class November does November::Session does November::Cache {
         );
     }
 
-    method view_page_history($page is rw = 'Main_Page') {
+    method view_page_history($page is copy = 'Main_Page') {
         $page .= subst('%20', '_', :g);
 
         unless $.storage.wiki_page_exists($page) {
@@ -305,7 +311,7 @@ class November does November::Session does November::Cache {
         self.response('page_history.tmpl',
             {
             'TITLE'     => $title,
-            'CHANGES'   => self.get_changes($page, limit => 50),
+            'CHANGES'   => self.get_changes(:$page, limit => 50),
             }
         );
     }
@@ -367,8 +373,9 @@ class November does November::Session does November::Cache {
         self.response('list_all_pages.tmpl', %params);
     }
 
-    # RAKUDO: die at hash merge if %params undef, so I use default value
-    method response ($tmpl, %params?={}, %opts?) {
+    # RAKUDO: Instead of %params? we do %params = {}, because the former
+    #         doesn't quite work. [perl #79642]
+    method response ($tmpl, %params = {}, %opts = {}) {
         my $template = HTML::Template.from_file($.config.template_path ~ $tmpl);
 
         $template.with_params(
@@ -389,9 +396,9 @@ class November does November::Session does November::Cache {
         my $root = $!config.web_root;
         if $title {
             if $page ~~ m/':'/ {
-                return qq|<a href="{ $root ~ $page }">$title</a>|;
+                return qq|<a href="{ $root ~ $page }">{$title}</a>|;
             } else {
-                return qq|<a href="$root/view/$page">$title</a>|;
+                return qq|<a href="$root/view/$page">{$title}</a>|;
             }
         } else {
             return sprintf('<a href="%s/%s/%s" %s >%s</a>',
@@ -405,9 +412,9 @@ class November does November::Session does November::Cache {
 
     method make_extlink($url, $title) {
         if $title {
-            return qq|<a href="$url">$title</a>|;
+            return qq|<a href="$url">{$title}</a>|;
         } else {
-            return qq|<a href="$url">$url</a>|;
+            return qq|<a href="$url">{$url}</a>|;
         }
     }
 }
