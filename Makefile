@@ -2,6 +2,7 @@ PERL6 = perl6
 
 SOURCES = \
     lib/Digest.pm \
+    lib/Digest/SHA.pm \
     lib/Dispatcher.pm \
     lib/Dispatcher/Rule.pm \
     lib/November.pm \
