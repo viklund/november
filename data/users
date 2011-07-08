@@ -1,18 +1,8 @@
+# Password generation is a manual process right now; run bin/generate-password.pl USER PASS
+# The plain_text value isn't used anywhere, it's just handy for human reference
 {
-  'johan' => {
-    'password' => 'hdm24HFlfrBgIX3bTsVLIQ',
+  'someone' => {
+    'password' => '47c96e61cbcb31e648b1987107117ca4f524658460b955e290675789466fcd1a',
     'plain_text' => 'howdy'
   },
-  'carl' => {
-    'password' => '3nRQWSNmQ/4jFD1w7AQMqg',
-    'plain_text' => 'howdy'
-  },
-  'ihrd' => {
-    'password' => 'yG7xslKNZt59hpwVBkWrFQ',
-    'plain_text' => 'gfhjkm'
-  },
-  'moritz' => {
-    'password' => '48f81da1091e84dbab7204',
-    'plain_text' => 'srhew49'
-  }
 }
