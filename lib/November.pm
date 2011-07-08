@@ -191,9 +191,7 @@ class November does November::Session does November::Cache {
     }
 
     method read_users {
-        # RAKUDO: NYI ~~ :X file 
-        #return {} unless $.config.userfile_path ~~ :e;
-        return {} unless $.config.userfile_path.IO.e;
+        return {} unless $.config.userfile_path.IO ~~ :e;
         return eval( slurp( $.config.userfile_path ) );
     }
 
