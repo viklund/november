@@ -3,11 +3,15 @@ use v6;
 use November::Config;
 
 class November::Tags {
-    my $server_root = November::Config.new.server_root;
-    # TODO Nasty hack to enable testing to use different paths
-    has $.page_tags_path is rw  = $server_root ~ 'data/page_tags/';
-    has $.tags_count_path is rw = $server_root ~ 'data/tags_count';
-    has $.tags_index_path is rw = $server_root ~ 'data/tags_index';
+    has $.page_tags_path is rw;
+    has $.tags_count_path is rw;
+    has $.tags_index_path is rw;
+
+    submethod BUILD(:$config = November::Config.new) {
+        $.page_tags_path = $config.server_root ~ 'data/page_tags/';
+        $.tags_count_path = $config.server_root ~ 'data/tags_count';
+        $.tags_index_path = $config.server_root ~ 'data/tags_index';
+    }
 
     method update_tags($_: Str $page, Str $new_tags) {
         my $old_tags = .read_page_tags($page).chomp;

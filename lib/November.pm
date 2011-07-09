@@ -60,7 +60,7 @@ class November does November::Session does November::Cache {
         }
 
         # TODO: we need plugin system (see topics in mail-list)
-        my $t = November::Tags.new;
+        my $t = November::Tags.new(:$.config);
 
         my $title = $page.trans( ['_'] => [' '] );
 
@@ -127,7 +127,7 @@ class November does November::Session does November::Cache {
             self.remove-cache-entry( $page );
 
             # TODO: we need plugin system (see topics in mail-list)
-            my $t = November::Tags.new();
+            my $t = November::Tags.new(:$.config);
             $t.update_tags($page, $tags);
 
             $.cgi.redirect('/view/' ~ $page );
@@ -135,7 +135,7 @@ class November does November::Session does November::Cache {
         }
 
         # TODO: we need plugin system (see topics in mail-list)
-        my $t = November::Tags.new;
+        my $t = November::Tags.new(:$.config);
         self.response( 'edit.tmpl',
             {
             PAGE     => $page,
@@ -160,7 +160,7 @@ class November does November::Session does November::Cache {
         );
 
         # Should really use the $tags parameter here, this will do for now...
-        #my $t = November::Tags.new();
+        #my $t = November::Tags.new(:$.config);
         #my $tags = $t.tags_parse( $tags );
 
         self.response( 'edit.tmpl',
@@ -341,7 +341,7 @@ class November does November::Session does November::Cache {
 
     method list_all_pages {
 
-        my $t = November::Tags.new();
+        my $t = November::Tags.new(:$.config);
         my %params;
         %params<TAGS> = $t.all_tags if $t;
 

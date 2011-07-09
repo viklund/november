@@ -5,6 +5,11 @@ plan 8;
 
 use November::Tags;
 
+use November::Config;
+my $config = November::Config.new(
+    server_root => 't/tags/',
+);
+
 role Testing {
     method clear ($_:) {
         my $c = {};
@@ -15,7 +20,7 @@ role Testing {
     }
 }
 
-my $t = November::Tags.new does Testing;
+my $t = November::Tags.new(:$config) does Testing;
 $t.page_tags_path  = 't/tags/data/page_tags/';
 $t.tags_count_path = 't/tags/data/tags_count';
 $t.tags_index_path = 't/tags/data/tags_index';

@@ -5,6 +5,11 @@ plan 3;
 
 use November::Tags;
 
+use November::Config;
+my $config = November::Config.new(
+    server_root => 't/tags/',
+);
+
 role Testing {
     method clear {
         my $c = {};
@@ -12,8 +17,7 @@ role Testing {
     }
 }
 
-my $t = November::Tags.new does Testing;
-$t.tags_count_path = 't/tags/data/tags_count';
+my $t = November::Tags.new(:$config) does Testing;
 $t.clear;
 
 is( ($t.norm_counts).perl, '{}', 'With empty tags_count norm_counts produce empty Hash' );
