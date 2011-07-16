@@ -9,7 +9,7 @@ use Digest;
 
 class November does November::Session does November::Cache {
 
-    use November::CGI;
+    use November::Request;
     use November::Tags;
     use HTML::Template;
     use Dispatcher;
@@ -19,22 +19,18 @@ class November does November::Session does November::Cache {
     use Text::Markup::Wiki::MediaWiki;
 
     has November::Storage $.storage;
-    has November::CGI     $.cgi;
     has November::Config  $.config;
+    has November::Request $.request;
+    has Dispatcher $!dispatcher;
 
     submethod BUILD( :$config = November::Config.new ) {
         $!config = $config;
         $!storage = November::Storage::File.new(
             storage_root => $!config.server_root ~ 'data/'
         );
-    }
 
-    method handle_request(November::CGI $cgi) {
-        $!cgi = $cgi;
-
-        my $d = Dispatcher.new( default => { self.error_page } );
-
-        $d.add: [
+        $!dispatcher = Dispatcher.new( default => { self.not_found } );
+        $!dispatcher.add: [
             [''],                     { self.view_page },
             ['view', /^ <-[?/]>+ $/], { self.view_page(~$^page) },
             ['edit', /^ <-[?/]>+ $/], { self.edit_page(~$^page) },
@@ -45,18 +41,22 @@ class November does November::Session does November::Cache {
             ['history', /^ <-[?/]>+ $/], { self.view_page_history(~$^page) },
             ['all'],                  { self.list_all_pages },
         ];
-
-        my @chunks = $cgi.uri.chunks.list;
-        $d.dispatch(@chunks);
     }
 
-    # RAKUDO: Should `is rw` work with constant defaults? (It doesn't.)
+    method handle_request(%env) {
+        $!request = November::Request.new(:%env);
+        #note "REQUEST: ", $!request.perl;
+
+        my @chunks = $!request.uri.chunks.list;
+        #note "Dispatching on {@chunks.perl}";
+        return $!dispatcher.dispatch(@chunks);
+    }
+
     method view_page($page is copy = 'Main_Page') {
         $page .= subst('%20', '_', :g);
 
         unless $.storage.wiki_page_exists($page) {
-            self.not_found($page);
-            return;
+            return self.no_such_page($page);
         }
 
         # TODO: we need plugin system (see topics in mail-list)
@@ -82,7 +82,9 @@ class November does November::Session does November::Cache {
             self.set-cache-entry( $page, $content );
         }
 
-        self.response( 'view.tmpl',
+        my $page_tags = $t.page_tags($page);
+        note "View w/ tags: {$page_tags.perl}";
+        return self.response( 'view.tmpl',
             {
             TITLE    => $title,
             PAGE     => $page,
@@ -93,7 +95,6 @@ class November does November::Session does November::Cache {
             TAGS     => $t.all_tags,
             }
         );
-
     }
 
     method edit_page($page is copy) {
@@ -106,21 +107,31 @@ class November does November::Session does November::Cache {
                         = $.storage.wiki_page_exists($page);
         my $action      = $already_exists ?? 'Editing' !! 'Creating';
         my $old_content = $already_exists ?? $.storage.read_page($page) !! '';
-        my $title = $action ~ ' ' ~ $page.trans( ['_'] => [' '] );
+        my $title = $page.trans( ['_'] => [' '] );
+
+        my %params = {
+            ACTION   => $action,
+            PAGE     => $page,
+            TITLE    => $title,
+            CONTENT  => $old_content,
+        }
 
         # The 'edit' action handles both showing the form and accepting the
         # POST data. The difference is the presence of the 'articletext'
         # parameter -- if there is one, the action is considered a save.
-        if $.cgi.params<articletext> || $.cgi.params<tags> {
-            my $summary    = $.cgi.params<summary>;
-            my $new_text   = $.cgi.params<articletext>;
-            my $tags       = $.cgi.params<tags>;
-            my $session_id = $.cgi.cookie<session_id>;
+        if $.request.params<articletext> || $.request.params<tags> {
+            my $summary    = $.request.params<summary>;
+            my $new_text   = $.request.params<articletext>;
+            my $tags       = $.request.params<tags>;
+            my $session_id = $.request.cookie<session_id>;
             my $author     = $sessions{$session_id}<user_name>;
 
-            if $.cgi.params<preview> {
-                # It's only a preview, should just send it back formatted
-                return self.show_preview( $page, $summary, $new_text, $tags );
+            if $.request.params<preview> {
+                # It's only a preview, just send it back formatted
+                %params<SUMMARY> = $summary;
+                %params<CONTENT> = $new_text;
+                %params<PAGETAGS> = $tags;
+                return self.show_preview(%params);
             }
 
             $.storage.save_page($page, $new_text, $author, $summary);
@@ -130,31 +141,24 @@ class November does November::Session does November::Cache {
             my $t = November::Tags.new(:$.config);
             $t.update_tags($page, $tags);
 
-            $.cgi.redirect('/view/' ~ $page );
-            return;
+            return self.redirect('/view/' ~ $page );
         }
 
         # TODO: we need plugin system (see topics in mail-list)
         my $t = November::Tags.new(:$.config);
-        self.response( 'edit.tmpl',
-            {
-            PAGE     => $page,
-            TITLE    => $title,
-            CONTENT  => $old_content,
-            PAGETAGS => $t.read_page_tags($page),
-            }
-        );
+        %params<PAGETAGS> = $t.read_page_tags($page);
+        return self.response( 'edit.tmpl', %params );
     }
 
-    method show_preview( $page is rw, $summary, $new_text, $tags ) {
-        $page .= subst('%20', '_', :g);
+    method show_preview(%params is rw) {
+        my $page = %params<PAGE>.subst('%20', '_', :g);
         my $title = $page.trans( ['_'] => [' '] );
 
         my $markup = $.config.markup;
 
-        my $content = $markup.format(
+        %params<PREVIEW> = $markup.format(
                     # MediaWiki markup can't handle trailing spaces, gh-16
-                    $new_text.subst(/[\s|\n]+$/, ''),
+                    %params<CONTENT>.subst(/[\s|\n]+$/, ''),
                     link_maker    => { self.make_link($^p, $^t) },
                     extlink_maker => { self.make_extlink($^p, $^t)}
         );
@@ -163,29 +167,19 @@ class November does November::Session does November::Cache {
         #my $t = November::Tags.new(:$.config);
         #my $tags = $t.tags_parse( $tags );
 
-        self.response( 'edit.tmpl',
-            {
-            ACTION   => 'Editing',
-            PAGE     => $page,
-            TITLE    => $title,
-            SUMMARY  => $summary,
-            CONTENT  => $new_text,
-            PREVIEW  => $content,
-            PAGETAGS => $tags,
-            }
-        );
+        return self.response( 'edit.tmpl', %params );
     }
 
     method logged_in() {
         my $sessions = self.read_sessions();
-        my $session_id = $.cgi.cookie<session_id>;
+        my $session_id = $.request.cookie<session_id>;
         # RAKUDO: 'defined' should maybe be 'exists', although here it doesn't
         # matter.
         defined $session_id && defined $sessions{$session_id}
     }
 
     method not_authorized {
-        self.response( 'action_not_authorized.tmpl',
+        return self.response( 'action_not_authorized.tmpl',
             { DISALLOWED_ACTION => 'edit pages' }
         );
     }
@@ -195,9 +189,9 @@ class November does November::Session does November::Cache {
         return eval( slurp( $.config.userfile_path ) );
     }
 
-    method not_found($page?) {
-        #TODO: that should by 404 when no $page
-        self.response('not_found.tmpl',
+    method no_such_page($page?) {
+        return self.not_found unless $page;
+        return self.response('no_such_page.tmpl',
             {
             'PAGE' => $page || 'Action Not found'
             }
@@ -205,9 +199,9 @@ class November does November::Session does November::Cache {
     }
 
     method register {
-        if my $user_name = $.cgi.params<user_name> {
-            my $password = $.cgi.params<password>;
-            my $passagain = $.cgi.params<passagain>;
+        if my $user_name = $.request.params<user_name> {
+            my $password = $.request.params<password>;
+            my $passagain = $.request.params<passagain>;
             
             my Str @errors;
             
@@ -230,18 +224,18 @@ class November does November::Session does November::Cache {
 
             if @errors {
                 # TODO: Send @errors to template.
-                self.response('register_failed.tmpl');
-                return;
+                return self.response('register_failed.tmpl');
             }
             my $phash = digest(digest($user_name, 'sha256') ~ $password, 'sha256');
             # TODO: Add the user to the users file.
         }
-        self.response('register.tmpl');
+        return self.response('register.tmpl');
     }
     
     method log_in {
-        if my $user_name = $.cgi.params<user_name> {
-            my $password = $.cgi.params<password>;
+        #note "Log in called";
+        if my $user_name = $.request.params<user_name> {
+            my $password = $.request.params<password>;
 
             my %users = self.read_users();
 
@@ -253,43 +247,44 @@ class November does November::Session does November::Cache {
 
                 my $session_id = self.new_session($user_name);
                 my $session_cookie = "session_id=$session_id";
+                # Stuff this back into $.request so logged_in() sees it
+                $.request.cookie<session_id> = $session_id;
 
-                self.response('login_succeeded.tmpl',
-                    {},
-                    { cookie => $session_cookie }
+                #note "Log in OK: $session_cookie";
+                return self.response('login_succeeded.tmpl',
+                    opts => { cookie => $session_cookie }
                 );
-                return;
             }
 
-            self.response('login_failed.tmpl');
-            return;
+            #note "Log in FAILED [$user_name,$password]";
+            return self.response('login_failed.tmpl');
         }
-        self.response('log_in.tmpl');
+        return self.response('log_in.tmpl');
     }
 
     method log_out {
-        if defined $.cgi.cookie<session_id> {
-            my $session_id = $.cgi.cookie<session_id>;
+        if defined $.request.cookie<session_id> {
+            my $session_id = $.request.cookie<session_id>;
             self.remove_session( $session_id );
 
             my $session_cookie = "session_id=";
 
-            self.response('logout_succeeded.tmpl',
-                {},
-                { :cookie($session_cookie) }
+            return self.response('logout_succeeded.tmpl',
+                opts => { :cookie($session_cookie) }
             );
-            return;
         }
 
-        self.response('logout_succeeded.tmpl');
+        return self.response('logout_succeeded.tmpl');
     }
 
     method error_page($message = "An internal error occurred. Apologies.") {
-        self.response( 'error.tmpl', { MESSAGE => $message ~ "<pre>{self.perl}</pre>" } );
+        return self.response( 'error.tmpl',
+            { MESSAGE => $message ~ "<pre>{self.perl}</pre>" }
+        );
     }
 
     method list_recent_changes {
-        self.response('recent_changes.tmpl',
+        return self.response('recent_changes.tmpl',
             {
             'CHANGES'   => self.get_changes(limit => 50),
             }
@@ -300,13 +295,13 @@ class November does November::Session does November::Cache {
         $page .= subst('%20', '_', :g);
 
         unless $.storage.wiki_page_exists($page) {
-            self.not_found($page);
+            self.no_such_page($page);
             return;
         }
 
         my $title = $page.trans( ['_'] => [' '] );
 
-        self.response('page_history.tmpl',
+        return self.response('page_history.tmpl',
             {
             'TITLE'     => $title,
             'CHANGES'   => self.get_changes(:$page, limit => 50),
@@ -347,7 +342,7 @@ class November does November::Session does November::Cache {
 
         my $index;
 
-        my $tag = $.cgi.params<tag>;
+        my $tag = $.request.params<tag>;
         if $tag and $t {
             # TODO: we need plugin system (see topics in mail-list)
             my $tags_index = $t.read_tags_index;
@@ -368,12 +363,22 @@ class November does November::Session does November::Cache {
             %params<LIST> = @list;
         }
 
-        self.response('list_all_pages.tmpl', %params);
+        return self.response('list_all_pages.tmpl', %params);
+    }
+
+    method redirect($uri, :%opts = {}) {
+        #note "REDIRECT: $uri";
+        return [
+            %opts<status> || 302,
+            [Location => $uri],
+            []
+        ];
     }
 
     # RAKUDO: Instead of %params? we do %params = {}, because the former
     #         doesn't quite work. [perl #79642]
-    method response ($tmpl, %params = {}, %opts = {}) {
+    method response ($tmpl, %params = {}, :%opts = {}) {
+        #note "RESPONSE: $tmpl";
         my $template = HTML::Template.from_file($.config.template_path ~ $tmpl);
 
         $template.with_params(
@@ -386,34 +391,45 @@ class November does November::Session does November::Cache {
             }
         );
 
-        $.cgi.send_response($template.output, %opts);
+        my @headers = ('Content-Type' => 'text/html; charset=utf-8');
+        if %opts && %opts<cookie> {
+            push @headers, 'Set-Cookie' => "%opts<cookie>; path=/;";
+        }
+        return [
+            200,
+            [ @headers ],
+            [ $template.output ]
+        ];
     }
 
-    method make_link($page is copy, $title) {
+    method not_found (:$message = 'Not Found') {
+        return [
+            404,
+            ['Content-Type' => 'text/plain'],
+            [$message]
+        ];
+    }
+
+    method make_link($page is copy, $title is copy) {
+        $title ||= $page.subst('_', ' ', :g);
         $page .= subst(' ', '_', :g);
         my $root = $!config.web_root;
-        if $title {
-            if $page ~~ m/':'/ {
-                return qq|<a href="{ $root ~ $page }">{$title}</a>|;
-            } else {
-                return qq|<a href="$root/view/$page">{$title}</a>|;
-            }
+
+        if $page ~~ m/':'/ {
+            return qq|<a href="{ $root ~ $page }">{$title}</a>|;
         } else {
             return sprintf('<a href="%s/%s/%s" %s >%s</a>',
                             $root,
                             $.storage.wiki_page_exists($page)
                                 ?? ('view', $page, '')
                                 !! ('edit', $page, ' class="nonexistent"'),
-                            $page);
+                            $title);
         }
     }
 
-    method make_extlink($url, $title) {
-        if $title {
-            return qq|<a href="$url">{$title}</a>|;
-        } else {
-            return qq|<a href="$url">{$url}</a>|;
-        }
+    method make_extlink($url, $title is copy) {
+        $title ||= $url;
+        return qq|<a href="$url">{$title}</a>|;
     }
 }
 
