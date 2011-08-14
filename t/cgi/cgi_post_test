@@ -1,13 +1,12 @@
-#!/usr/bin/perl6
+#!/usr/bin/env perl6
 use Test;
 
-use CGI;
-my $cgi = CGI.new();
-$cgi.init();
+use November::CGI;
+my $cgi = November::CGI.new();
 
-print _is_deeply( $cgi.params, eval( %*ENV<TEST_RESULT> ) ) 
+# _is_deeply no longer visible from Test.pm so worked around it ...
+print $cgi.params eqv eval( %*ENV<TEST_RESULT> )
       ?? "ok " 
       !! "not ok \n" ~ "got: " ~ $cgi.param.perl ~ 
          "\nexpected: " ~ %*ENV<TEST_RESULT> ~ "\n";
-
 say "- " ~ %*ENV<TEST_NAME>;

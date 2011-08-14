@@ -1,5 +1,6 @@
 use v6;
 use URI;
+use URI::Escape;
 
 class November::CGI {
     has %.params;
@@ -85,11 +86,9 @@ class November::CGI {
 
     method parse_params($string) {
         if $string ~~ / '&' | ';' | '=' / {
-            my @param_values = $string.split(/ '&' | ';' /);
-
-            for @param_values -> $param_value {
-                my @kvs = $param_value.split("=");
-                self.add_param( @kvs[0], unescape(@kvs[1]) );
+            my %query_form = URI::split_query($string);
+            for %query_form.kv -> $k, $v {
+                self.add_param($k, uri_unescape( item $v ));
             }
         }
         else {
@@ -98,7 +97,7 @@ class November::CGI {
     }
 
     method parse_keywords (Str $string is copy) {
-        my $kws = unescape($string);
+        my $kws = uri_unescape($string);
         @!keywords = $kws.split(/ \s+ /);
     }
 
@@ -108,51 +107,8 @@ class November::CGI {
 
         for @param_values -> $param_value {
             my @kvs = $param_value.split('=');
-            %!cookie{ @kvs[0] } = unescape( @kvs[1] );
+            %!cookie{ @kvs[0] } = uri_unescape( @kvs[1] );
         }
-    }
-
-    our sub unescape($string is copy) {
-        $string .= subst('+', ' ', :g);
-        # RAKUDO: This could also be rewritten as a single .subst :g call.
-        #         ...when the semantics of .subst is revised to change $/,
-        #         that is.
-        # The percent_hack can be removed once the bug is fixed and :g is
-        # added
-        while $string ~~ / ( [ '%' <[0..9A..F]>**2 ]+ ) / {
-            $string .= subst( ~$0,
-            percent_hack_start( decode_urlencoded_utf8( ~$0 ) ) );
-        }
-        return percent_hack_end( $string );
-    }
-
-    sub percent_hack_start($str is rw) {
-        if $str ~~ '%' {
-            $str = '___PERCENT_HACK___';
-        }
-        return $str;
-    }
-
-    sub percent_hack_end($str) {
-        return $str.subst('___PERCENT_HACK___', '%', :g);
-    }
-
-    sub decode_urlencoded_utf8($str) {
-        my $r = '';
-        my @chars = map { :16($_) }, $str.split('%').grep({$^w});
-        while @chars {
-            my $bytes = 1;
-            my $mask  = 0xFF;
-            given @chars[0] {
-                when { $^c +& 0xF0 == 0xF0 } { $bytes = 4; $mask = 0x07 }
-                when { $^c +& 0xE0 == 0xE0 } { $bytes = 3; $mask = 0x0F }
-                when { $^c +& 0xC0 == 0xC0 } { $bytes = 2; $mask = 0x1F }
-            }
-            my @shift = (^$bytes).reverse.map({6 * $_});
-            my @mask  = $mask, 0x3F xx $bytes-1;
-            $r ~= chr( [+] @chars.splice(0,$bytes) »+&« @mask »+<« @shift );
-        }
-        return $r;
     }
 
     method add_param ( Str $key, $value ) {
