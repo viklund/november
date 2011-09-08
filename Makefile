@@ -13,8 +13,6 @@ SOURCES = \
     lib/November/Storage.pm \
     lib/November/Storage/File.pm \
     lib/November/Tags.pm \
-    lib/November/URI.pm \
-    lib/November/URI/Grammar.pm \
     lib/November/Utils.pm \
     lib/November/Utils.pm \
     lib/Test/CGI.pm \

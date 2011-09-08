@@ -32,16 +32,16 @@ See instructions on the Rakudo web site:
 
  <http://rakudo.org/how-to-get-rakudo>
 
-You'll also need the projects listed in deps.proto, presently only
-HTML::Template. It is preferrable to build HTML::Template before building
-November.
+You'll also need the projects listed in META.info including HTML::Template,
+Digest::MD5, and URI.  It is preferrable to build HTML::Template before
+building November.
 
 $ pwd
 /tmp
 $ git clone git://github.com/viklund/november.git
 $ git clone git://github.com/masak/html-template.git
 $ export RAKUDO_DIR=$PARROT_DIR/languages/rakudo
-$ export PERL6LIB=$RAKUDO_DIR:/tmp/november/lib:/tmp/html-template/lib
+$ export PERL6LIB=$RAKUDO_DIR:/tmp/november/lib:/tmp/html-template/lib:/tmp/perl6-digest-md5/lib/:/tmp/uri/lib
 $ cd html-template/
 $ perl Makefile.PL
 $ make

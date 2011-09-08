@@ -46,8 +46,8 @@ class November does November::Session does November::Cache {
             ['all'],                  { self.list_all_pages },
         ];
 
-        my @chunks = $cgi.uri.chunks.list;
-        $d.dispatch(@chunks);
+        my @segments = $cgi.uri.segments.list;
+        $d.dispatch(@segments);
     }
 
     # RAKUDO: Should `is rw` work with constant defaults? (It doesn't.)
