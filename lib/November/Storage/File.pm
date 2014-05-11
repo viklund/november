@@ -31,7 +31,7 @@ class November::Storage::File is November::Storage {
 
     method read_recent_changes {
         return [] unless $.recent_changes_path.IO ~~ :e;
-        return eval( slurp( $.recent_changes_path ) );
+        return EVAL( slurp( $.recent_changes_path ) );
     }
 
     method write_recent_changes ($recent_changes) {

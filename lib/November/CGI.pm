@@ -126,7 +126,7 @@ class November::CGI {
         return percent_hack_end( $string );
     }
 
-    sub percent_hack_start($str is rw) {
+    sub percent_hack_start($str is copy) {
         if $str ~~ '%' {
             $str = '___PERCENT_HACK___';
         }
@@ -156,10 +156,7 @@ class November::CGI {
     }
 
     method add_param ( Str $key, $value ) {
-        # RAKUDO: синтаксис Hash :exists еще не реализован
-        #        (Hash :exists{key} not implemented yet)
-        # if %.params :exists{$key} {
-        if %.params.exists($key) {
+        if %.params{$key} :exists {
             # RAKUDO: ~~ Scalar
             if %.params{$key} ~~ Str | Int {
                 my $old_param = %.params{$key};
