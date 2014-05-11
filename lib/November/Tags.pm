@@ -8,9 +8,9 @@ class November::Tags {
     has $.tags_index_path is rw;
 
     submethod BUILD(:$config = November::Config.new) {
-        $.page_tags_path = $config.server_root ~ 'data/page_tags/';
-        $.tags_count_path = $config.server_root ~ 'data/tags_count';
-        $.tags_index_path = $config.server_root ~ 'data/tags_index';
+        $!page_tags_path = $config.server_root ~ 'data/page_tags/';
+        $!tags_count_path = $config.server_root ~ 'data/tags_count';
+        $!tags_index_path = $config.server_root ~ 'data/tags_index';
     }
 
     method update_tags($_: Str $page, Str $new_tags) {
@@ -58,9 +58,7 @@ class November::Tags {
         for @tags -> $t {
             $count{$t}--;
             
-            # RAKUDO: :delete on Hash not implemented yet
-            # $count{$t} :delete;
-            $count.delete($t) if $count{$t} <= 0; 
+            $count{$t} :delete if $count{$t} <= 0; 
         }
 
         self.write_tags_count($count);
@@ -95,7 +93,7 @@ class November::Tags {
     method read_tags_count() {
         my $file = $.tags_count_path;
         return {} unless $file.IO ~~ :e;
-        return eval slurp $file;
+        return EVAL slurp $file;
     }
 
     method write_tags_count(Hash $counts) {
@@ -108,7 +106,7 @@ class November::Tags {
     method read_tags_index() {
         my $file = $.tags_index_path;
         return {} unless $file.IO ~~ :e;
-        return eval slurp $file;
+        return EVAL slurp $file;
     }
 
     method write_tags_index(Hash $index) {

@@ -1,5 +1,5 @@
 use v6;
-use Test :EXPORT;
+use Test;
 
 class Test::InputOutput {
     has $.filter;

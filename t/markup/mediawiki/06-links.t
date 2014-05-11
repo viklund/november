@@ -7,7 +7,7 @@ use Text::Markup::Wiki::MediaWiki;
 
 my $converter = Text::Markup::Wiki::MediaWiki.new;
 my $link_maker = {
-    my $l = $^page.ucfirst;
+    my $l = $^page.tc;
     my $t = $^title // $^page;
     $l .= subst(' ', '_', :g);
     qq[<a href="/?page=$l">{$t}</a>];

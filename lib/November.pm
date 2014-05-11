@@ -5,7 +5,7 @@ class November { ... }
 
 use November::Session;
 use November::Cache;
-use Digest;
+use Digest::SHA;
 
 class November does November::Session does November::Cache {
 
@@ -233,7 +233,7 @@ class November does November::Session does November::Cache {
                 self.response('register_failed.tmpl');
                 return;
             }
-            my $phash = digest(digest($user_name, 'sha256') ~ $password, 'sha256');
+            my $phash = sha256((sha256($user_name.encode).list».fmt("%02x") ~ $password).encode).list».fmt("%02x");
             # TODO: Add the user to the users file.
         }
         self.response('register.tmpl');
@@ -246,10 +246,9 @@ class November does November::Session does November::Cache {
             my %users = self.read_users();
 
             # Yes, this is cheating. Stand by for a real MD5 hasher.
+            my $hashed = sha256((sha256($user_name.encode).list».fmt("%02x") ~ $password).encode).list».fmt("%02x");
             if defined %users{$user_name}
-                and digest(digest($user_name, 'sha256') ~ $password,
-                          'sha256'
-                   ) eq %users{$user_name}<password> {
+                and $hashed eq %users{$user_name}<password> {
 
                 my $session_id = self.new_session($user_name);
                 my $session_cookie = "session_id=$session_id";

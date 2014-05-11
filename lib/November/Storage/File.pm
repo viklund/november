@@ -31,7 +31,7 @@ class November::Storage::File is November::Storage {
 
     method read_recent_changes {
         return [] unless $.recent_changes_path.IO ~~ :e;
-        return eval( slurp( $.recent_changes_path ) );
+        return EVAL( slurp( $.recent_changes_path ) );
     }
 
     method write_recent_changes ($recent_changes) {
@@ -43,7 +43,7 @@ class November::Storage::File is November::Storage {
     method read_page_history($page) {
         my $file = $.content_path ~ $page;
         return [] unless $file.IO ~~ :e;
-        my $page_history = eval( slurp($file) );
+        my $page_history = EVAL( slurp($file) );
         return $page_history;
     }
 
@@ -57,7 +57,7 @@ class November::Storage::File is November::Storage {
     method read_modification($modification_id) {
         my $file = $.modifications_path ~ $modification_id;
         return [] unless $file.IO ~~ :e;
-        return eval( slurp($file) );
+        return EVAL( slurp($file) );
     }
 
     method write_modification ($modification) {
@@ -89,7 +89,7 @@ class November::Storage::File is November::Storage {
     }
 
     method read_index {
-        return eval( slurp($.index_path) );
+        return EVAL( slurp($.index_path) );
     }
 }
 
