@@ -1,8 +1,8 @@
 {
     "name"        : "November",
     "version"     : "*",
+    "author"      : "github:viklund",
     "description" : "A wiki engine written in Perl 6",
     "depends"     : ["HTML::Template", "Digest"],
-    "repo-type"   : "git",
-    "repo-url"    : "git://github.com/viklund/november.git"
+    "source-url"  : "git://github.com/viklund/november.git"
 }
