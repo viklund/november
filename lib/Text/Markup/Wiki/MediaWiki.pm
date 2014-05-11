@@ -130,7 +130,7 @@ class Text::Markup::Wiki::MediaWiki {
                     toggle(@style_stack, @promises, 'i');
                 }
                 elsif $token<wikilink> {
-                    take defined $link_maker
+                    take defined($link_maker)
                             ?? $link_maker(~$token<wikilink><page>, Any)
                             !! ~$token<wikilink>;
                 }
@@ -143,13 +143,13 @@ class Text::Markup::Wiki::MediaWiki {
                     if $token<extlink><title> {
                         # RAKUDO: return 1 from ~$token<extlink><title> if title defined,
                         # but thats works:
-                        $title = ~$token<extlink><title>[0];
+                        $title = ~$token<extlink><title>;
                     }
                     else { 
                         $title = $url;
                     }
                     
-                    take defined $extlink_maker
+                    take defined($extlink_maker)
                             ?? $extlink_maker($url, $title)
                             !! ~$token<extlink>;
                 }

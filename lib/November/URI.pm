@@ -42,7 +42,7 @@ method authority {
 
 method host {
     #RAKUDO: $.uri<authority>[0]<host> return full <authority> now
-    my $h = ~$.uri<authority>[0]<host>;
+    my $h = ~$.uri<authority><host>;
     return $h.lc || '';
 }
 
@@ -50,7 +50,7 @@ method port {
     # TODO: send rakudobug
     # RAKUDO: $.uri<authority><port> return full <authority> now
     # workaround:
-    item $.uri<authority>[0]<port> || '';
+    item $.uri<authority><port> || '';
 }
 
 method path {

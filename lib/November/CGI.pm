@@ -19,7 +19,7 @@ class November::CGI {
         # a priority. It would make our tests scripts more complicated, with
         # little gains. It would look like this:
         # if %*ENV<REQUEST_METHOD> eq 'POST' && %*ENV{CONTENT_LENGTH} > 0 {
-        if %*ENV<REQUEST_METHOD> eq 'POST' {
+        if (%*ENV<REQUEST_METHOD> // '') eq 'POST' {
             my $input;
             if %*ENV<MODPERL6> {
                 my $r = Apache::RequestRec.new();
@@ -34,9 +34,9 @@ class November::CGI {
 
         self.eat_cookie( %*ENV<HTTP_COOKIE> ) if %*ENV<HTTP_COOKIE>;
 
-        my $uri_str = 'http://' ~ %*ENV<SERVER_NAME>;
+        my $uri_str = 'http://' ~ (%*ENV<SERVER_NAME> // '');
         $uri_str ~= ':' ~ %*ENV<SERVER_PORT> if %*ENV<SERVER_PORT>;
-        $uri_str ~=  %*ENV<MODPERL6> ?? %*ENV<PATH_INFO> !! %*ENV<REQUEST_URI>;
+        $uri_str ~=  (%*ENV<MODPERL6> ?? %*ENV<PATH_INFO> !! %*ENV<REQUEST_URI>) // '';
 
         $!uri = November::URI.new( uri => $uri_str );
     }

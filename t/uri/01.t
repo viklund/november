@@ -44,8 +44,7 @@ is($u.chunks[1], 'bar', 'second chunk');
 is($u.chunks[*-1], 'baz', 'last chunk'); 
 
 $u = November::URI.new(uri => 'http://foo.com');
-
-ok($u.chunks.list.perl eq '[""]', ".chunks return [''] for empty path");
+ok($u.chunks.perl eq 'Array.new("")', ".chunks return [''] for empty path");
 ok($u.absolute, 'http://foo.com has an absolute path'); 
 nok($u.relative, 'http://foo.com does not have a relative path'); 
 

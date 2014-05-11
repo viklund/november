@@ -9,7 +9,7 @@ my $d = Dispatcher.new;
 $d.add: [
     [:controller(*), :action(*) ], { 'c:' ~ $:controller ~ ' a:' ~ $:action },
     [:controller(*), / \d / ],     {  $:controller ~ '/' ~ $^a },
-    [:controller(*), *, * ],       { my $c = $:controller; require "$c"; is($^a, $^b, 'Test within Rule') },
+    [:controller(*), *, * ],       { my $c = $:controller; is($^a, $^b, 'Test within Rule') },
 ];
 
 is( $d.dispatch(['one', 5]), 

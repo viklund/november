@@ -106,7 +106,7 @@ class November::Tags {
     method read_tags_index() {
         my $file = $.tags_index_path;
         return {} unless $file.IO ~~ :e;
-        return eval slurp $file;
+        return EVAL slurp $file;
     }
 
     method write_tags_index(Hash $index) {
