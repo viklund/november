@@ -3,6 +3,29 @@
     "version"     : "*",
     "author"      : "github:viklund",
     "description" : "A wiki engine written in Perl 6",
+    "provides"    : {
+        "November"          : "lib/November.pm",
+        "Dispatcher"        : "lib/Dispatcher.pm",
+        "Test::CGI"         : "lib/Test/CGI.pm",
+        "Test::InputOutput" : "lib/Test/InputOutput.pm",
+        "Text::Markup::Wiki::Minimal" :
+            "lib/Text/Markup/Wiki/Minimal.pm",
+        "Text::Markup::Wiki::MediaWiki" :
+            "lib/Text/Markup/Wiki/MediaWiki.pm",
+        "Text::Markup::Wiki::Minimal::Grammar" :
+            "lib/Text/Markup/Wiki/Minimal/Grammar.pm",
+        "Dispatcher::Rule"        : "lib/Dispatcher/Rule.pm",
+        "November::URI"           : "lib/November/URI.pm",
+        "November::Tags"          : "lib/November/Tags.pm",
+        "November::Storage"       : "lib/November/Storage.pm",
+        "November::CGI"           : "lib/November/CGI.pm",
+        "November::Session"       : "lib/November/Session.pm",
+        "November::Utils"         : "lib/November/Utils.pm",
+        "November::Config"        : "lib/November/Config.pm",
+        "November::Cache"         : "lib/November/Cache.pm",
+        "November::URI::Grammar"  : "lib/November/URI/Grammar.pm",
+        "November::Storage::File" : "lib/November/Storage/File.pm"
+    },
     "depends"     : ["HTML::Template", "Digest"],
     "source-url"  : "git://github.com/viklund/november.git"
 }
