@@ -1,4 +1,4 @@
-class Dispatcher::Rule;
+unit class Dispatcher::Rule;
 has @.pattern;
 has @.args;
 

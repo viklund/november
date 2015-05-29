@@ -1,4 +1,4 @@
-role November::Session;
+unit role November::Session;
 
 method sessionfile-path {
     return $.config.server_root  ~ 'data/sessions';

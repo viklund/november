@@ -1,4 +1,4 @@
-module November::Utils;
+unit module November::Utils;
 
 sub r_remove( $str is rw ) is export {
     $str .= subst( /\\r/, '', :g );
