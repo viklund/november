@@ -62,7 +62,7 @@ class Text::Markup::Wiki::MediaWiki {
     # In case it was on, also turns off all styles pushed after that style.
     # In case it was off and the style was found in @promises, this token
     # cancels the one in @promises, and nothing is output.
-    sub toggle(@style_stack is rw, @promises is rw, $marker) {
+    sub toggle(@style_stack, @promises, $marker) {
         if $marker ~~ any(@style_stack) {
             while @style_stack[@style_stack.end] ne $marker {
                 my $t = @style_stack.pop();
