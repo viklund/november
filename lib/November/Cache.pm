@@ -1,4 +1,4 @@
-role November::Cache;
+unit role November::Cache;
 
 use November::Config;
 

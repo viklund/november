@@ -1,4 +1,4 @@
-class November::Storage;
+unit class November::Storage;
 
 method wiki_page_exists($page)                               { ... }
 
