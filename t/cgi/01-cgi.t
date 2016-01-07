@@ -78,9 +78,9 @@ is(  $cgi.param('key3'), '4', 'Test param' );
 
 my @cookies = (
     'foo=bar',
-      { :foo<bar> },
+      { :foo('bar') },
     'foo=bar; bar=12.20',
-      { :foo<bar>, :bar<12.20> },
+      { :foo('bar') :bar('12.20') },
     );
 
 for @cookies -> $in, $expected {
