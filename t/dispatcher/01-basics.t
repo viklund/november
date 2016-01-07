@@ -11,7 +11,7 @@ ok(1,'We use Dispatcher::Rule and we are still alive');
 
 my $d = Dispatcher.new;
 
-dies_ok( { $d.add: Dispatcher::Rule.new }, 
+dies-ok( { $d.add: Dispatcher::Rule.new }, 
          '.add adds only complete Rule objects' );
 
 $d.add: Dispatcher::Rule.new( :pattern(['']), code => { "Krevedko" } );
