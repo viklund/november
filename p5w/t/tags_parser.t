@@ -26,5 +26,5 @@ for (@to_parse) {
     my ($in, $result) = @$_;
     my $comment =  'Parse tags: ' . $in; 
     $comment =~ s/\n/\\n/;
-    is_deeply( $tf->($in), $result, $comment  );
+    is-deeply( $tf->($in), $result, $comment  );
 }

@@ -27,5 +27,5 @@ for (@counts_to_test) {
         $out{$_} = $tf->($tags{$_}, $min, $max);
     } 
     
-    is_deeply( \%out , \%expected, 'Normalize: ' . Dumper(\%tags) );
+    is-deeply( \%out , \%expected, 'Normalize: ' . Dumper(\%tags) );
 }

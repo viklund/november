@@ -25,10 +25,10 @@ is( ($t.norm_counts).perl, '{}', 'With empty tags_count norm_counts produce empt
 my $in = { foo => 5, bar => 5, baz => 2, her => 1 };
 $t.write_tags_count($in);
 
-is_deeply( $t.norm_counts, {"foo" => 10, "bar" => 10, "baz" => 4, "her" => 0}, 'Normalize all from: ' ~ $in.perl );
+is-deeply( $t.norm_counts, {"foo" => 10, "bar" => 10, "baz" => 4, "her" => 0}, 'Normalize all from: ' ~ $in.perl );
 
 my @tags = <foo baz>;
-is_deeply( $t.norm_counts(@tags), {"foo" => 10, "baz" => 4}, 'Normalize foo and baz from: ' ~ $in.perl );
+is-deeply( $t.norm_counts(@tags), {"foo" => 10, "baz" => 4}, 'Normalize foo and baz from: ' ~ $in.perl );
 
 
 $t.clear;

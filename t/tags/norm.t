@@ -24,7 +24,7 @@ for @counts_to_test -> @in, @expected {
     # So, second map work with wrong min and max
     my @out = map { $t.norm($_, $min, $max) }, @in.values;
 
-    is_deeply( @out, @expected, 'Normalize: ' ~ @in.perl );
+    is-deeply( @out, @expected, 'Normalize: ' ~ @in.perl );
 }
 
 # vim:ft=perl6
