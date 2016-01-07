@@ -2,6 +2,7 @@ use v6;
 
 use November::Storage;
 use November::Utils;
+use MONKEY-SEE-NO-EVAL;
 
 class November::Storage::File is November::Storage {
 
