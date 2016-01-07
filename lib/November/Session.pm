@@ -17,6 +17,7 @@ method remove_session($id) {
 }
 
 method read_sessions {
+    use MONKEY-SEE-NO-EVAL;
     return {} unless self.sessionfile-path.IO ~~ :e;
     my $string = slurp( self.sessionfile-path );
     my $stuff = EVAL( $string );
