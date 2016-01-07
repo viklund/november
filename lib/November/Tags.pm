@@ -1,6 +1,7 @@
 use v6;
 
 use November::Config;
+use MONKEY-SEE-NO-EVAL;
 
 class November::Tags {
     has $.page_tags_path is rw;
