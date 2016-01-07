@@ -6,6 +6,7 @@ class November { ... }
 use November::Session;
 use November::Cache;
 use Digest::SHA;
+use MONKEY-SEE-NO-EVAL;
 
 class November does November::Session does November::Cache {
 
@@ -192,7 +193,7 @@ class November does November::Session does November::Cache {
 
     method read_users {
         return {} unless $.config.userfile_path.IO ~~ :e;
-        return eval( slurp( $.config.userfile_path ) );
+        return EVAL( slurp( $.config.userfile_path ) );
     }
 
     method not_found($page?) {
