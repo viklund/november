@@ -165,7 +165,7 @@ class Text::Markup::Wiki::MediaWiki {
                 }
             }
 
-            take join '', map { "</$_>" }, reverse @style_stack;
+            take join '', map { "</$_>" if $_}, reverse @style_stack;
         }
 
         return sprintf '<%s>%s</%s>', $partype, $result, $partype;
