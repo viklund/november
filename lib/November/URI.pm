@@ -1,4 +1,4 @@
-class November::URI;
+unit class November::URI;
 
 # This class used to be called just 'URI', but there was a collision with
 # the eponymous class in the 'uri' project. Arguably, that class has more

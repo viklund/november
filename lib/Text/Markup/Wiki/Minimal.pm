@@ -1,4 +1,4 @@
-class Text::Markup::Wiki::Minimal;
+unit class Text::Markup::Wiki::Minimal;
 
 method format($text, :$link_maker, :$extlink_maker) {
     my @pars = grep { $_ ne "" },
