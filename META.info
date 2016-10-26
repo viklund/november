@@ -1,4 +1,5 @@
 {
+    "perl"        : "6.*",
     "name"        : "November",
     "version"     : "*",
     "author"      : "github:viklund",
