@@ -7,5 +7,5 @@ install:
   - docker run -t --entrypoint="/bin/sh" jjmerelo/test-perl6 -c "perl6 --version; which zef "
 
 script:
-  - docker run -t -v  /home/travis/build/JJ/p6-wikidata-API:/test jjmerelo/test-perl6
+  - docker run -t -v  /home/travis/build/JJ/november:/test jjmerelo/test-perl6
 
