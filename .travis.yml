@@ -1,10 +1,11 @@
-branches:
-  except:
-    - gh-pages
-language: perl6
-sudo: false
-perl6:
-  - latest
+services:
+  - docker
+
 install:
-  - rakudobrew build-panda
-  - panda installdeps .
+  - docker pull jjmerelo/test-perl6
+  - docker images
+  - docker run -t --entrypoint="/bin/sh" jjmerelo/test-perl6 -c "perl6 --version; which zef "
+
+script:
+  - docker run -t -v  /home/travis/build/JJ/november:/test jjmerelo/test-perl6
+
